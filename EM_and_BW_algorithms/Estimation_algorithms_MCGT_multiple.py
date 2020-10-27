@@ -7,7 +7,7 @@ from math import log
 #a 0. Il faut trouver une solution (normaliser le tout ??)
 
 
-class Estimation_algorithms_MCGT:
+class Estimation_algorithm_MCGT:
 	def __init__(self,h,alphabet):
 		"""
 		h is a MCGT
@@ -54,7 +54,6 @@ class Estimation_algorithms_MCGT:
 		sequences = list(set(sequences))
 		while True:
 			new_states = []
-			self.precomputeMatrices_multiple()
 			for i in range(len(self.h.states)):
 				next_probas = []
 				next_states = []
@@ -92,57 +91,7 @@ class Estimation_algorithms_MCGT:
 		#print("Duration:",time()-start_time)
 		return [self.logLikelihood(),time()-start_time]
 
-
-
-class BW_ON_MCGT(Estimation_algorithms_MCGT):
-	"""implementation of the Baun-Welch algorithm on Hidden Markov Model"""
-
-	def __init__(self,h,alphabet):
-		"""
-		h is a MCGT
-		alphabet is a list of the possible observations (list of strings)
-		"""
-		super().__init__(h,alphabet)
-
-	def gamma(self,s,k):
-		"""
-		Returns the probability to generate the kth obs of o in state s * bigK
-		Note: it's important to compute self.bigK before
-		"""
-		return self.alpha_matrix[s][k]*self.beta_matrix[s][k]/self.bigK
-
-	def xi(self,s1,s2,k):
-		"""
-		Returns the probabilty to move from state s1 to state s2 at time step k
-		Note: it's important to compute self.bigK and the TUKmatrix before
-		"""
-		return self.alpha_matrix[s1][k]*self.h.states[s1].g(s2,self.sequence[k])*self.beta_matrix[s2][k+1]/self.bigK
-
-	def computeK(self):
-		"""
-		Returns sum over ss of alpha(k-1,ss) * beta(ss,k)
-		"""
-		self.bigK = self.beta_matrix[self.h.initial_state][0]
-
-
-	def ghatmultiple(self,s1,s2,obs):
-		num = 0
-		den = 0
-		for seq in range(len(self.sequences[0])):
-			self.sequence = self.sequences[0][seq]
-			times = self.sequences[1][seq]
-			self.precomputeMatrices(self.sequence)
-			self.computeK()
-			for k in range(len(self.sequence)):
-				den += self.gamma(s1,k) * times
-				if self.sequence[k] == obs:
-					num += self.xi(s1,s2,k) * times
-		if den == 0:
-			#in this case we don't expect to reach s1 (except maybe at the end)
-			#so we don't care of this value
-			return 0.0
-		return num/den
-
+	
 	def precomputeMatrices(self,sequence):
 		"""Here we compute all the values alpha(k,t) and beta(t,k) for a given sequence"""
 		self.alpha_matrix = []
@@ -175,116 +124,41 @@ class BW_ON_MCGT(Estimation_algorithms_MCGT):
 						summ += self.beta_matrix[ss][1 if ss<s else 0]*p
 				self.beta_matrix[s].insert(0,summ)
 
-		print(self.alpha_matrix)
-		print()
-		print(self.beta_matrix)
 
-	def precomputeMatrices_multiple(self):
-		return None
-
-
-class EM_ON_MCGT(Estimation_algorithms_MCGT):
-	"""implementation of the Baun-Welch algorithm on Hidden Markov Model"""
-	def __init__(self,h,alphabet):
+	def gamma(self,s,k):
 		"""
-		h is a MCGT
-		alphabet is a list of the possible observations (list of strings)
+		Returns the probability to generate the kth obs of o in state s * bigK
+		Note: it's important to compute self.bigK before
 		"""
-		super().__init__(h,alphabet)
+		return self.alpha_matrix[s][k]*self.beta_matrix[s][k]/self.bigK
 
-	def ghat(self,t,u,o):
-		"""Here we use the TUKmatrix"""
+	def xi(self,s1,s2,k):
+		"""
+		Returns the probabilty to move from state s1 to state s2 at time step k
+		Note: it's important to compute self.bigK and the TUKmatrix before
+		"""
+		return self.alpha_matrix[s1][k]*self.h.states[s1].g(s2,self.sequence[k])*self.beta_matrix[s2][k+1]/self.bigK
+
+	def computeK(self):
+		"""
+		Returns sum over ss of alpha(k-1,ss) * beta(ss,k)
+		"""
+		self.bigK = self.beta_matrix[self.h.initial_state][0]
+
+	def ghatmultiple(self,s1,s2,obs):
 		num = 0
 		den = 0
-		for k in range(0,len(self.sequence)):
-			den += self.alpha_matrix[t][k]*self.beta_matrix[t][k]
-			if o == self.sequence[k]:
-				num += self.alpha_matrix[t][k]*self.h.states[t].g(u,self.sequence[k])*self.beta_matrix[u][k+1]
+		for seq in range(len(self.sequences[0])):
+			self.sequence = self.sequences[0][seq]
+			times = self.sequences[1][seq]
+			self.precomputeMatrices(self.sequence)
+			self.computeK()
+			for k in range(len(self.sequence)):
+				den += self.gamma(s1,k) * times
+				if self.sequence[k] == obs:
+					num += self.xi(s1,s2,k) * times
 		if den == 0:
-			return 0.0
-		return num/den
-
-	def precomputeMatrices_multiple(self):
-		"""Here we compute all the values alpha(k,t) and beta(t,k) for a set of sequences"""
-		self.alpha_matrix = []
-
-		for s in range(len(self.h.states)):
-			if s == self.h.initial_state:
-				self.alpha_matrix.append([1.0])
-			else:
-				self.alpha_matrix.append([0.0])
-		
-		for k in range(len(self.sequences[0][0])):
-			for s in range(len(self.h.states)):
-				summ = 0
-				for ss in range(len(self.h.states)):
-					p = 1
-					for seq in range(len(self.sequences[0])):
-						p *= self.h.states[ss].g(s,self.sequences[0][seq][k])**self.sequences[1][seq]
-					summ += self.alpha_matrix[ss][k]*p
-				self.alpha_matrix[s].append(summ)
-
-
-		self.beta_matrix = []
-
-		for s in range(len(self.h.states)):
-			self.beta_matrix.append([1.0])
-		
-		for k in range(len(self.sequences[0][0])-1,-1,-1):
-			for s in range(len(self.h.states)):
-				summ = 0
-				for ss in range(len(self.h.states)):
-					p = 1
-					for seq in range(len(self.sequences[0])):
-						p *= self.h.states[s].g(ss,self.sequences[0][seq][k])**self.sequences[1][seq]
-					summ += self.beta_matrix[ss][1 if ss<s else 0]*p
-				self.beta_matrix[s].insert(0,summ)
-
-
-	def ghatmultiple(self,t,u,o):
-		"""WARNING : HERE WE SUPPOSE THAT ALL THE SEQUENCES OF OBSERVATIONS HAVE THE SAME LENGTH"""
-		num = 0
-		den = 0
-
-		for k in range(0,len(self.sequences[0][0])):
-			
-			temp = self.alpha_matrix[t][k]*self.beta_matrix[t][k+1]
-			for seq in range(len(self.sequences[0])):
-				if self.sequences[0][seq][k] == o:
-					temp *= self.h.states[t].g(u,o) #if != we don't mutliply by 0 !!!!
-			num += temp 
-
-		for oprime in self.alphabet:
-			for uprime in range(len(self.h.states)):
-				for k in range(0,len(self.sequences[0][0])):
-					temp = self.alpha_matrix[t][k]*self.beta_matrix[t][k+1]
-					for seq in range(len(self.sequences[0])):
-						if self.sequences[0][seq][k] == oprime:
-							temp *= self.h.states[t].g(uprime,oprime) #if != we don't mutliply by 0 !!!!
-					den += temp
-
-		if den == 0:
-			return 0.0
-		return num/den
-
-	def ghatmultiple_badway(self,t,u,o):
-		num = 0
-		den = 0
-
-		for path in self.h.allStatesPathLength(len(self.sequences[0][0])):
-			p = 1
-			for seq in self.sequences[0]:
-				p *= self.h.probabilityStatesObservations(path,seq)
-			if p > 0.0:
-				c = 0
-				for seq in self.sequences[0]:
-					for k in range(len(seq)):
-						if seq[k] == o and path[k+1] == u and path[k] == t:
-							c += 1
-
-				num += p*c
-				den += p*path.count(t)
-
-		if den == 0:
+			#in this case we don't expect to reach s1 (except maybe at the end)
+			#so we don't care of this value
 			return 0.0
 		return num/den
