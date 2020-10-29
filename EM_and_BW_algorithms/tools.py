@@ -1,4 +1,10 @@
 from random import random
+from fractions import gcd
+from functools import reduce
+
+def find_gcd(ll):
+	x = reduce(gcd, ll)
+	return x
 
 def resolveRandom(m):
 	"""

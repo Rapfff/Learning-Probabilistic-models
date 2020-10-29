@@ -108,6 +108,7 @@ class Estimation_algorithms_MCGT:
 		self.h.pprint()
 		#print("probability:",round(self.problem1(sequence),4))
 		print("Duration:",time()-start_time)
+		return self.h
 
 
 
