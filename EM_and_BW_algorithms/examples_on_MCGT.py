@@ -47,10 +47,10 @@ def test3multiple(nb_runs,runs_length):
 
 	#res = []
 	print("With EM (same random initialization):")
-	res1 = Estimation_algorithm_MCGT(h,alphabet).problem3multiple([res_outputs,res_val])
-	#res.append(EM_ON_MCGT(h,alphabet).problem3multiple([res_outputs,res_val]))
+	algo = Estimation_algorithm_MCGT(h,alphabet)
+	res1 = algo.problem3multiple([res_outputs,res_val])
 	print(res1)
-	print()
+	algo.h.UPPAAL_convert("test")
 
 #test1("xbd")
 #test3("xada",5,['x','y','a','b','c','d'],RANDOM)

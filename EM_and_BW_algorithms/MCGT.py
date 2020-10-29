@@ -201,8 +201,7 @@ def UPPAAL_addState(idd,coords):
 	res  = "\t\t<location id=\"id"+str(idd)+"\""
 	res += " x=\""+str(coords[0])+"\"" 
 	res += " y=\""+str(coords[1])+"\">\n"
-	res  = "\t\t\t<name x=\""+str(coords[0])+"\" y=\""+str(coords[1])+"\">id"+str(idd)+"</name>\n"
-	res += "\t\t</location>\n"
+	res += "\t\t\t<name x=\""+str(coords[0])+"\" y=\""+str(coords[1])+"\">id"+str(idd)+"</name>\n"
 	res += "\t\t</location>\n"
 	return res
 
@@ -286,6 +285,4 @@ def UPPAAL_probas(next_mat,digits=3):
 			next_mat[2] = next_mat[2][:i] + next_mat[2][i+1:]
 			i -= 1
 		i += 1
-
-	print(next_mat)
 	return next_mat
