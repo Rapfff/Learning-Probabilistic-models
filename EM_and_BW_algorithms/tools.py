@@ -17,9 +17,9 @@ def resolveRandom(m):
 		i += 1
 	return i
 
-def correct_proba(ll,times=1):
+def correct_proba(ll,accuracy = 5,times=1):
 	diff = sum(ll)-1.0
-	res =  [round(i-diff/len(ll),5) for i in ll]
+	res =  [round(i-diff/len(ll),accuracy) for i in ll]
 	f = False
 	for i in range(len(res)):
 		if res[i]>1.0:

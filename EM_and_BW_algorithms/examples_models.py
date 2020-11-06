@@ -1,6 +1,7 @@
 from HMM import *
 from MCGT import *
 from MCGS import *
+from MDP import *
 from tools import randomProbabilities
 
 # ---- HMM ----------------------------
@@ -137,6 +138,16 @@ def modelMCGS1():
 	return MCGS([m_s0,m_s1,m_s2,m_s3,m_s4,m_s0x,m_s0y,m_s1a,m_s2b,m_s3c,m_s4d],[[1.0],[0]])
 
 
-# -------------------------------------
+# ---- MDP ----------------------------
 
-#modelMCGT_random(5,['x','y','a','b','c','d']).pprint()
+def modelMDP1():
+	m_s0 = MDP_state({'a': [[1.0],[1]], 'b': [[1.0],[2]]},"s0")
+	m_s1 = MDP_state({'a': [[0.8,0.2],[2,3]], 'b': [[0.9,0.1],[3,4]]},"s1")
+	m_s2 = MDP_state({'a': [[0.9,0.1],[6,4]]},"s2")
+	m_s3 = MDP_state({'a': [[0.9,0.1],[1,2]], 'b': [[1.0],[1]]},"s3")
+	m_s4 = MDP_state({'a': [[1.0],[5]]},"s4")
+	m_s5 = MDP_state({'a': [[1.0],[0]], 'b': [[1.0],[0]]},"s5")
+	m_s6 = MDP_state({'a': [[1.0],[4]], 'b': [[1.0],[4]]},"s6")
+	return MDP([m_s0,m_s1,m_s2,m_s3,m_s4,m_s5,m_s6],0)
+
+# -------------------------------------
