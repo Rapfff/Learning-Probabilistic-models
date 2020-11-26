@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.</declaration>
+	<template>
+		<name x="5" y="5">Template</name>
+		<location id="id0" x="300" y="0">
+			<name x="300" y="0">id0</name>
+		</location>
+		<location id="id1" x="92" y="285">
+			<name x="92" y="285">id1</name>
+		</location>
+		<location id="id2" x="-242" y="176">
+			<name x="-242" y="176">id2</name>
+		</location>
+		<location id="id3" x="-242" y="-176">
+			<name x="-242" y="-176">id3</name>
+		</location>
+		<location id="id4" x="92" y="-285">
+			<name x="92" y="-285">id4</name>
+		</location>
+		<branchpoint id="id5" x="250" y="0"></branchpoint>
+		<branchpoint id="id6" x="77" y="237"></branchpoint>
+		<branchpoint id="id7" x="-202" y="146"></branchpoint>
+		<branchpoint id="id8" x="-202" y="-146"></branchpoint>
+		<branchpoint id="id9" x="77" y="-237"></branchpoint>
+		<init ref="id0"/>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id5"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id4"/>
+			<label kind="comments" x="210" y="-82">x</label>
+			<label kind="probability" x="210" y="-62">489</label>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id4"/>
+			<label kind="comments" x="210" y="-82">y</label>
+			<label kind="probability" x="210" y="-62">511</label>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id6"/>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id1"/>
+			<label kind="comments" x="117" y="355">d</label>
+			<label kind="probability" x="117" y="375">258</label>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id2"/>
+			<label kind="comments" x="37" y="219">d</label>
+			<label kind="probability" x="37" y="239">421</label>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id3"/>
+			<label kind="comments" x="37" y="175">d</label>
+			<label kind="probability" x="37" y="195">320</label>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id7"/>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id1"/>
+			<label kind="comments" x="-162" y="154">d</label>
+			<label kind="probability" x="-162" y="174">314</label>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id2"/>
+			<label kind="comments" x="-242" y="166">d</label>
+			<label kind="probability" x="-242" y="186">13</label>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id3"/>
+			<label kind="comments" x="-242" y="-186">d</label>
+			<label kind="probability" x="-242" y="-166">173</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id8"/>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id1"/>
+			<label kind="comments" x="-162" y="-97">d</label>
+			<label kind="probability" x="-162" y="-77">847</label>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id2"/>
+			<label kind="comments" x="-242" y="166">d</label>
+			<label kind="probability" x="-242" y="186">112</label>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id3"/>
+			<label kind="comments" x="-242" y="-186">d</label>
+			<label kind="probability" x="-242" y="-166">41</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id9"/>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id1"/>
+			<label kind="comments" x="117" y="1145">b</label>
+			<label kind="probability" x="117" y="1165">233</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id1"/>
+			<label kind="comments" x="117" y="1145">a</label>
+			<label kind="probability" x="117" y="1165">186</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id1"/>
+			<label kind="comments" x="117" y="1145">c</label>
+			<label kind="probability" x="117" y="1165">126</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id2"/>
+			<label kind="comments" x="37" y="-195">b</label>
+			<label kind="probability" x="37" y="-175">120</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id2"/>
+			<label kind="comments" x="37" y="-195">a</label>
+			<label kind="probability" x="37" y="-175">100</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id2"/>
+			<label kind="comments" x="37" y="-195">c</label>
+			<label kind="probability" x="37" y="-175">139</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id3"/>
+			<label kind="comments" x="37" y="-239">b</label>
+			<label kind="probability" x="37" y="-219">57</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id3"/>
+			<label kind="comments" x="37" y="-239">a</label>
+			<label kind="probability" x="37" y="-219">8</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id3"/>
+			<label kind="comments" x="37" y="-239">c</label>
+			<label kind="probability" x="37" y="-219">32</label>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+Process = Template();
+// List one or more processes to be composed into a system.
+system Process;
+</system>
+	<queries>
+		<query>
+			<formula></formula>
+			<comment></comment>
+		</query>
+	</queries>
+</nta>
