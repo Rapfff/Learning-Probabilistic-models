@@ -25,13 +25,13 @@ class Estimation_algorithm_MCGT:
 		return True
 
 	def logLikelihood(self):
-		try:
-			return log(self.hhat.probabilityObservations(self.sequence))
-		except AttributeError:
-			res = 0
-			for i in range(len(self.sequences[0])):
-				res += log(self.hhat.probabilityObservations(self.sequences[0][i])) * self.sequences[1][i]
-			return res / sum(self.sequences[1])
+		res = 0
+		for i in range(len(self.sequences[0])):
+			p = self.hhat.probabilityObservations(self.sequences[0][i])
+			if p == 0:
+				return -256
+			res += log(p) * self.sequences[1][i]
+		return res / sum(self.sequences[1])
 
 	def problem1(self,sequence):
 		"""
@@ -75,7 +75,7 @@ class Estimation_algorithm_MCGT:
 			
 			currentloglikelihood = self.logLikelihood()
 			print("loglikelihood :",currentloglikelihood)
-			if self.checkEnd() or time() - start_time > 120 or prevloglikelihood == currentloglikelihood:
+			if self.checkEnd() or prevloglikelihood == currentloglikelihood:#or time() - start_time > 120
 				self.h = self.hhat
 				break
 			else:

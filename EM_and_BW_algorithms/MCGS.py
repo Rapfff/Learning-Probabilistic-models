@@ -21,19 +21,13 @@ class MCGS_state:
 
 class MCGS:
 
-	def __init__(self,states,initial_matrix):
-		"""
-		initial_matrix = [[proba_state1,proba_state2,...],[state1,state2,...]]
-		"""
-		if sum(initial_matrix[0]) < 1.0:
-			print("Sum of the probabilies of the initial_matrix should be 1.0")
-			return False
-		self.initial_matrix = initial_matrix
+	def __init__(self,states,initial_state):
+		self.initial_state = initial_state
 		self.states = states
 
 	def run(self,number_steps):
 		output = ""
-		current = self.initial_matrix[1][resolveRandom(self.initial_matrix[0])]
+		current = self.initial_state
 
 		while len(output) < number_steps:
 			output += self.states[current].generate()
@@ -51,4 +45,4 @@ def HMMtoMCGS(h):
 		offset += len(sh.output_matrix[0])
 		for sy in sh.output_matrix[1]:
 			new_states_m.append(MCGS_state(sy,sh.next_matrix))
-	return MCGS(states_m+new_states_m,h.initial_matrix)
+	return MCGS(states_m+new_states_m,h.initial_state)

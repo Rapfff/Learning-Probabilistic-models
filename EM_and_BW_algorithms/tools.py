@@ -1,4 +1,4 @@
-from random import random
+from random import random, randint
 from fractions import gcd
 from functools import reduce
 
@@ -45,3 +45,11 @@ def randomProbabilities(size):
 	rand.insert(0,0.0)
 	rand.append(1.0)
 	return [rand[i]-rand[i-1] for i in range(1,len(rand))]
+
+def randomLTL(depth, width, alphabet):
+	"""
+	Generate a random LTL formula given the depth, the width and the set of atomic prop (here set of observations).
+	We need to adapt it to the uppaal format.
+	"""
+
+
