@@ -74,8 +74,8 @@ def test3multiple(nb_runs,runs_length):
 fout = open("results.py",'w')
 
 
-min_state = 1
-max_state = 5
+min_state = 6
+max_state = 10
 
 runs_length = 6
 nb_runs_by_states = 10
@@ -131,6 +131,7 @@ for states in range(min_state,max_state+1):
 			fout.write(',')
 fout.close()
 
+"""
 from results import RES
 import matplotlib.pyplot as plt
 fig, ax = plt.subplots()
@@ -141,3 +142,4 @@ ax.set_xlabel('Number of states')
 ax.set_ylabel('loglikelihood')# add x-tick labels
 plt.setp(ax,xticks=[y + min_state for y in range(len(RES))], xticklabels=[str(y + min_state) for y in range(len(RES))])
 plt.show()
+"""
