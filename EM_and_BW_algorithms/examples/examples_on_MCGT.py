@@ -97,6 +97,8 @@ for i in range(1000):
 
 	training_set_val[training_set_seq.index(res)] += 1
 
+training_set = [training_set_seq,training_set_val]
+
 for i in range(100000): 
 	res = h.run(runs_length)
 	
@@ -106,6 +108,7 @@ for i in range(100000):
 
 	test_set_val[test_set_seq.index(res)] += 1
 
+test_set = [test_set_seq,test_set_val]
 
 alphabet = getAlphabetFromSequences(test_set_seq)
 fout.write("RES = [\n")
@@ -116,9 +119,8 @@ for states in range(min_state,max_state+1):
 		h = modelMCGT_random(states,alphabet)
 		print("estimating with",states," , run nb:", iii)
 		algo = Estimation_algorithm_MCGT(h, alphabet)
-		algo.problem3multiple([training_set_seq,training_set_val])
-		algo.sequences = [test_set_seq,test_set_val]
-		fout.write(str(algo.logLikelihood()))
+		algo.problem3multiple(training_set)
+		fout.write(str(algo.h.logLikelihood(test_set)))
 		if iii == nb_runs_by_states-1:
 			fout.write("]")
 			if states < max_state:

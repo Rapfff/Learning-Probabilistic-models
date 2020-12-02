@@ -1,3 +1,8 @@
+import os, sys
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+
 from HMM import *
 from MCGT import *
 from MCGS import *
@@ -92,6 +97,16 @@ def modelMCGT4():
 	g_s4 = MCGT_state([[1.0],[5],['d']])
 	g_s5 = MCGT_state([[1.0],[5],['e']])
 	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5],0)
+
+def modelMCGT_REBER():
+	g_s0 = MCGT_state([[1.0],[1],['B']])
+	g_s1 = MCGT_state([[0.5,0.5],[2,3],['T','P']])
+	g_s2 = MCGT_state([[0.6,0.4],[2,4],['S','X']])
+	g_s3 = MCGT_state([[0.7,0.3],[3,5],['T','V']])
+	g_s4 = MCGT_state([[0.5,0.5],[3,6],['X','S']])
+	g_s5 = MCGT_state([[0.5,0.5],[4,6],['P','V']])
+	g_s6 = MCGT_state([[1.0],[6],['E']])
+	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5,g_s6],0)
 
 def modelMCGT1_assist():
 	g_s0 = MCGT_state([randomProbabilities(6),[1,1,2,2,3,3],['x','y','x','y','x','y']])

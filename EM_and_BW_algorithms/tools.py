@@ -51,5 +51,15 @@ def randomLTL(depth, width, alphabet):
 	Generate a random LTL formula given the depth, the width and the set of atomic prop (here set of observations).
 	We need to adapt it to the uppaal format.
 	"""
-
+	h = randint(1,width)
+	a = [ [alphabet[i]] for i in range(h)]
+	if depth == 0:
+		return a
+	else:
+		res = []
+		b = randomLTL(depth-1,width,alphabet)
+		for i in a:
+			for j in b:
+				res.append(i+j)
+		return res
 

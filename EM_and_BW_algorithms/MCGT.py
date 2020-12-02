@@ -1,6 +1,6 @@
 from tools import resolveRandom, correct_proba, find_gcd
 from itertools import combinations_with_replacement
-from math import pi, sin, cos
+from math import pi, sin, cos, log
 
 class MCGT_state:
 
@@ -8,8 +8,8 @@ class MCGT_state:
 		"""
 		next_matrix = [[proba_transition1,proba_transition2,...],[transition1_state,transition2_state,...],[transition1_symbol,transition2_symbol,...]]
 		"""
-		if round(sum(next_matrix[0]),2) < 1.0:
-			print("Sum of the probabilies of the next_matrix should be 1.0 here it's ",sum(next_matrix[0]))
+		if round(sum(next_matrix[0]),2) < 1.0 and sum(next_matrix[0]) != 0:
+			print("Sum of the probabilies of the next_matrix should be 1 or 0 here it's ",sum(next_matrix[0]))
 			#return False
 		self.next_matrix = next_matrix
 
@@ -54,6 +54,15 @@ class MCGT:
 					print("s",i," - (",self.states[i].next_matrix[2][j],") -> s",self.states[i].next_matrix[1][j]," : ",self.states[i].next_matrix[0][j],sep='')
 		print()
 	
+	def logLikelihood(self,sequences):
+		res = 0
+		for i in range(len(sequences[0])):
+			p = self.probabilityObservations(sequences[0][i])
+			if p == 0:
+				return -256
+			res += log(p) * sequences[1][i]
+		return res / sum(sequences[1])
+
 	def allStatesPathIterative(self, start, obs_seq):
 		"""return all the states path from start that can generate obs_seq"""
 		res = []
@@ -80,6 +89,13 @@ class MCGT:
 		res = []
 		for i in list(combi)[:-1]:
 			res.append([self.initial_state]+list(i))
+		return res
+
+	def checkListOrLTL(self,lstprops):
+		res = 0.0
+		for i in lstprops:
+			#res += self.checkLTL(i)
+			res += self.probabilityObservations(i)
 		return res
 
 
@@ -196,6 +212,7 @@ def HMMtoMCGT(h):
 		states_g.append(MCGT_state(transitions))
 	return MCGT(states_g,h.initial_state)
 
+#UPPAAL PACK
 
 def UPPAAL_addState(idd,coords):
 	res  = "\t\t<location id=\"id"+str(idd)+"\""

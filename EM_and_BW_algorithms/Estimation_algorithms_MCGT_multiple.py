@@ -14,6 +14,7 @@ class Estimation_algorithm_MCGT:
 		alphabet is a list of the possible observations (list of strings)
 		"""
 		self.h = h
+		self.hhat = h
 		self.alphabet = alphabet
 
 	def checkEnd(self):
@@ -23,15 +24,6 @@ class Estimation_algorithm_MCGT:
 					if self.h.states[i].g(j,k) != self.hhat.states[i].g(j,k):
 						return False
 		return True
-
-	def logLikelihood(self):
-		res = 0
-		for i in range(len(self.sequences[0])):
-			p = self.hhat.probabilityObservations(self.sequences[0][i])
-			if p == 0:
-				return -256
-			res += log(p) * self.sequences[1][i]
-		return res / sum(self.sequences[1])
 
 	def problem1(self,sequence):
 		"""
@@ -45,7 +37,7 @@ class Estimation_algorithm_MCGT:
 		these sequences of observations.
 		sequences = [[sequence1,sequence2,...],[number_of_seq1,number_of_seq2,...]]
 		"""
-		prevloglikelihood = 999
+		prevloglikelihood = self.h.logLikelihood(sequences)
 		start_time = time()
 		self.sequences = sequences
 		sequences = ""
@@ -73,7 +65,7 @@ class Estimation_algorithm_MCGT:
 				new_states.append(MCGT_state([ next_probas, next_states, next_obs]))
 			self.hhat = MCGT(new_states,self.h.initial_state)
 			
-			currentloglikelihood = self.logLikelihood()
+			currentloglikelihood = self.hhat.logLikelihood(self.sequences)
 			print("loglikelihood :",currentloglikelihood)
 			if self.checkEnd() or prevloglikelihood == currentloglikelihood:#or time() - start_time > 120
 				self.h = self.hhat
@@ -89,7 +81,7 @@ class Estimation_algorithm_MCGT:
 			#print(self.sequences[0][i],round(self.problem1(self.sequences[0][i]),3),self.sequences[1][i]/total)
 		#print("\nAccuracy:",self.accuracy())
 		#print("Duration:",time()-start_time)
-		return [self.logLikelihood(),time()-start_time]
+		return [self.h.logLikelihood(self.sequences),time()-start_time]
 
 	
 	def precomputeMatrices(self,sequence):
