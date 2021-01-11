@@ -199,6 +199,11 @@ class MCGT:
 		document.close()
 
 
+def comparisonMCGTs(mcgt1,mcgt2,lstlstprops):
+	maxx = 0.0
+	for i in lstlstprops:
+		maxx = max ( maxx, abs(mcgt2.checkListOrLTL(i) - mcgt1.checkListOrLTL(i)) )
+	return maxx
 
 def HMMtoMCGT(h):
 	states_g = []
