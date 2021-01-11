@@ -2,6 +2,7 @@ from examples_models import modelMCGT4, modelMCGT_random
 from alergia import Alergia
 from Estimation_algorithms_MCGT_multiple import Estimation_algorithm_MCGT
 from time import time
+from numpy import mean
 
 alphabet = ['x','y','a','b','c','d','e']
 
@@ -22,7 +23,7 @@ for i in range(nb_runs):
 	res_val[res_outputs.index(res)] += 1
 trainning_set = [res_outputs,res_val]
 
-nb_runs = 1000
+nb_runs = 100000
 runs_length = 6
 
 res_outputs = []
@@ -46,13 +47,17 @@ modelAlergia.pprint()
 resAlergia = modelAlergia.logLikelihood(test_set)
 Alergia_duration = time()-start_time
 
-
-h = modelMCGT_random(8,alphabet)
-start_time = time()
-algo = Estimation_algorithm_MCGT(h, alphabet)
-algo.problem3multiple(trainning_set)
-resEM = algo.h.logLikelihood(test_set)
-EM_duration = time()-start_time
+EM_duration = []
+resEM = []
+for i in range(10):
+	h = modelMCGT_random(6,alphabet)
+	start_time = time()
+	algo = Estimation_algorithm_MCGT(h, alphabet)
+	algo.problem3multiple(trainning_set)
+	resEM.append( algo.h.logLikelihood(test_set) )
+	EM_duration.append( time()-start_time )
+EM_duration = mean(EM_duration)
+resEM = mean(resEM)
 
 
 start_time = time()
