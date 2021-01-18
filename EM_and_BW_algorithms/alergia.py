@@ -102,7 +102,6 @@ class Alergia:
 				return False
 			if not self.compatibleMerge(self.transitionStateAction(i,a),self.transitionStateAction(j,a)):
 				return False
-		print("Merging",self.states_lbl[i],self.states_lbl[j])
 		self.merge(i,j)
 		return True
 

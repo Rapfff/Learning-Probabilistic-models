@@ -7,27 +7,6 @@ from Estimation_algorithms_MDP import *
 from examples_models import modelMDP1
 from MDP import *
 
-def scheduler_MDP1_a(path, current):
-	if "a" in current.actions():
-		return "a"
-	else:
-		return "b"
-
-def scheduler_MDP1_b(path, current):
-	if "b" in current.actions():
-		return "b"
-	else:
-		return "a"
-
-def scheduler_MDP1_change(path,current):
-	actions = current.actions()
-	if len(actions) == 1:
-		return actions[0]
-	if len(path) == 1:
-		return "a"
-	return actions[(actions.index(path[-2])+1) % len(actions)] #path[-2] = last action
-
-
 def fullyobservable_sequences(mdp, scheduler, length_sequences, nb_sequences):
 	print("Real MDP:")
 	mdp.pprint()
@@ -45,7 +24,3 @@ def fullyobservable_blackbox(mdp, length_sequences, nb_sequences):
 	print("Learned MDP:")
 	Estimation_algorithm_fullyobservable_MDP().learnFromBlackBox(mdp, nb_sequences,length_sequences).pprint()
 
-
-
-m = modelMDP1()
-fullyobservable_blackbox(m, 10, 100) 

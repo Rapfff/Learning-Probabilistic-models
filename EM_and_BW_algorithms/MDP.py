@@ -1,11 +1,38 @@
 from tools import resolveRandom
 
+class FiniteMemoryScheduler:
+	def __init__(self,next_matrix,transition_matrix):
+	"""
+	next_matrix = {scheduler_state: [[proba1,proba2,...],[action1,action2,...]],
+				   scheduler_state: [[proba1,proba2,...],[action1,action2,...]],
+				   ...}
+	transition_matrix = {obs1: [scheduler_state_dest_if_current_state_=_0,scheduler_state_dest_if_current_state_=_1,...]
+						 obs2: [scheduler_state_dest_if_current_state_=_0,scheduler_state_dest_if_current_state_=_1,...]
+						 ...}
+	"""	
+		self.s = 0
+		self.next_matrix = next_matrix
+		self.transition_matrix = transition_matrix
+
+	def get_action(self):
+	"""return an action to execute by the agent"""
+		return self.next_matrix[self.s][1][resolveRandom(self.next_matrix[self.s][0])]
+
+	def add_observation(self,obs):
+	"""give to the scheduler the new observation seen by the agent"""
+		self.s = self.transition_matrix[obs][self.s]
+
+	def get_actions(self):
+	"""return the actions (and their probability) that the agent can execute now"""
+		return self.next_matrix[self.s]
+
+
 class MDP_state:
 
 	def __init__(self,next_matrix, obs):
 		"""
-		next_matrix = {action1 : [[proba_transition1,proba_transition2,...],[transition1_state,transition2_state,...]],
-					   action2 : [[proba_transition1,proba_transition2,...],[transition1_state,transition2_state,...]],
+		next_matrix = {action1 : [[proba_transition1,proba_transition2,...],[transition1_state,transition2_state,...],[transition1_obs,transition2_obs,...]],
+					   action2 : [[proba_transition1,proba_transition2,...],[transition1_state,transition2_state,...],[transition1_obs,transition2_obs,...]],
 					   ...}
 		"""
 		for action in next_matrix:
@@ -24,6 +51,14 @@ class MDP_state:
 	def actions(self):
 		return [i for i in self.next_matrix]
 
+	def g(self,action,state,obs):
+		if action not in self.actions:
+			return 0.0
+		for i in range(len(self.next_matrix[action][0])):
+			if self.next_matrix[action][1][i] == state and self.next_matrix[action][2][i]:
+				return self.next_matrix[action][0][i]
+		return 0.0
+
 
 class MDP:
 
@@ -38,18 +73,19 @@ class MDP:
 			return 0.0
 			
 	def run(self,number_steps,scheduler):
-		"""
-		scheduler(path, current) where path <string> is the path from now, current <MDP_state> is the current state
-		"""
 		output = [self.states[self.initial_state].observation]
 		actions = []
 		current = self.initial_state
 
 		while len(output) < number_steps+1:
-			action = scheduler(output, self.states[current])
-			next_state = self.states[current].next(action)
-			output.append(self.states[next_state].observation)
+			action = scheduler.get_action()
 			actions.append(action)
+			next_state = self.states[current].next(action)
+
+			observation = self.states[next_state].observation
+			output.append(observation)
+			scheduler.add_observation(observation)
+
 			current = next_state
 
 		return [output,actions]
@@ -64,13 +100,60 @@ class MDP:
 			print("observation  --",self.states[i].observation)
 		print()
 	
-	def probabilityStatesObservations(self,states_path, obs_seq):
-		"""return the probability to get this states_path generating this observations sequence"""
-		return None
+	def allStatesPathIterative(self, start, trace):
+		"""return all the states path from start that can generate trace"""
+		res = []
+		action = trace[0]
+		obs  = trace[1]
 
-	def probabilityObservations(self,obs_seq):
-		"""return the probability to get this observations sequence"""
-		return None
+		if not action in self.states[start].actions:
+			return []
+
+		for i in range(len(self.states[start].next_matrix[action][1])):
+
+			if self.states[start].next_matrix[action][0][i] > 0 and self.states[start].next_matrix[action][2][i] == obs:
+				if len(trace) == 2:
+					res.append([start,self.states[start].next_matrix[action][1][i]])
+				else:
+					t = self.allStatesPathIterative(self.states[start].next_matrix[action][1][i],trace[2:])
+					for j in t:
+						res.append([start]+j)
+		return res
+	
+	def allStatesPathTrace(self,trace):
+		"""return all the states path that can generate obs_seq"""
+		res = []
+		for j in self.allStatesPathIterative(self.initial_state,trace):
+			res.append(j)
+		return res
+
+	def probabilityStateTrace(self,states_path, trace):
+		"""return the probability to get this states_path generating this observations sequence"""
+		if states_path[0] != self.initial_state:
+			return 0.0
+		else:
+			res = 1.0
+		for i in range(len(states_path)-1):
+			if res == 0.0:
+				return 0.0
+			res *= self.states[states_path[i]].g(trace[i*2],states_path[i+1],trace[i*2+1])
+		return res
+
+	def probabilityTrace(self,trace):
+		"""return the probability to get this trace"""
+		res = 0
+		for p in self.allStatesPathTrace(trace):
+			res += self.probabilityStateTrace(p,trace)
+		return res
+
+	def logLikelihoodTraces(self,sequences):
+		res = 0
+		for i in range(len(sequences[0])):
+			p = self.probabilityTrace(sequences[0][i])
+			if p == 0:
+				return -256
+			res += log(p) * sequences[1][i]
+		return res / sum(sequences[1])
 
 
 	def UPPAAL_convert(self,outputfile="mcgt.xml"):

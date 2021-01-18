@@ -3,9 +3,12 @@ from alergia import Alergia
 from Estimation_algorithms_MCGT_multiple import Estimation_algorithm_MCGT
 from time import time
 from numpy import mean
+import matplotlib.pyplot as plt
 
 alphabet = ['x','y','a','b','c','d','e']
 
+
+# TRAINING SET
 nb_runs = 1000
 runs_length = 6
 
@@ -23,6 +26,7 @@ for i in range(nb_runs):
 	res_val[res_outputs.index(res)] += 1
 trainning_set = [res_outputs,res_val]
 
+# TEST SET
 nb_runs = 100000
 runs_length = 6
 
@@ -40,13 +44,25 @@ for i in range(nb_runs):
 test_set = [res_outputs,res_val]
 
 
-start_time = time()
-modelAlergia = Alergia(trainning_set,0.05)
-modelAlergia = modelAlergia.learn()
-modelAlergia.pprint()
-resAlergia = modelAlergia.logLikelihood(test_set)
-Alergia_duration = time()-start_time
+#start_time = time()
+resAlergia = []
+xx = [i*0.05 for i in range(1,19)]
+for alpha in xx:
+	print(alpha)
+	modelAlergia = Alergia(trainning_set,alpha)
+	modelAlergia = modelAlergia.learn()
+	#modelAlergia.pprint()
+	resAlergia.append(modelAlergia.logLikelihood(test_set))
+print(resAlergia)
+#Alergia_duration = time()-start_time
 
+fig, ax = plt.subplots()
+ax.plot(xx,resAlergia)
+ax.set_xlabel('alpha')
+ax.set_ylabel('loglikelihood')
+plt.show()
+
+"""
 EM_duration = []
 resEM = []
 for i in range(10):
@@ -69,3 +85,4 @@ EM_Alergia_duration = time()-start_time + Alergia_duration
 print("               |  ALERGIA   |     EM     | ALERGIA+EM |")
 print(" logLikelihood | "+str(resAlergia)[:10]+" | "+str(resEM)[:10]+" | "+str(resEM_Alergia)[:10]+" | ")
 print("   duration    |    "+str(Alergia_duration)[:4]+"    |    "+str(EM_duration)[:4]+"    |    "+str(EM_Alergia_duration)[:4]+"    | ")
+"""
