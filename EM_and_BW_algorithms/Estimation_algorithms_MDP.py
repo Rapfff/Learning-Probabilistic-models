@@ -8,7 +8,7 @@ class Estimation_algorithm_fullyobservable_MDP:
 		None
 
 	def learnFromSequences(self,sequences):
-	"""Passive learning: we already have the training set"""
+		"""Passive learning: we already have the training set"""
 		actions_id = []
 		for seq in sequences:
 			for j in seq[1]:
@@ -52,7 +52,7 @@ class Estimation_algorithm_fullyobservable_MDP:
 		return MDP(states,states_id.index(sequences[0][0][0]))
 
 	def learnFromBlackBox(self,black_box,l,length_exp):
-	"""Active learning: we have access to the MDP and we generate the sequences"""
+		"""Active learning: we have access to the MDP and we generate the sequences"""
 
 		#TO DO: we need to bui scheduler_random
 		sequences = []
@@ -78,9 +78,19 @@ class Estimation_algorithm_MDP:
 			for j in range(len(self.h.states)):
 				for act in self.actions:
 					for k in self.alphabet:
-						if self.h.states[i].g(act,j,k) != self.hhat.states[i].g(act,j,k):
+						if self.h_g(i,act,j,k) != self.g_hhat(i,act,j,k):
 							return False
 		return True
+
+	def h_g(self,s1,act,s2,obs):
+		if self.h.states[s2].observations != obs:
+			return 0.0
+		return self.h.states[i].g(act,j)
+
+	def hhat_g(self,s1,act,s2,obs):
+		if self.hhat.states[s2].observations != obs:
+			return 0.0
+		return self.hhat.states[i].g(act,j)
 
 	def problem3(self,traces):
 		"""
@@ -141,7 +151,7 @@ class Estimation_algorithm_MDP:
 		return [self.h.logLikelihood(traces),time()-start_time]
 
 	
-def precomputeMatrices(self,sequence,actions):
+	def precomputeMatrices(self,sequence,actions):
 		"""Here we compute all the values alpha(k,t) and beta(t,k) for a given sequence"""
 		self.alpha_matrix = []
 
@@ -155,7 +165,7 @@ def precomputeMatrices(self,sequence,actions):
 			for s in range(len(self.h.states)):
 				summ = 0
 				for ss in range(len(self.h.states)):
-					p = self.h.states[ss].g(actions[k],s,sequence[k])
+					p = self.h_g(ss,actions[k],s,sequence[k])
 					summ += self.alpha_matrix[ss][k]*p
 				self.alpha_matrix[s].append(summ)
 
@@ -168,7 +178,7 @@ def precomputeMatrices(self,sequence,actions):
 			for s in range(len(self.h.states)):
 				summ = 0
 				for ss in range(len(self.h.states)):
-					p = self.h.states[s].g(actions[k],ss,sequence[k])
+					p = self.h_g(s,actions[k],ss,sequence[k])
 					if p > 0:
 						summ += self.beta_matrix[ss][1 if ss<s else 0]*p
 				self.beta_matrix[s].insert(0,summ)
@@ -180,12 +190,12 @@ def precomputeMatrices(self,sequence,actions):
 		"""
 		return self.alpha_matrix[s][k]*self.beta_matrix[s][k]/self.bigK
 
-	def xi(self,s1,s2,k):
+	def xi(self,action,s1,s2,k):
 		"""
 		Returns the probabilty to move from state s1 to state s2 at time step k
 		Note: it's important to compute self.bigK and the TUKmatrix before
 		"""
-		return self.alpha_matrix[s1][k]*self.h.states[s1].g(s2,self.sequence[k])*self.beta_matrix[s2][k+1]/self.bigK
+		return self.alpha_matrix[s1][k]*self.h_g(s1,action,s2,self.sequence[k])*self.beta_matrix[s2][k+1]/self.bigK
 
 	def computeK(self):
 		"""
@@ -215,6 +225,6 @@ def precomputeMatrices(self,sequence,actions):
 			for k in range(len(self.sequence)):
 				den[self.actions.index(actions[k])] += self.gamma(s1,k) * times
 				if self.sequence[k] == obs:
-					num[self.actions.index(actions[k])] += self.xi(s1,s2,k) * times
+					num[self.actions.index(actions[k])] += self.xi(actions[k],s1,s2,k) * times
 		
 		return [num[i]/den[i] if den[i] != 0.0 else 0.0 for i in range(len(num))]

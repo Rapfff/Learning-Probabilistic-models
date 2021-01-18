@@ -2,28 +2,29 @@ from tools import resolveRandom
 
 class FiniteMemoryScheduler:
 	def __init__(self,next_matrix,transition_matrix):
-	"""
-	next_matrix = {scheduler_state: [[proba1,proba2,...],[action1,action2,...]],
-				   scheduler_state: [[proba1,proba2,...],[action1,action2,...]],
-				   ...}
-	transition_matrix = {obs1: [scheduler_state_dest_if_current_state_=_0,scheduler_state_dest_if_current_state_=_1,...]
-						 obs2: [scheduler_state_dest_if_current_state_=_0,scheduler_state_dest_if_current_state_=_1,...]
-						 ...}
-	"""	
+		"""
+		next_matrix = {scheduler_state: [[proba1,proba2,...],[action1,action2,...]],
+					   scheduler_state: [[proba1,proba2,...],[action1,action2,...]],
+					   ...}
+		transition_matrix = {obs1: [scheduler_state_dest_if_current_state_=_0,scheduler_state_dest_if_current_state_=_1,...]
+							 obs2: [scheduler_state_dest_if_current_state_=_0,scheduler_state_dest_if_current_state_=_1,...]
+							 ...}
+		"""	
 		self.s = 0
 		self.next_matrix = next_matrix
 		self.transition_matrix = transition_matrix
 
 	def get_action(self):
-	"""return an action to execute by the agent"""
+		"""return an action to execute by the agent"""
 		return self.next_matrix[self.s][1][resolveRandom(self.next_matrix[self.s][0])]
 
 	def add_observation(self,obs):
-	"""give to the scheduler the new observation seen by the agent"""
-		self.s = self.transition_matrix[obs][self.s]
+		"""give to the scheduler the new observation seen by the agent"""
+		if obs in self.transition_matrix:
+			self.s = self.transition_matrix[obs][self.s]
 
 	def get_actions(self):
-	"""return the actions (and their probability) that the agent can execute now"""
+		"""return the actions (and their probability) that the agent can execute now"""
 		return self.next_matrix[self.s]
 
 
@@ -31,8 +32,8 @@ class MDP_state:
 
 	def __init__(self,next_matrix, obs):
 		"""
-		next_matrix = {action1 : [[proba_transition1,proba_transition2,...],[transition1_state,transition2_state,...],[transition1_obs,transition2_obs,...]],
-					   action2 : [[proba_transition1,proba_transition2,...],[transition1_state,transition2_state,...],[transition1_obs,transition2_obs,...]],
+		next_matrix = {action1 : [[proba_transition1,proba_transition2,...],[transition1_state,transition2_state,...]],
+					   action2 : [[proba_transition1,proba_transition2,...],[transition1_state,transition2_state,...]]
 					   ...}
 		"""
 		for action in next_matrix:
@@ -51,11 +52,11 @@ class MDP_state:
 	def actions(self):
 		return [i for i in self.next_matrix]
 
-	def g(self,action,state,obs):
+	def g(self,action,state):
 		if action not in self.actions:
 			return 0.0
 		for i in range(len(self.next_matrix[action][0])):
-			if self.next_matrix[action][1][i] == state and self.next_matrix[action][2][i]:
+			if self.next_matrix[action][1][i] == state:
 				return self.next_matrix[action][0][i]
 		return 0.0
 
@@ -73,22 +74,26 @@ class MDP:
 			return 0.0
 			
 	def run(self,number_steps,scheduler):
-		output = [self.states[self.initial_state].observation]
-		actions = []
+		#output = [self.states[self.initial_state].observation]
+		res = []
+		#actions = []
 		current = self.initial_state
 
-		while len(output) < number_steps+1:
+		while len(res)/2 < number_steps:
 			action = scheduler.get_action()
-			actions.append(action)
+			#actions.append(action)
+			res.append(action)
 			next_state = self.states[current].next(action)
 
 			observation = self.states[next_state].observation
-			output.append(observation)
+			#output.append(observation)
+			res.append(observation)
 			scheduler.add_observation(observation)
 
 			current = next_state
 
-		return [output,actions]
+		#return [output,actions]
+		return res
 
 	def pprint(self):
 		for i in range(len(self.states)):
@@ -111,7 +116,7 @@ class MDP:
 
 		for i in range(len(self.states[start].next_matrix[action][1])):
 
-			if self.states[start].next_matrix[action][0][i] > 0 and self.states[start].next_matrix[action][2][i] == obs:
+			if self.states[start].next_matrix[action][0][i] > 0 and self.states[self.states[start].next_matrix[action][1][i]].observation == obs:
 				if len(trace) == 2:
 					res.append([start,self.states[start].next_matrix[action][1][i]])
 				else:
@@ -136,7 +141,7 @@ class MDP:
 		for i in range(len(states_path)-1):
 			if res == 0.0:
 				return 0.0
-			res *= self.states[states_path[i]].g(trace[i*2],states_path[i+1],trace[i*2+1])
+			res *= self.states[states_path[i]].g(trace[i*2],states_path[i+1])
 		return res
 
 	def probabilityTrace(self,trace):
