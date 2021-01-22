@@ -1,7 +1,7 @@
 from MDP import *
 from tools import correct_proba
 from random import randint
-
+from time import time
 # a MDP is fully observable if the obs in each state is unique (for all s,s' s.t. s != s' then s.obs != s'.obs )
 class Estimation_algorithm_fullyobservable_MDP:
 	def __init__(self):
@@ -82,15 +82,26 @@ class Estimation_algorithm_MDP:
 							return False
 		return True
 
+	def checkEndLikelihood(self,c):
+		if c < 10:
+			self.prevloglikelihood = -256
+			print(c)
+			return False
+		
+		currentloglikelihood = self.hhat.logLikelihoodTraces(traces)
+		print(c,"- loglikelihood :",currentloglikelihood)
+		if self.prevloglikelihood == currentloglikelihood:
+			self.prevloglikelihood = currentloglikelihood
+			return True
+		else:
+			self.prevloglikelihood = currentloglikelihood
+			return False
+
 	def h_g(self,s1,act,s2,obs):
-		if self.h.states[s2].observations != obs:
-			return 0.0
-		return self.h.states[i].g(act,j)
+		return self.h.states[s1].g(act,s2,obs)
 
 	def hhat_g(self,s1,act,s2,obs):
-		if self.hhat.states[s2].observations != obs:
-			return 0.0
-		return self.hhat.states[i].g(act,j)
+		return self.hhat.states[s1].g(act,s2,obs)
 
 	def problem3(self,traces):
 		"""
@@ -102,9 +113,9 @@ class Estimation_algorithm_MDP:
 		traces = [[trace1,trace2,...],[number_of_trace1,number_of_trace2,...]]
 		trace = [action,obs1,action2,obs2,...,actionx,obsx]
 		"""
-		prevloglikelihood = self.h.logLikelihood(traces)
 		start_time = time()
-		self.sequences = traces
+		self.traces = traces
+		counter = 0
 
 		observations = []
 		for seq in traces:
@@ -139,16 +150,15 @@ class Estimation_algorithm_MDP:
 
 			self.hhat = MDP(new_states,self.h.initial_state)
 			
-			currentloglikelihood = self.hhat.logLikelihood(traces)
-			print("loglikelihood :",currentloglikelihood)
-			if self.checkEnd() or prevloglikelihood == currentloglikelihood:
+			counter += 1
+			if self.checkEnd() or self.checkEndLikelihood(counter):
 				self.h = self.hhat
 				break
 			else:
-				prevloglikelihood = currentloglikelihood
 				self.h = self.hhat
+
 		self.h.pprint()
-		return [self.h.logLikelihood(traces),time()-start_time]
+		return [self.prevloglikelihood,time()-start_time]
 
 	
 	def precomputeMatrices(self,sequence,actions):
