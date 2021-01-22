@@ -4,7 +4,7 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
 from Estimation_algorithms_MDP import *
-from examples_models import modelMDP2, scheduler_MDP2_random
+from examples_models import modelMDP1_fullyobservable, modelMDP_random, scheduler_random
 from MDP import *
 
 def fullyobservable_sequences(mdp, scheduler, length_sequences, nb_sequences):
@@ -26,22 +26,25 @@ def fullyobservable_blackbox(mdp, length_sequences, nb_sequences):
 
 
 
-m = modelMDP2()
-s = scheduler_MDP2_random()
+
+alphabet = ['0','1','2','3','4','5','6']
+actions = ['a','b']
+m = modelMDP1_fullyobservable()
+s = scheduler_random(actions)
 
 training_set_seq = []
 training_set_val = []
 
-for i in range(1000):
-	trace = m.run(10, s)
+for i in range(100):
+	trace = m.run(5, s)
 
 	if not trace in training_set_seq:
-		training_set_seq.append(res)
+		training_set_seq.append(trace)
 		training_set_val.append(0)
 
 	training_set_val[training_set_seq.index(trace)] += 1
 
 training_set = [training_set_seq,training_set_val]
 
-algo = Estimation_algorithms_MDP(??,['tl','t','tr','l','n','r','bl','b','br'],['t','l','b','r'])
-algo.problem3(training_set)
+algo = Estimation_algorithm_MDP(modelMDP_random(12,alphabet,actions),alphabet, actions)
+print(algo.problem3(training_set))

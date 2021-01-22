@@ -171,14 +171,91 @@ def modelMCGS1():
 
 # ---- MDP ----------------------------
 
-def modelMDP1():
-	m_s0 = MDP_state({'a': [[1.0],[1]], 'b': [[1.0],[2]]},"s0")
-	m_s1 = MDP_state({'a': [[0.8,0.2],[2,3]], 'b': [[0.9,0.1],[3,4]]},"s1")
-	m_s2 = MDP_state({'a': [[0.9,0.1],[6,4]]},"s2")
-	m_s3 = MDP_state({'a': [[0.9,0.1],[1,2]], 'b': [[1.0],[1]]},"s3")
-	m_s4 = MDP_state({'a': [[1.0],[5]]},"s4")
-	m_s5 = MDP_state({'a': [[1.0],[0]], 'b': [[1.0],[0]]},"s5")
-	m_s6 = MDP_state({'a': [[1.0],[4]], 'b': [[1.0],[4]]},"s6")
+def modelMDP_random(nb_states,alphabet,actions):
+	s = []
+	for i in range(nb_states):
+		s += [i] * len(alphabet)
+	obs = alphabet*nb_states
+	
+	states = []
+	for i in range(nb_states):
+		dic = {}
+		for act in actions:
+			dic[act] = [randomProbabilities(len(obs)),s,obs]
+		states.append(MDP_state(dic))
+	return MDP(states,0)
+
+def modelMDP1_fullyobservable():
+	m_s0 = MDP_state({'a': [[1.0],[1],['1']], 'b': [[1.0],[2],['2']]})
+	m_s1 = MDP_state({'a': [[0.8,0.2],[2,3],['2','3']], 'b': [[0.9,0.1],[3,4],['3','4']]})
+	m_s2 = MDP_state({'a': [[0.9,0.1],[6,4],['6','4']], 'b': [[1.0],[2],['2']]})
+	m_s3 = MDP_state({'a': [[0.9,0.1],[1,2],['1','2']], 'b': [[1.0],[1],['1']]})
+	m_s4 = MDP_state({'a': [[1.0],[5],['5']], 'b': [[1.0],[2],['4']]})
+	m_s5 = MDP_state({'a': [[1.0],[0],['0']], 'b': [[1.0],[0],['0']]})
+	m_s6 = MDP_state({'a': [[1.0],[4],['4']], 'b': [[1.0],[4],['4']]})
 	return MDP([m_s0,m_s1,m_s2,m_s3,m_s4,m_s5,m_s6],0)
+
+def modelMDP2():
+	# x*y grid
+	# starting point : (x_init,y_init)
+	# p : prob of deplacement failure
+	x,y = 4,3
+	x_init,y_init = 0,0
+	p = 0.2
+
+	target_obs = []
+	for i in range(y):
+		target_obs.append([])	
+		if i == 0:
+			preobs = 't'
+		elif i == y-1:
+			preobs = 'b'
+		else:
+			preobs = ''
+		
+		for j in range(x):
+			if j == 0:
+				target_obs[-1].append(preobs+'l')
+			elif j == x-1:
+				target_obs[-1].append(preobs+'r')
+			elif preobs == '':
+				target_obs[-1].append('n')
+			else:
+				target_obs[-1].append(preobs)
+
+
+	states = []
+	pos = 0
+	for i in range(y):
+		for j in range(x):
+			dic = {}
+			if i == 0:
+				dic['t'] = [ [1.0], [pos], [target_obs[i][j]] ]
+			else:
+				dic['t'] = [ [1.0-p,p], [pos - x, pos], [target_obs[i-1][j],target_obs[i][j]] ]
+
+			if i == y-1:
+				dic['b'] = [ [1.0],[pos], [target_obs[i][j]] ]
+			else:
+				dic['b'] = [ [1.0-p,p],[pos + x, pos], [target_obs[i+1][j],target_obs[i][j]] ]
+
+			if j == 0:
+				dic['l'] = [ [1.0],[pos], [target_obs[i][j]] ]
+			else:
+				dic['l'] = [ [1.0-p,p],[pos - 1, pos], [target_obs[i][j-1],target_obs[i][j]] ]
+
+			if j == x-1:
+				dic['r'] = [ [1.0],[pos], [target_obs[i][j]] ]
+			else:
+				dic['r'] = [ [1.0-p,p],[pos + 1, pos], [target_obs[i][j+1],target_obs[i][j]] ]
+
+			states.append(MDP_state(dic))
+			pos += 1
+
+	return MDP(states, y_init*x+x_init )
+
+
+def scheduler_random(actions):
+	return FiniteMemoryScheduler({0:[[1/len(actions)]*len(actions),actions]},{})
 
 # -------------------------------------
