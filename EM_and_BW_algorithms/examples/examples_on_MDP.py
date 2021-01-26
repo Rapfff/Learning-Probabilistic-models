@@ -4,7 +4,7 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
 from Estimation_algorithms_MDP import *
-from examples_models import modelMDP1_fullyobservable, modelMDP_random, scheduler_random
+from examples_models import modelMDP1_fullyobservable, modelMDP3, modelMDP_random, scheduler_random
 from MDP import *
 
 def fullyobservable_sequences(mdp, scheduler, length_sequences, nb_sequences):
@@ -45,6 +45,7 @@ for i in range(100):
 	training_set_val[training_set_seq.index(trace)] += 1
 
 training_set = [training_set_seq,training_set_val]
-
-algo = Estimation_algorithm_MDP(modelMDP_random(12,alphabet,actions),alphabet, actions)
+m = modelMDP_random(7,alphabet,actions)
+m.pprint()
+algo = Estimation_algorithm_MDP(m, alphabet, actions)
 print(algo.problem3(training_set))
