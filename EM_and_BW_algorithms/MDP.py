@@ -45,7 +45,7 @@ class MDP_state:
 
 	def next(self,action):
 		if not action in self.next_matrix:
-			print("ACTION",action,"is not available in state",self.observation)
+			print("ACTION",action,"is not available in state")
 		c = resolveRandom(self.next_matrix[action][0])
 		return [self.next_matrix[action][1][c],self.next_matrix[action][2][c]]
 
@@ -100,8 +100,7 @@ class MDP:
 			for action in self.states[i].next_matrix:
 				for j in range(len(self.states[i].next_matrix[action][0])):
 					if self.states[i].next_matrix[action][0][j] > 0.0:
-						print("s",i," - (",action,") -> s",self.states[i].next_matrix[action][1][j]," : ",self.states[i].next_matrix[action][0][j],sep='')
-			print("observation  --",self.states[i].observation)
+						print("s",i," - (",action,") -> s",self.states[i].next_matrix[action][1][j]," : ",self.states[i].next_matrix[action][2][j],' : ',self.states[i].next_matrix[action][0][j],sep='')
 		print()
 	
 	def allStatesPathIterative(self, start, trace):
@@ -153,7 +152,6 @@ class MDP:
 	def logLikelihoodTraces(self,sequences):
 		res = 0
 		for i in range(len(sequences[0])):
-			print(i)
 			p = self.probabilityTrace(sequences[0][i])
 			if p == 0:
 				return -256

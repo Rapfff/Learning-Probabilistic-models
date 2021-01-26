@@ -78,7 +78,7 @@ class Estimation_algorithm_MDP:
 			for j in range(len(self.h.states)):
 				for act in self.actions:
 					for k in self.alphabet:
-						if self.h_g(i,act,j,k) != self.g_hhat(i,act,j,k):
+						if self.h_g(i,act,j,k) != self.hhat_g(i,act,j,k):
 							return False
 		return True
 
@@ -88,7 +88,7 @@ class Estimation_algorithm_MDP:
 			print(c)
 			return False
 		
-		currentloglikelihood = self.hhat.logLikelihoodTraces(traces)
+		currentloglikelihood = self.hhat.logLikelihoodTraces(self.traces)
 		print(c,"- loglikelihood :",currentloglikelihood)
 		if self.prevloglikelihood == currentloglikelihood:
 			self.prevloglikelihood = currentloglikelihood
@@ -118,7 +118,7 @@ class Estimation_algorithm_MDP:
 		counter = 0
 
 		observations = []
-		for seq in traces:
+		for seq in traces[0]:
 			for i in range(1,len(seq),2):
 				if not seq[i] in observations:
 					observations.append(seq[i])
