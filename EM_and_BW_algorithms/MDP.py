@@ -82,6 +82,9 @@ class MDP:
 		while len(res)/2 < number_steps:
 			action = scheduler.get_action()
 			#actions.append(action)
+			while action not in self.states[current].next_matrix:
+				action = scheduler.get_action()
+
 			res.append(action)
 			next_state, observation = self.states[current].next(action)
 
