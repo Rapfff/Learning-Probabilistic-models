@@ -259,6 +259,12 @@ def modelMDP3():
 	m_s1 = MDP_state({'a': [[0.8,0.2],[0,1],['0','1']], 'b': [[0.9,0.1],[1,0],['1','0']]})
 	return MDP([m_s0,m_s1],0)
 
+def modelMDP4():
+	m_s0 = MDP_state({'a': [[0.25,0.75],[2,1],['C','B']], 'b': [[1.0],[0],['A']]})
+	m_s1 = MDP_state({'b': [[1.0],[0],['B']]})
+	m_s2 = MDP_state({'a': [[1.0],[2],['C']]})
+	return MDP([m_s0,m_s1,m_s2],0)
+
 
 def scheduler_random(actions):
 	return FiniteMemoryScheduler({0:[[1/len(actions)]*len(actions),actions]},{})
