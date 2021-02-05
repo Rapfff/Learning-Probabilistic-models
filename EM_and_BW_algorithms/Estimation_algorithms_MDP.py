@@ -62,7 +62,7 @@ class Estimation_algorithm_fullyobservable_MDP:
 
 
 
-class Estimation_algorithm_MDP:
+class Estimation_algorithm_MDP_sequences:
 	def __init__(self,h,alphabet,actions):
 		"""
 		h is a MDP

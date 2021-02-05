@@ -157,6 +157,7 @@ class MDP:
 		for i in range(len(sequences[0])):
 			p = self.probabilityTrace(sequences[0][i])
 			if p == 0:
+				print(sequences[0][i])
 				return -256
 			res += log(p) * sequences[1][i]
 		return res / sum(sequences[1])
