@@ -27,9 +27,9 @@ def fullyobservable_blackbox(mdp, length_sequences, nb_sequences):
 
 
 
-alphabet = ['0','1','2','3','4','5','6']
+alphabet = ['0','1']
 actions = ['a','b']
-m = modelMDP1_fullyobservable()
+m = modelMDP3()
 s = scheduler_random(actions)
 
 training_set_seq = []
@@ -45,7 +45,11 @@ for i in range(100):
 	training_set_val[training_set_seq.index(trace)] += 1
 
 training_set = [training_set_seq,training_set_val]
-m = modelMDP_random(7,alphabet,actions)
+m = modelMDP_random(3,alphabet,actions)
 m.pprint()
-algo = Estimation_algorithm_MDP(m, alphabet, actions)
-print(algo.problem3(training_set))
+
+#algo = Estimation_algorithm_MDP_sequences(m, alphabet, actions)
+#print(algo.problem3(training_set))
+
+algo = Estimation_algorithm_MDP_schedulers(m, alphabet, actions)
+print(algo.problem3([s,training_set]))
