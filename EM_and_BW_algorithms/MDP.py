@@ -47,9 +47,9 @@ class FiniteMemoryScheduler:
 		"""given a scheduler state and an action return the probability to execute this action in this state"""
 		if state == None:
 			state = self.s
-		if not action in self.transition_matrix[state][1]:
+		if not action in self.action_matrix[state][1]:
 			return 0
-		return self.action_matrix[state][0][self.transition_matrix[state][1].index(action)]
+		return self.action_matrix[state][0][self.action_matrix[state][1].index(action)]
 
 
 class MDP_state:
@@ -77,6 +77,7 @@ class MDP_state:
 
 	def g(self,action,state,obs):
 		if action not in self.actions():
+			print("Not",action,"in",self.actions())
 			return 0.0
 		for i in range(len(self.next_matrix[action][0])):
 			if self.next_matrix[action][1][i] == state and self.next_matrix[action][2][i] == obs:
@@ -175,7 +176,7 @@ class MDP:
 
 	#-------------------------------------------
 	def allStatesPathObservations(self,seq_obs):
-		res = [[0]]
+		res = [[self.initial_state]]
 		c = 0
 		while c < len(seq_obs):
 			new = []
@@ -186,17 +187,19 @@ class MDP:
 							new.append(p+[act,seq_obs[c],s])
 			c += 1
 			res = new
+		print(res)
 		return res
 
 	def probabilityStateActionObservationWithScheduler(self,path,scheduler):
 		scheduler.reset()
 		c = 0
 		p = 1
-		while p > 0.0 and c < len(path):
+		while p > 0.0 and c < len(path)-1:
 			p *= scheduler.get_probability(path[c+1])
 			p *= self.g(path[c],path[c+1],path[c+3],path[c+2])
 			scheduler.add_observation(path[c+2])
 			c += 3
+		print(path,p)
 		return p
 
 	def probabilityObservationsScheduler(self,seq_obs,scheduler):
@@ -212,7 +215,9 @@ class MDP:
 		for scheduler,sequences in data:
 			nb_seq += sum(sequences[1])
 			for i in range(len(sequences[0])):
+				print(sequences[0][i],sequences[1][i])
 				p = self.probabilityObservationsScheduler(sequences[0][i],scheduler)
+				print(p)
 				if p == 0:
 					return -256
 				res += log(p) * sequences[1][i]

@@ -2,64 +2,6 @@ from MDP import *
 from tools import correct_proba
 from random import randint
 from time import time
-# a MDP is fully observable if the obs in each state is unique (for all s,s' s.t. s != s' then s.obs != s'.obs )
-class Estimation_algorithm_fullyobservable_MDP:
-	def __init__(self):
-		None
-
-	def learnFromSequences(self,sequences):
-		"""Passive learning: we already have the training set"""
-		actions_id = []
-		for seq in sequences:
-			for j in seq[1]:
-				if not j in actions_id:
-					actions_id.append(j)
-		
-		states_id = []
-		for seq in sequences:
-			for j in seq[0]:
-				if not j in states_id:
-					states_id.append(j)
-
-		count_matrix = []
-		for i in range(len(states_id)):
-			count_matrix.append([])
-			for j in range(len(actions_id)):
-				count_matrix[-1].append([])
-				for k in range(len(states_id)):
-					count_matrix[-1][-1].append(0)
-
-		for seq in sequences:
-			for i in range(len(seq[1])):
-				count_matrix[states_id.index(seq[0][i])][actions_id.index(seq[1][i])][states_id.index(seq[0][i+1])] += 1
-
-		states = []
-		for s1 in range(len(states_id)):
-			dic_state = {}
-			for a in range(len(actions_id)):
-				den = sum(count_matrix[s1][a])
-				if den > 0:
-					list_action = [[],[]]
-					for s2 in range(len(states_id)):
-						num = count_matrix[s1][a][s2]
-						if num > 0:
-							list_action[0].append(num/den)
-							list_action[1].append(s2)
-					list_action[0] = correct_proba(list_action[0],2)
-					dic_state[actions_id[a]] = list_action
-			states.append(MDP_state(dic_state, states_id[s1]))
-
-		return MDP(states,states_id.index(sequences[0][0][0]))
-
-	def learnFromBlackBox(self,black_box,l,length_exp):
-		"""Active learning: we have access to the MDP and we generate the sequences"""
-
-		#TO DO: we need to bui scheduler_random
-		sequences = []
-		for i in range(l):
-			sequences.append(black_box.run(length_exp, scheduler_random))
-		return self.learnFromSequences(sequences)
-
 
 class Estimation_algorithm_MDP:
 	def __init__(self,h,alphabet,actions):
@@ -86,9 +28,9 @@ class Estimation_algorithm_MDP:
 			self.prevloglikelihood = -256
 			print(c)
 			return False
-		
+		print(c," - computing loglikelihood...",end=" ")
 		currentloglikelihood = self.logLikelihood()
-		print(c,"- loglikelihood :",currentloglikelihood)
+		print(currentloglikelihood)
 		if self.prevloglikelihood == currentloglikelihood:
 			self.prevloglikelihood = currentloglikelihood
 			return True
@@ -113,13 +55,13 @@ class Estimation_algorithm_MDP:
 				self.alpha_matrix.append([0.0])
 		
 		for k in range(len(sequence)):
+			possible_actions = self.getActions(k)
 			for s in range(len(self.h.states)):
-				summ = 0
+				summ = 0.0
 				for ss in range(len(self.h.states)):
-					for action, proba_action in self.getAction(k):
+					for action, proba_action in possible_actions:
 						p = self.h_g(ss,action,s,sequence[k])*proba_action
-						if p > 0:
-							summ += self.alpha_matrix[ss][k]*p
+						summ += self.alpha_matrix[ss][k]*p
 				self.alpha_matrix[s].append(summ)
 
 		self.beta_matrix = []
@@ -128,13 +70,13 @@ class Estimation_algorithm_MDP:
 			self.beta_matrix.append([1.0])
 		
 		for k in range(len(sequence)-1,-1,-1):
+			possible_actions = self.getActions(k)
 			for s in range(len(self.h.states)):
-				summ = 0
+				summ = 0.0
 				for ss in range(len(self.h.states)):
-					for action, proba_action in self.getAction(k):
+					for action, proba_action in possible_actions:
 						p = self.h_g(s,action,ss,sequence[k])*proba_action
-						if p > 0:
-							summ += self.beta_matrix[ss][1 if ss<s else 0]*p
+						summ += self.beta_matrix[ss][1 if ss<s else 0]*p
 				self.beta_matrix[s].insert(0,summ)
 
 	def problem3(self,observations):
@@ -218,7 +160,7 @@ class Estimation_algorithm_MDP_sequences(Estimation_algorithm_MDP):
 	def logLikelihood(self):
 		return self.hhat.logLikelihoodTraces(self.traces)
 
-	def getAction(self,k):
+	def getActions(self,k):
 		"""Return the action at time step k, and probaility=1.0"""
 		return [(self.sequence_actions[k],1.0)]
 
@@ -263,19 +205,22 @@ class Estimation_algorithm_MDP_schedulers(Estimation_algorithm_MDP):
 		self.data = data
 		observations = []
 		for sched in data:
-			for seq in sched[1]:
+			for seq in sched[1][0]:
 				for i in seq:
 					if not i in observations:
 						observations.append(i)
-
+		observations.sort()
 		return super().problem3(observations)
 	
 	def logLikelihood(self):
 		return self.hhat.logLikelihoodObservationsScheduler(self.data)
 
-	def getAction(self,k):
-		"""Return the action at time step k, and probaility=1.0"""
-		return self.scheduler.get_actions(self.seq_sched_state[k])
+	def getActions(self,k):
+		temp = self.scheduler.get_actions(self.seq_sched_state[k])
+		res = []
+		for i in range(len(temp[0])):
+			res.append((temp[1][i],temp[0][i]))
+		return res
 
 	def ghatmultiple(self,s1,s2,obs):
 		"""
@@ -305,6 +250,6 @@ class Estimation_algorithm_MDP_schedulers(Estimation_algorithm_MDP):
 					for act in range(len(self.actions)):
 						den[act] += self.gamma(s1,k) * times
 						if sequence[k] == obs:
-							num[act] += self.xi(sequence,self.actions[act],s1,s2,k) * times * self.scheduler.get_probability(act,self.seq_sched_state[k])
-		
+							num[act] += self.xi(sequence,self.actions[act],s1,s2,k) * times * self.scheduler.get_probability(self.actions[act],self.seq_sched_state[k])
+
 		return [num[i]/den[i] if den[i] != 0.0 else 0.0 for i in range(len(num))]
