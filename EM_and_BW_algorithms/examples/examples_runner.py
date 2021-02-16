@@ -84,7 +84,7 @@ def generateRandomModel(type_of_model, number_of_states, observations, actions=N
 		return modelHMM_random(number_of_states, observations)
 	print("incorrect type_of_model value")
 
-def chooseLearningAlgorithm(initial_model, type_of_model, observations, actions=None):
+def chooseLearningAlgorithm(initial_model, type_of_model, fixed_action, observations, actions=None):
 	if type_of_model == MDP and not fixed_action:
 		return Estimation_algorithm_MDP_schedulers(initial_model,observations,actions)
 	elif type_of_model == MDP and fixed_action:
@@ -104,7 +104,7 @@ else:
 
 training_set = generateTrainingSet(model_to_learn, number_of_sequences, length_of_each_sequence, schedulers, fixed_action)
 initial_model = generateRandomModel(type_of_model, number_of_states, observations, actions)
-algo = chooseLearningAlgorithm(initial_model, type_of_model, observations, actions)
+algo = chooseLearningAlgorithm(initial_model, type_of_model, fixed_action, observations, actions)
 
 final_loglikelihood, running_time = algo.problem3(training_set)
 output_model = algo.h
