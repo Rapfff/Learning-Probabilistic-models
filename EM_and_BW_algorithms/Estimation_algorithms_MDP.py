@@ -28,7 +28,7 @@ class Estimation_algorithm_MDP:
 			self.prevloglikelihood = -256
 			print(c)
 			return False
-		print(c," - computing loglikelihood...",end=" ")
+		print(c,"- loglikelihood",end=" ")
 		currentloglikelihood = self.logLikelihood()
 		print(currentloglikelihood)
 		if self.prevloglikelihood == currentloglikelihood:

@@ -43,6 +43,12 @@ class HMM:
 		self.initial_state = initial_state
 		self.states = states
 
+	def observations(self):
+		res = []
+		for s in self.states:
+			res += s.output_matrix[1]
+		return list(set(res))
+
 	def pi(self,s):
 		if s == self.initial_state:
 			return 1.0

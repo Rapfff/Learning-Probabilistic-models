@@ -29,6 +29,12 @@ class MCGT:
 		self.initial_state = initial_state
 		self.states = states
 
+	def observations(self):
+		res = []
+		for s in self.states:
+			res += s.next_matrix[2]
+		return list(set(res))
+
 	def pi(self,s):
 		if s == self.initial_state:
 			return 1.0

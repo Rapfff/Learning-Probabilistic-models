@@ -91,6 +91,23 @@ class MDP:
 		self.initial_state = initial_state
 		self.states = states
 
+	def actions(self):
+		res = []
+		for s in self.states:
+			res += s.actions()
+		res = list(set(res))
+		res.sort()
+		return res
+
+	def observations(self):
+		res = []
+		for s in self.states:
+			for act in s.actions():
+				res += s.next_matrix[act][2]
+		res = list(set(res))
+		res.sort()
+		return res
+
 	def pi(self,s):
 		if s == self.initial_state:
 			return 1.0
@@ -107,7 +124,9 @@ class MDP:
 		current = self.initial_state
 		scheduler.reset()
 
-		while len(res)/2 < number_steps:
+		current_len = 0
+
+		while current_len < number_steps:
 			action = scheduler.get_action()
 			#actions.append(action)
 			while action not in self.states[current].next_matrix:
@@ -122,6 +141,7 @@ class MDP:
 			scheduler.add_observation(observation)
 
 			current = next_state
+			current_len += 1
 
 		#return [output,actions]
 		return res
@@ -187,7 +207,6 @@ class MDP:
 							new.append(p+[act,seq_obs[c],s])
 			c += 1
 			res = new
-		print(res)
 		return res
 
 	def probabilityStateActionObservationWithScheduler(self,path,scheduler):
@@ -199,7 +218,6 @@ class MDP:
 			p *= self.g(path[c],path[c+1],path[c+3],path[c+2])
 			scheduler.add_observation(path[c+2])
 			c += 3
-		print(path,p)
 		return p
 
 	def probabilityObservationsScheduler(self,seq_obs,scheduler):
@@ -215,9 +233,7 @@ class MDP:
 		for scheduler,sequences in data:
 			nb_seq += sum(sequences[1])
 			for i in range(len(sequences[0])):
-				print(sequences[0][i],sequences[1][i])
 				p = self.probabilityObservationsScheduler(sequences[0][i],scheduler)
-				print(p)
 				if p == 0:
 					return -256
 				res += log(p) * sequences[1][i]

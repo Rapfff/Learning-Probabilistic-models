@@ -1,5 +1,7 @@
 from HMM import *
+from time import time
 from tools import correct_proba
+from math import log
 
 class Estimation_algorithms_HMM:
 	def __init__(self,h,alphabet):
@@ -112,7 +114,7 @@ class Estimation_algorithms_HMM:
 
 
 
-	def problem3(self,sequence):
+	def problem3single(self,sequence):
 		"""
 		Given a sequence of observations it adapts the parameters of h in order to maximize the probability to get 
 		this sequence of observations.
@@ -124,7 +126,7 @@ class Estimation_algorithms_HMM:
 				output_probas = correct_proba([self.bhat(i,self.alphabet[j]) for j in range(len(self.alphabet))])
 				next_probas   = correct_proba([self.ahat(i,j) for j in range(len(self.h.states))])
 				new_states.append(HMM_state([ output_probas,self.alphabet],[next_probas, [j for j in range(len(self.h.states))]]))
-			self.hhat = HMM(new_states,self.h.initial_matrix)
+			self.hhat = HMM(new_states,self.h.initial_state)
 			#self.hhat.pprint()
 			#print()
 			if self.checkEnd():
@@ -134,12 +136,13 @@ class Estimation_algorithms_HMM:
 		self.h.pprint()
 		print("probability:",round(self.problem1(sequence),4))
 
-	def probem3multiple(self,sequences):
+	def problem3(self,sequences):
 		"""
 		Given sequences of observations it adapts the parameters of h in order to maximize the probability to get 
 		these sequences of observations.
 		sequences = [[sequence1,sequence2,...],[number_of_seq1,number_of_seq2,...]]
 		"""
+		start_time = time()
 		self.sequences = sequences
 		f = True
 		while f:
@@ -148,22 +151,26 @@ class Estimation_algorithms_HMM:
 				output_probas = correct_proba([self.bhatmultiple(i,self.alphabet[j]) for j in range(len(self.alphabet))])
 				next_probas   = correct_proba([self.ahatmultiple(i,j) for j in range(len(self.h.states))])
 				new_states.append(HMM_state([ output_probas,self.alphabet],[next_probas, [j for j in range(len(self.h.states))]]))
-			self.hhat = HMM(new_states,self.h.initial_matrix)
+			self.hhat = HMM(new_states,self.h.initial_state)
 			
 			if self.checkEnd():
 				self.h = self.hhat
 				break
 			else:
 				self.h = self.hhat
-				print("Accuracy:",self.accuracy())
-				self.h.pprint()
 				f = True
 		self.h.pprint()
-		print("\nSeq/prob/freq")
-		total = sum(sequences[1])
+
+		loglikelihood = 0
 		for i in range(len(sequences[0])):
-			print(sequences[0][i],round(self.problem1(sequences[0][i]),3),sequences[1][i]/total)
-		print("\nAccuracy:",self.accuracy())
+			p = self.problem1(sequences[0][i])
+			if p == 0:
+				loglikelihood = -256 * sum(sequences[1])
+				break
+			loglikelihood += log(p) * sequences[1][i]
+		loglikelihood /= sum(sequences[1])
+		running_time = time()-start_time
+		return [loglikelihood, running_time]
 
 
 

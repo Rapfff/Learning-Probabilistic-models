@@ -31,12 +31,13 @@ class Estimation_algorithm_MCGT:
 		"""
 		return self.beta_matrix[self.h.initial_state][0]
 
-	def problem3multiple(self,sequences):
+	def problem3(self,sequences):
 		"""
 		Given sequences of observations it adapts the parameters of h in order to maximize the probability to get 
 		these sequences of observations.
 		sequences = [[sequence1,sequence2,...],[number_of_seq1,number_of_seq2,...]]
 		"""
+		c = 0
 		prevloglikelihood = self.h.logLikelihood(sequences)
 		start_time = time()
 		self.sequences = sequences
@@ -45,6 +46,7 @@ class Estimation_algorithm_MCGT:
 			sequences += i
 		sequences = list(set(sequences))
 		while True:
+			c += 1
 			new_states = []
 			for i in range(len(self.h.states)):
 				next_probas = []
@@ -66,21 +68,14 @@ class Estimation_algorithm_MCGT:
 			self.hhat = MCGT(new_states,self.h.initial_state)
 			
 			currentloglikelihood = self.hhat.logLikelihood(self.sequences)
-			print("loglikelihood :",currentloglikelihood)
+			print(c,"- loglikelihood ",currentloglikelihood)
 			if self.checkEnd() or prevloglikelihood == currentloglikelihood:#or time() - start_time > 120
 				self.h = self.hhat
 				break
 			else:
 				prevloglikelihood = currentloglikelihood
 				self.h = self.hhat
-				#self.h.pprint()
 		self.h.pprint()
-		#print("\nSeq/prob/freq")
-		#total = sum(self.sequences[1])
-		#for i in range(len(self.sequences[0])):
-			#print(self.sequences[0][i],round(self.problem1(self.sequences[0][i]),3),self.sequences[1][i]/total)
-		#print("\nAccuracy:",self.accuracy())
-		#print("Duration:",time()-start_time)
 		return [self.h.logLikelihood(self.sequences),time()-start_time]
 
 	
