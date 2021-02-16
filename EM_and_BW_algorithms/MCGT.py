@@ -25,9 +25,13 @@ class MCGT_state:
 
 class MCGT:
 
-	def __init__(self,states,initial_state):
+	def __init__(self,states,initial_state,name="unknown MCGT"):
 		self.initial_state = initial_state
 		self.states = states
+		self.name = name
+
+	def __str__(self):
+		return self.name
 
 	def observations(self):
 		res = []

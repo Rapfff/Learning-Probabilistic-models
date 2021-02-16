@@ -87,9 +87,13 @@ class MDP_state:
 
 class MDP:
 
-	def __init__(self,states,initial_state):
+	def __init__(self,states,initial_state,name="unknown MDP"):
 		self.initial_state = initial_state
 		self.states = states
+		self.name = name
+
+	def __str__(self):
+		return self.name
 
 	def actions(self):
 		res = []
