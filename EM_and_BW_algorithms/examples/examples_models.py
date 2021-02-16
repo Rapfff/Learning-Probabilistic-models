@@ -36,10 +36,10 @@ def modelHMM2():
 	return HMM([h_s0,h_s1,h_s2,h_s4],0)
 
 def modelHMM2_random():
-	h_s0 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(5),[0,1,2,3]])
-	h_s1 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(5),[0,1,2,3]])
-	h_s2 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(5),[0,1,2,3]])
-	h_s3 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(5),[0,1,2,3]])
+	h_s0 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(4),[0,1,2,3]])
+	h_s1 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(4),[0,1,2,3]])
+	h_s2 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(4),[0,1,2,3]])
+	h_s3 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(4),[0,1,2,3]])
 	return HMM([h_s0,h_s1,h_s2,h_s3],0)
 
 def modelHMM2_equiprobable():
@@ -63,6 +63,12 @@ def modelHMM4():
 	h_s3 = HMM_state([[0.5,0.5],['x','y']],[[0.8,0.1,0.1],[0,1,2]])
 	h_s4 = HMM_state([[1.0],['y']],[[1.0],[3]])
 	return HMM([h_s0,h_s1,h_s2,h_s3,h_s4],0)
+
+def modelHMM_random(number_states, alphabet):
+	states = []
+	for s in range(number_states):
+		states.append(HMM_state([randomProbabilities(len(alphabet)),alphabet],[randomProbabilities(number_states),list(range(number_states))]))
+	return HMM(states,0)
 
 # ---- MCGT ---------------------------
 
