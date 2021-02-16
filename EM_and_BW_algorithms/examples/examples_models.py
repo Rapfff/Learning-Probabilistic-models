@@ -17,7 +17,7 @@ def modelHMM1():
 	h_s2 = HMM_state([[1.0],['b']],[[1.0],[4]])
 	h_s3 = HMM_state([[1.0],['c']],[[1.0],[4]])
 	h_s4 = HMM_state([[1.0],['d']],[[1.0],[4]])
-	return HMM([h_s0,h_s1,h_s2,h_s3,h_s4],0)
+	return HMM([h_s0,h_s1,h_s2,h_s3,h_s4],0,"HMM1")
 
 
 def modelHMM1_equiprobable():
@@ -26,35 +26,35 @@ def modelHMM1_equiprobable():
 	h_s2 = HMM_state([[0.2,0.2,0.2,0.2,0.2],['$','a','b','c','d']],[[0.2,0.2,0.2,0.2,0.2],[0,1,2,3,4]])
 	h_s3 = HMM_state([[0.2,0.2,0.2,0.2,0.2],['$','a','b','c','d']],[[0.2,0.2,0.2,0.2,0.2],[0,1,2,3,4]])
 	h_s4 = HMM_state([[0.2,0.2,0.2,0.2,0.2],['$','a','b','c','d']],[[0.2,0.2,0.2,0.2,0.2],[0,1,2,3,4]])
-	return HMM([h_s0,h_s1,h_s2,h_s3,h_s4],0)
+	return HMM([h_s0,h_s1,h_s2,h_s3,h_s4],0,"HMM1_equiprobable")
 
 def modelHMM2():
 	h_s0 = HMM_state([[0.5,0.5],['x','y']],[[0.3,0.7,0.0],[1,2,3]])
 	h_s1 = HMM_state([[1.0],['a']],[[1.0],[3]])
 	h_s2 = HMM_state([[1.0],['b']],[[1.0],[3]])
 	h_s4 = HMM_state([[1.0],['d']],[[1.0],[3]])
-	return HMM([h_s0,h_s1,h_s2,h_s4],0)
+	return HMM([h_s0,h_s1,h_s2,h_s4],0,"HMM2")
 
 def modelHMM2_random():
 	h_s0 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(4),[0,1,2,3]])
 	h_s1 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(4),[0,1,2,3]])
 	h_s2 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(4),[0,1,2,3]])
 	h_s3 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(4),[0,1,2,3]])
-	return HMM([h_s0,h_s1,h_s2,h_s3],0)
+	return HMM([h_s0,h_s1,h_s2,h_s3],0,"HMM2_random")
 
 def modelHMM2_equiprobable():
 	h_s0 = HMM_state([[0.25,0.25,0.25,0.25,0.0],['x','y','a','b','d']],[[0.25,0.25,0.25,0.25],[0,1,2,3]])
 	h_s1 = HMM_state([[0.25,0.25,0.25,0.25,0.0],['x','y','a','b','d']],[[0.25,0.25,0.25,0.25],[0,1,2,3]])
 	h_s2 = HMM_state([[0.25,0.25,0.25,0.25,0.0],['x','y','a','b','d']],[[0.25,0.25,0.25,0.25],[0,1,2,3]])
 	h_s3 = HMM_state([[0.0,0.0,0.0,0.0,1.0],['x','y','a','b','d']],[[0.25,0.25,0.25,0.25],[0,1,2,3]])
-	return HMM([h_s0,h_s1,h_s2,h_s3],0)
+	return HMM([h_s0,h_s1,h_s2,h_s3],0,"HMM2_equiprobable")
 
 
 def modelHMM3():
 	h_s0 = HMM_state([[1.0],['$']],[[0.5,0.5],[1,2]])
 	h_s1 = HMM_state([[0.8,0.2],['a','b']],[[1.0],[0]])
 	h_s2 = HMM_state([[0.2,0.8],['a','b']],[[1.0],[0]])
-	return HMM([h_s0,h_s1,h_s2],0)
+	return HMM([h_s0,h_s1,h_s2],0,"HMM3")
 
 def modelHMM4():
 	h_s0 = HMM_state([[0.4,0.6],['x','y']],[[0.5,0.5],[1,2]])
@@ -62,7 +62,7 @@ def modelHMM4():
 	h_s2 = HMM_state([[0.1,0.9],['a','b']],[[1.0],[4]])
 	h_s3 = HMM_state([[0.5,0.5],['x','y']],[[0.8,0.1,0.1],[0,1,2]])
 	h_s4 = HMM_state([[1.0],['y']],[[1.0],[3]])
-	return HMM([h_s0,h_s1,h_s2,h_s3,h_s4],0)
+	return HMM([h_s0,h_s1,h_s2,h_s3,h_s4],0,"HMM4")
 
 def modelHMM_random(number_states, alphabet):
 	states = []
@@ -78,14 +78,14 @@ def modelMCGT1():
 	g_s2 = MCGT_state([[1.0],[4],['b']])
 	g_s3 = MCGT_state([[1.0],[4],['c']])
 	g_s4 = MCGT_state([[1.0],[4],['d']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0)
+	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0,"MCGT1")
 
 def modelMCGT2():
 	g_s0 = MCGT_state([[0.2,0.2,0.3,0.3],[1,1,2,2],['x','y','x','y']])
 	g_s1 = MCGT_state([[1.0],[3],['a']])
 	g_s2 = MCGT_state([[1.0],[3],['b']])
 	g_s3 = MCGT_state([[1.0],[3],['d']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3],0)
+	return MCGT([g_s0,g_s1,g_s2,g_s3],0,"MCGT2")
 
 def modelMCGT3():
 	g_s0 = MCGT_state([[1/3,1/3,1/3],[1,2,3],['$','$','$']])
@@ -93,7 +93,7 @@ def modelMCGT3():
 	g_s2 = MCGT_state([[1.0],[4],['b']])
 	g_s3 = MCGT_state([[1.0],[4],['c']])
 	g_s4 = MCGT_state([[1.0],[4],['d']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0)
+	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0,"MCGT3")
 
 def modelMCGT4():
 	g_s0 = MCGT_state([[0.5,0.5],[1,2],['x','y']])
@@ -102,7 +102,7 @@ def modelMCGT4():
 	g_s3 = MCGT_state([[0.5,0.5],[4,5],['c','c']])
 	g_s4 = MCGT_state([[1.0],[5],['d']])
 	g_s5 = MCGT_state([[1.0],[5],['e']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5],0)
+	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5],0,"MCGT4")
 
 def modelMCGT_REBER():
 	g_s0 = MCGT_state([[1.0],[1],['B']])
@@ -112,7 +112,7 @@ def modelMCGT_REBER():
 	g_s4 = MCGT_state([[0.5,0.5],[3,6],['X','S']])
 	g_s5 = MCGT_state([[0.5,0.5],[4,6],['P','V']])
 	g_s6 = MCGT_state([[1.0],[6],['E']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5,g_s6],0)
+	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5,g_s6],0,"MCGT_REBER")
 
 def modelMCGT1_assist():
 	g_s0 = MCGT_state([randomProbabilities(6),[1,1,2,2,3,3],['x','y','x','y','x','y']])
@@ -120,7 +120,7 @@ def modelMCGT1_assist():
 	g_s2 = MCGT_state([randomProbabilities(4),[1,2,3,4],['b','b','b','b']])
 	g_s3 = MCGT_state([randomProbabilities(4),[1,2,3,4],['c','c','c','c']])
 	g_s4 = MCGT_state([randomProbabilities(4),[1,2,3,4],['d','d','d','d']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0)
+	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0,"MCGT1_assist")
 
 def modelMCGT_equiprobable(nb_states,alphabet):
 	s = []
@@ -131,7 +131,7 @@ def modelMCGT_equiprobable(nb_states,alphabet):
 	states = []
 	for i in range(nb_states):
 		states.append(MCGT_state([[1/len(obs)]*len(obs),s,obs]))
-	return MCGT(states,0)
+	return MCGT(states,0,"MCGT_equiprobable_"+str(nb_states)+"states")
 
 def modelMCGT_random(nb_states,alphabet):
 	s = []
@@ -142,7 +142,7 @@ def modelMCGT_random(nb_states,alphabet):
 	states = []
 	for i in range(nb_states):
 		states.append(MCGT_state([randomProbabilities(len(obs)),s,obs]))
-	return MCGT(states,0)
+	return MCGT(states,0,"MCGT_random_"+str(nb_states)+"states")
 
 def modelMCGT1_equiprobable():
 	return modelMCGT_equiprobable(5,['x','y','a','b','c','d'])
@@ -155,7 +155,7 @@ def modelMCGT1_random():
 	g_s2 = MCGT_state([randomProbabilities(len(obs)),s,obs])
 	g_s3 = MCGT_state([randomProbabilities(len(obs)),s,obs])
 	g_s4 = MCGT_state([randomProbabilities(len(obs)),s,obs])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0)
+	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0,"MCGT1_random")
 
 
 # ---- MCGS ---------------------------
@@ -189,7 +189,7 @@ def modelMDP_random(nb_states,alphabet,actions):
 		for act in actions:
 			dic[act] = [randomProbabilities(len(obs)),s,obs]
 		states.append(MDP_state(dic))
-	return MDP(states,0)
+	return MDP(states,0,"MDP_random_"+str(nb_states)+"states")
 
 def modelMDP1_fullyobservable():
 	m_s0 = MDP_state({'a': [[1.0],[1],['1']], 'b': [[1.0],[2],['2']]})
@@ -199,7 +199,7 @@ def modelMDP1_fullyobservable():
 	m_s4 = MDP_state({'a': [[1.0],[5],['5']], 'b': [[1.0],[2],['4']]})
 	m_s5 = MDP_state({'a': [[1.0],[0],['0']], 'b': [[1.0],[0],['0']]})
 	m_s6 = MDP_state({'a': [[1.0],[4],['4']], 'b': [[1.0],[4],['4']]})
-	return MDP([m_s0,m_s1,m_s2,m_s3,m_s4,m_s5,m_s6],0)
+	return MDP([m_s0,m_s1,m_s2,m_s3,m_s4,m_s5,m_s6],0,"MDP1_fullyobservable")
 
 def modelMDP2():
 	# x*y grid
@@ -258,28 +258,31 @@ def modelMDP2():
 			states.append(MDP_state(dic))
 			pos += 1
 
-	return MDP(states, y_init*x+x_init )
+	return MDP(states, y_init*x+x_init,"MDP2")
 
 def modelMDP3():
 	m_s0 = MDP_state({'a': [[1.0],[0],['0']], 'b': [[1.0],[1],['1']]})
 	m_s1 = MDP_state({'a': [[0.8,0.2],[0,1],['0','1']], 'b': [[0.9,0.1],[1,0],['1','0']]})
-	return MDP([m_s0,m_s1],0)
+	return MDP([m_s0,m_s1],0,"MDP3")
 
 def modelMDP4():
 	m_s0 = MDP_state({'a': [[0.25,0.75],[2,1],['C','B']], 'b': [[1.0],[0],['A']]})
 	m_s1 = MDP_state({'b': [[1.0],[0],['B']]})
 	m_s2 = MDP_state({'a': [[1.0],[2],['C']]})
-	return MDP([m_s0,m_s1,m_s2],0)
+	return MDP([m_s0,m_s1,m_s2],0,"MDP4")
 
 def modelMDP5():
 	m_s0 = MDP_state({'a': [[1.0],[1],['A']], 'b': [[1.0],[2],['A']]})
 	m_s1 = MDP_state({'a': [[0.8,0.2],[0,3],['A','C']], 'b': [[1.0],[2],['A']]})
 	m_s2 = MDP_state({'a': [[0.5,0.5],[0,1],['A','B']], 'b': [[1.0],[3],['C']]})
 	m_s3 = MDP_state({'a': [[1.0],[3],['A']], 'b': [[1.0],[0],['A']]})
-	return MDP([m_s0,m_s1,m_s2,m_s3],0)
+	return MDP([m_s0,m_s1,m_s2,m_s3],0,"MDP5")
 
 
 def scheduler_random(actions):
 	return FiniteMemoryScheduler({0:[[1/len(actions)]*len(actions),actions]},{})
+
+def scheduler_always_same(action):
+	return FiniteMemoryScheduler({0:[[1.0],[action]]},{})
 
 # -------------------------------------

@@ -27,11 +27,11 @@ type_of_model = MDP #here put HMM, MCGT or MDP
 number_of_sequences = 50 #int
 length_of_each_sequence = 4 #int
 #if we are learning an MDP (if not just set it to False)
-schedulers = [scheduler_random(['a','b']),scheduler_random(['a','b'])] #Should be a list (it can have one element) or False
+schedulers = [scheduler_random(['a','b'])] #Should be a list (it can have one element) or False
 fixed_action = False #bool
 
 ## *** initial model ***
-number_of_states = 4#int
+number_of_states = 4 #int
 ###################################################
 
 def generateSet(model,set_size,sequence_size,scheduler=None,with_action=False):
@@ -84,7 +84,7 @@ def generateRandomModel(type_of_model, number_of_states, observations, actions=N
 		return modelHMM_random(number_of_states, observations)
 	print("incorrect type_of_model value")
 
-def chooseLearningAlgorithm(initial_model, type_of_model, fixed_action, observations, actions=None):
+def chooseLearningAlgorithm(initial_model, type_of_model, fixed_action,observations, actions=None):
 	if type_of_model == MDP and not fixed_action:
 		return Estimation_algorithm_MDP_schedulers(initial_model,observations,actions)
 	elif type_of_model == MDP and fixed_action:
@@ -95,19 +95,50 @@ def chooseLearningAlgorithm(initial_model, type_of_model, fixed_action, observat
 		return EM_ON_HMM(initial_model, observations)
 	print("incorrect type_of_model value")
 
+def runningExperiment(type_of_model,model_to_learn,number_of_sequences,length_of_each_sequence,schedulers,fixed_action,number_of_states):
+	observations = model_to_learn.observations()
+	if type_of_model == MDP:
+		actions = model_to_learn.actions()
+	else:
+		actions = None
+
+	training_set = generateTrainingSet(model_to_learn, number_of_sequences, length_of_each_sequence, schedulers, fixed_action)
+	initial_model = generateRandomModel(type_of_model, number_of_states, observations, actions)
+	algo = chooseLearningAlgorithm(initial_model, type_of_model, fixed_action, observations, actions)
+
+	final_loglikelihood, running_time = algo.problem3(training_set)
+	output_model = algo.h
+
+	return [final_loglikelihood,running_time,output_model]
+
+def runningSeveralExperiments(number_experiments, output_file, type_of_model,model_to_learn,number_of_sequences,length_of_each_sequence,schedulers,fixed_action,number_of_states):
+	output_file = open(output_file,'w')
+	output_file.write("Model:\t"+str(model_to_learn)+"\n")
+	output_file.write("Number of sequences:\t"+str(number_of_sequences)+"\n")
+	output_file.write("Number of observations:\t"+str(length_of_each_sequence)+"\n")
+	output_file.write("Fixed action:\t"+str(fixed_action)+"\n")
+	output_file.write("Number of states:\t"+str(number_of_states)+"\n")
+	output_file.write('\n')
+	sum_loglikelihood = 0
+	sum_running_time = 0
+	best_loglikelihood = -256
+
+	for i in range(number_experiments):
+		final_loglikelihood,running_time,output_model = runningExperiment(type_of_model,model_to_learn,number_of_sequences,length_of_each_sequence,schedulers,fixed_action,number_of_states)
+		output_file.write(str(final_loglikelihood)+"\n")
+		sum_loglikelihood += final_loglikelihood
+		sum_running_time += running_time
+		best_loglikelihood = max(best_loglikelihood,final_loglikelihood)
+	
+	output_file.write('\n')
+	output_file.write("Average loglikelihood:\t"+str(sum_loglikelihood/number_experiments)+'\n')
+	output_file.write("Best loglikelihood:\t"+str(best_loglikelihood)+'\n')
+	output_file.write("Average running time:\t"+str(sum_running_time/number_experiments)+'\n')
+	
+	output_file.close()
+
+
 ###################################################
-observations = model_to_learn.observations()
-if type_of_model == MDP:
-	actions = model_to_learn.actions()
-else:
-	actions = None
 
-training_set = generateTrainingSet(model_to_learn, number_of_sequences, length_of_each_sequence, schedulers, fixed_action)
-initial_model = generateRandomModel(type_of_model, number_of_states, observations, actions)
-algo = chooseLearningAlgorithm(initial_model, type_of_model, fixed_action, observations, actions)
-
-final_loglikelihood, running_time = algo.problem3(training_set)
-output_model = algo.h
-
-print("Running time:",running_time)
-print("Final Loglikelihood:",final_loglikelihood)
+runningExperiment(type_of_model,model_to_learn,number_of_sequences,length_of_each_sequence,schedulers,fixed_action,number_of_states)
+#runningSeveralExperiments(10,"test.txt",MDP,modelMDP5(),10,5,[scheduler_random(['a','b']),scheduler_always_same('a')],False,4)
