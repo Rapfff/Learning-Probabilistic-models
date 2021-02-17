@@ -23,6 +23,19 @@ class MCGT_state:
 				return self.next_matrix[0][i]
 		return 0.0
 
+	def __str__(self):
+		res = ""
+		for proba in self.next_matrix[0]:
+			res += str(proba)+' '
+		res += '\n'
+		for state in self.next_matrix[1]:
+			res += str(state)+' '
+		res += '\n'
+		for obs in self.next_matrix[2]:
+			res += str(obs)+' '
+		res += '\n'
+		return res
+
 class MCGT:
 
 	def __init__(self,states,initial_state,name="unknown MCGT"):
@@ -32,6 +45,16 @@ class MCGT:
 
 	def __str__(self):
 		return self.name
+
+	def save(self,file_path):
+		f = open(file_path,'w')
+		f.write(self.name)
+		f.write('\n')
+		f.write(str(self.initial_state))
+		f.write('\n')
+		for s in self.states:
+			f.write(str(s))
+		f.close()
 
 	def observations(self):
 		res = []
@@ -318,3 +341,19 @@ def UPPAAL_probas(next_mat,digits=3):
 			i -= 1
 		i += 1
 	return next_mat
+
+
+def loadMCGT(file_path):
+	f = open(file_path,'r')
+	name = f.readline()[:-1]
+	initial_state = int(f.readline()[:-1])
+	states = []
+	
+	l = f.readline()
+	while l:
+		p = [float(i) for i in  l[:-2].split(' ')]
+		s = [int(i) for i in  f.readline()[:-2].split(' ')]
+		t = f.readline()[:-2].split(' ')
+		states.append(MCGT_state([p,s,t]))
+		l = f.readline()
+	return MCGT(states,initial_state,name)
