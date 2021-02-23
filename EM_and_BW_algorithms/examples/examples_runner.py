@@ -34,25 +34,6 @@ fixed_action = False #bool
 number_of_states = 4 #int
 ###################################################
 
-def generateSet(model,set_size,sequence_size,scheduler=None,with_action=False):
-	seq = []
-	val = []
-	for i in range(set_size):
-		if scheduler and with_action:
-			trace = model.run(sequence_size,scheduler,True)
-		elif scheduler:
-			trace = model.run(sequence_size,scheduler,False)
-		else:
-			trace = model.run(sequence_size)
-
-		if not trace in seq:
-			seq.append(trace)
-			val.append(0)
-
-		val[seq.index(trace)] += 1
-
-	return [seq,val]
-
 def generateTrainingSet(model,set_size,sequence_size,scheduler,with_action):
 	if not scheduler:
 		return generateSet(model,set_size,sequence_size)
@@ -126,6 +107,7 @@ def runningSeveralExperiments(number_experiments, output_file, type_of_model,mod
 	for i in range(number_experiments):
 		final_loglikelihood,running_time,output_model = runningExperiment(type_of_model,model_to_learn,number_of_sequences,length_of_each_sequence,schedulers,fixed_action,number_of_states)
 		output_file.write(str(final_loglikelihood)+"\n")
+		output_model.save(??????)
 		sum_loglikelihood += final_loglikelihood
 		sum_running_time += running_time
 		best_loglikelihood = max(best_loglikelihood,final_loglikelihood)
