@@ -46,6 +46,25 @@ def randomProbabilities(size):
 	rand.append(1.0)
 	return [rand[i]-rand[i-1] for i in range(1,len(rand))]
 
+def generateSet(model,set_size,sequence_size,scheduler=None,with_action=False):
+	seq = []
+	val = []
+	for i in range(set_size):
+		if scheduler and with_action:
+			trace = model.run(sequence_size,scheduler,True)
+		elif scheduler:
+			trace = model.run(sequence_size,scheduler,False)
+		else:
+			trace = model.run(sequence_size)
+
+		if not trace in seq:
+			seq.append(trace)
+			val.append(0)
+
+		val[seq.index(trace)] += 1
+
+	return [seq,val]
+
 def randomLTL(depth, width, alphabet):
 	"""
 	Generate a random LTL formula given the depth, the width and the set of atomic prop (here set of observations).

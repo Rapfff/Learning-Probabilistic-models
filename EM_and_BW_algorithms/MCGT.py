@@ -351,9 +351,16 @@ def loadMCGT(file_path):
 	
 	l = f.readline()
 	while l:
-		p = [float(i) for i in  l[:-2].split(' ')]
-		s = [int(i) for i in  f.readline()[:-2].split(' ')]
-		t = f.readline()[:-2].split(' ')
-		states.append(MCGT_state([p,s,t]))
+		p = [ float(i) for i in l[:-2].split(' ')]
+		zeros = [ i for i in range(len(p)) if p[i] == 0.0 ]
+		
+		l = f.readline()[:-2].split(' ')
+		s = [ int(l[i]) for i in range(len(l)) if i not in zeros ]
+		
+		l = f.readline()[:-2].split(' ')
+		o = [ l[i] for i in range(len(l)) if i not in zeros ]
+		
+		states.append(MCGT_state([p,s,o]))
 		l = f.readline()
+
 	return MCGT(states,initial_state,name)

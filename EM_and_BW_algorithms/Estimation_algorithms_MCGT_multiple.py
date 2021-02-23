@@ -41,10 +41,12 @@ class Estimation_algorithm_MCGT:
 		prevloglikelihood = self.h.logLikelihood(sequences)
 		start_time = time()
 		self.sequences = sequences
-		sequences = ""
+		sequences = []
 		for i in self.sequences[0]:
-			sequences += i
-		sequences = list(set(sequences))
+			for j in i:
+				if not j in sequences:
+					sequences.append(j)
+
 		while True:
 			c += 1
 			new_states = []
