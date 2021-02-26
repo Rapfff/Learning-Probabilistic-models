@@ -203,6 +203,7 @@ class Estimation_algorithm_MDP_schedulers(Estimation_algorithm_MDP):
 		trace = [obs1,obs2,...]
 		"""
 		self.data = data
+		print(data)
 		observations = []
 		for sched in data:
 			for seq in sched[1][0]:
