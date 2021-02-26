@@ -1,6 +1,7 @@
 from MCGT import *
 from tools import correct_proba
 from time import time
+import datetime
 from math import log
 
 #Le proleme est dans precomputematrices_multiple: on obtient des valeurs trop petites => il les mets
@@ -70,14 +71,14 @@ class Estimation_algorithm_MCGT:
 			self.hhat = MCGT(new_states,self.h.initial_state)
 			
 			currentloglikelihood = self.hhat.logLikelihood(self.sequences)
-			print(c,"- loglikelihood ",currentloglikelihood)
+			#print(c,datetime.datetime.now(),"- loglikelihood ",currentloglikelihood)
 			if self.checkEnd() or prevloglikelihood == currentloglikelihood:#or time() - start_time > 120
 				self.h = self.hhat
 				break
 			else:
 				prevloglikelihood = currentloglikelihood
 				self.h = self.hhat
-		self.h.pprint()
+		#self.h.pprint()
 		return [self.h.logLikelihood(self.sequences),time()-start_time]
 
 	
