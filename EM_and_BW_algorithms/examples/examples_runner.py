@@ -20,12 +20,12 @@ from HMM import *
 
 
 ###################INPUTS##########################
-model_to_learn = modelMDP3() #element of MDP,MCGT or HMM class
+model_to_learn = modelMDP5() #element of MDP,MCGT or HMM class
 type_of_model = MDP #here put HMM, MCGT or MDP
 
 ## *** training set ***
 number_of_sequences = 50 #int
-length_of_each_sequence = 4 #int
+length_of_each_sequence = 5 #int
 #if we are learning an MDP (if not just set it to False)
 schedulers = [scheduler_random(['a','b'])] #Should be a list (it can have one element) or False
 fixed_action = False #bool
@@ -107,7 +107,7 @@ def runningSeveralExperiments(number_experiments, output_file, type_of_model,mod
 	for i in range(number_experiments):
 		final_loglikelihood,running_time,output_model = runningExperiment(type_of_model,model_to_learn,number_of_sequences,length_of_each_sequence,schedulers,fixed_action,number_of_states)
 		output_file.write(str(final_loglikelihood)+"\n")
-		output_model.save(??????)
+		output_model.save("smthing/")
 		sum_loglikelihood += final_loglikelihood
 		sum_running_time += running_time
 		best_loglikelihood = max(best_loglikelihood,final_loglikelihood)
