@@ -1,6 +1,8 @@
 from tools import resolveRandom, correct_proba, find_gcd
 from itertools import combinations_with_replacement
 from math import pi, sin, cos, log
+from operator import mul
+from functools import reduce
 
 class MCGT_state:
 
@@ -88,101 +90,58 @@ class MCGT:
 		print()
 	
 	def logLikelihood(self,sequences):
-		paths = self.allPossibleStateObservationsPaths(sequences)
-		probas = self.probaPaths(paths)
-
-		logLikelihoods = [0.0 for i in range(len(sequences[0]))]
-		
-		for i in range(len(paths)):
-			seq_obs = [paths[i][j+1] for j in range(0,len(paths[i]-1,2))]
-			logLikelihoods[sequences.index(seq_obs)] += probas[i]
-		
+		probas = self.getProbaStateObservationsPaths(sequences[0])
 		res = 0
-		for i in range(len(sequences[0])):
-			p = logLikelihoods[i]
-			if p == 0.0:
+		for p in range(len(probas)):
+			if probas[p]== 0:
 				return -256
-			res += log(p) * sequences[1][i]
+			res += log(probas[p]) * sequences[1][p]
 		return res / sum(sequences[1])
 
 
-	def allPossibleStateObservationsPaths(self,sequences):
-		"""Given a set of sequences of observations return all the possbiles state-observation path"""
-		final_paths = []
-		sequences.sort()
-		final_paths.append(self.allStatesPath(sequences[0][0]))
-		
-		for i in range(1,len(sequences[0])):
-			common = 0 
-			while common < len(sequences[0][i]):
-				if sequences[0][i-1][common] != sequences[0][i][common]:
-					break
-				else:
-					common += 1
-			paths = []
-			done = []
-			for p in final_paths[-1]:
-				if p[:common+1] not in done:
-					done.append(p[:common+1])
-					temp = self.allStatesPathIterative(done[-1][-1], sequences[0][i][common:])
-					for new_path in temp:
-						paths.append(done[-1]+new_path)
-			final_paths.append(paths)
+	def getProbaStateObservationsPaths(self,sequences):
+		sequences = [list(i) if type(i) == type('x') else i for i in sequences]
+		cur_state = self.initial_state
+		choices = []
+		obs = []
+		probs = []
+		states = [self.initial_state]
+		final_probs = [[] for i in range(len(sequences))]
+		prev_choice = -1
 
-		res = []
+		while not (len(states) == 1 and prev_choice == len(self.states[cur_state].next_matrix[0])-1):
+				
+			#take next choice
+			choices.append(prev_choice+1)
+			obs.append(   self.states[cur_state].next_matrix[2][choices[-1]])
+			probs.append( self.states[cur_state].next_matrix[0][choices[-1]])
+			states.append(self.states[cur_state].next_matrix[1][choices[-1]])
+			cur_state =  states[-1]
+			
 
-		for i in range(len(sequences)):
-			for p in final_paths[i]:
-				tmp = []
-				for j in range(len(p)-1):
-					tmp.append(p[j])
-					tmp.append(sequences[0][i][j])
-				tmp.append(p[-1])
-				res.append(tmp)
-		res.sort()
-		return res
-
-	def probaPaths(self,paths,sequences):
-		"""Given a set of paths it returns its logLikelihood. We assume all the paths start with initial_state"""
-		res = []
-		path = paths[0]
-		p = self.listProbaPath(path,[1.0])
-		res.append(p[-1])
-
-		for index_path in range(1,len(paths)):
-			path = paths[index_path]
-			pold = p
-			common = 0
-			while common < len(path):
-				if path[common] != paths[index_path-1][common]:
-					break
-				else:
-					common += 1
-			p = pold[:1+common//2]
-			path = path[((common-1)//2)*2:]
-			p = self.listProbaPath(path,p)
-			res.append(p[-1])
-		return res
-
-
-
-	def listProbaPath(self,path,p):
-		for i in range(0,len(path)-1,2):
-			if p[-1] == 0.0:
-				p += [0.0]*((len(path)/2)-i+1)
-				break
-			p.append(p[-1]* self.states[path[i]].g(path[i+2],path[i+1]))
-		return p
-		
-
-	#def logLikelihood(self,sequences):
-	#	res = 0
-	#	for i in range(len(sequences[0])):
-	#		p = self.probabilityObservations(sequences[0][i])
-	#		if p == 0:
-	#			return -256
-	#		res += log(p) * sequences[1][i]
-	#	return res / sum(sequences[1])
+			if (obs in sequences) or (obs not in [ s[:len(obs)] for s in sequences]) or (probs[-1] <= 0.0):
+				if obs in sequences:
+					#save it
+					final_probs[sequences.index(obs)].append(reduce(mul, probs, 1))
+				#roll back
+				obs = obs[:-1]
+				probs = probs[:-1]
+				prev_choice = choices[-1]
+				choices = choices[:-1]
+				states = states[:-1]
+				cur_state = states[-1]
+				while prev_choice == len(self.states[cur_state].next_matrix[0])-1 and len(states)>1:
+					#roll back
+					obs = obs[:-1]
+					probs = probs[:-1]
+					prev_choice = choices[-1]
+					choices = choices[:-1]
+					states = states[:-1]
+					cur_state = states[-1]
+			else:
+				prev_choice = -1
+		final_probs = [sum(i) for i in final_probs]
+		return final_probs
 
 	def allStatesPathIterative(self, start, obs_seq):
 		"""return all the states path from start that can generate obs_seq"""

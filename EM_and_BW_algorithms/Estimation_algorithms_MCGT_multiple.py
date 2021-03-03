@@ -48,7 +48,7 @@ class Estimation_algorithm_MCGT:
 				if not j in sequences:
 					sequences.append(j)
 
-		while True:
+		while c<200:
 			c += 1
 			new_states = []
 			for i in range(len(self.h.states)):
