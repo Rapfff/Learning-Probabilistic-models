@@ -4,9 +4,6 @@ from time import time
 import datetime
 from math import log
 
-#Le proleme est dans precomputematrices_multiple: on obtient des valeurs trop petites => il les mets
-#a 0. Il faut trouver une solution (normaliser le tout ??)
-
 
 class Estimation_algorithm_MCGT:
 	def __init__(self,h,alphabet):
@@ -48,8 +45,9 @@ class Estimation_algorithm_MCGT:
 				if not j in sequences:
 					sequences.append(j)
 
-		while c<200:
+		while c<20:
 			c += 1
+			print(c)
 			new_states = []
 			for i in range(len(self.h.states)):
 				next_probas = []
@@ -81,35 +79,37 @@ class Estimation_algorithm_MCGT:
 		#self.h.pprint()
 		return [self.h.logLikelihood(self.sequences),time()-start_time]
 
-	
-	def precomputeMatrices(self,sequence):
-		"""Here we compute all the values alpha(k,t) and beta(t,k) for a given sequence"""
-		self.alpha_matrix = []
+	def precomputeMatrices(self, common):
+		"""Here we compute all the values alpha(k,t) and beta(t,k) for a given self.sequence"""
+		if common == -1:
+			common = 0
+			self.alpha_matrix = []
 
-		for s in range(len(self.h.states)):
-			if s == self.h.initial_state:
-				self.alpha_matrix.append([1.0])
-			else:
-				self.alpha_matrix.append([0.0])
+			for s in range(len(self.h.states)):
+				if s == self.h.initial_state:
+					self.alpha_matrix.append([1.0])
+				else:
+					self.alpha_matrix.append([0.0])
+				self.alpha_matrix[-1] += [None for i in range(len(self.sequence))]
 		
-		for k in range(len(sequence)):
+		for k in range(common,len(self.sequence)):
 			for s in range(len(self.h.states)):
 				summ = 0
 				for ss in range(len(self.h.states)):
-					p = self.h.states[ss].g(s,sequence[k])
+					p = self.h.states[ss].g(s,self.sequence[k])
 					summ += self.alpha_matrix[ss][k]*p
-				self.alpha_matrix[s].append(summ)
+				self.alpha_matrix[s][k+1] = summ
 
 		self.beta_matrix = []
 
 		for s in range(len(self.h.states)):
 			self.beta_matrix.append([1.0])
 		
-		for k in range(len(sequence)-1,-1,-1):
+		for k in range(len(self.sequence)-1,-1,-1):
 			for s in range(len(self.h.states)):
 				summ = 0
 				for ss in range(len(self.h.states)):
-					p = self.h.states[s].g(ss,sequence[k])
+					p = self.h.states[s].g(ss,self.sequence[k])
 					if p > 0:
 						summ += self.beta_matrix[ss][1 if ss<s else 0]*p
 				self.beta_matrix[s].insert(0,summ)
@@ -138,10 +138,20 @@ class Estimation_algorithm_MCGT:
 	def ghatmultiple(self,s1,s2,obs):
 		num = 0
 		den = 0
-		for seq in range(len(self.sequences[0])):
-			self.sequence = self.sequences[0][seq]
-			times = self.sequences[1][seq]
-			self.precomputeMatrices(self.sequence)
+		sequences_sorted = self.sequences[0]
+		sequences_sorted.sort()
+
+		for seq in range(len(sequences_sorted)):
+			self.sequence = sequences_sorted[seq]
+			times = self.sequences[1][self.sequences[0].index(self.sequence)]
+			if seq == 0:
+				self.precomputeMatrices(-1)
+			else:
+				common = 0 
+				while sequences_sorted[seq-1][common] == self.sequence[common]:
+					common += 1
+				self.precomputeMatrices(common)
+
 			self.computeK()
 			for k in range(len(self.sequence)):
 				den += self.gamma(s1,k) * times
