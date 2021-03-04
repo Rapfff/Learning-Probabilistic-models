@@ -77,7 +77,7 @@ def modelMCGT1():
 	g_s1 = MCGT_state([[1.0],[4],['a']])
 	g_s2 = MCGT_state([[1.0],[4],['b']])
 	g_s3 = MCGT_state([[1.0],[4],['c']])
-	g_s4 = MCGT_state([[1.0],[4],['d']])
+	g_s4 = MCGT_state([[0.5,0.5],[4,4],['d','e']])
 	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0,"MCGT1")
 
 def modelMCGT2():
@@ -114,6 +114,16 @@ def modelMCGT_REBER():
 	g_s6 = MCGT_state([[1.0],[6],['E']])
 	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5,g_s6],0,"MCGT_REBER")
 
+def modelMCGT_REBERlight():
+	g_s0 = MCGT_state([[0.5,0.5],[1,2],['T','P']])
+	g_s1 = MCGT_state([[1.0],[3],['X']])
+	g_s2 = MCGT_state([[1.0],[4],['V']])
+	g_s3 = MCGT_state([[0.5,0.5],[2,5],['X','S']])
+	g_s4 = MCGT_state([[0.5,0.5],[3,5],['P','V']])
+	g_s5 = MCGT_state([[1.0],[5],['E']])
+	g_s6 = MCGT_state([[1.0],[0],['B']])
+	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5,g_s6],6,"MCGT_REBER")
+
 def modelMCGT1_assist():
 	g_s0 = MCGT_state([randomProbabilities(6),[1,1,2,2,3,3],['x','y','x','y','x','y']])
 	g_s1 = MCGT_state([randomProbabilities(4),[1,2,3,4],['a','a','a','a']])
@@ -146,16 +156,6 @@ def modelMCGT_random(nb_states,alphabet):
 
 def modelMCGT1_equiprobable():
 	return modelMCGT_equiprobable(5,['x','y','a','b','c','d'])
-
-def modelMCGT1_random():
-	s = [0,0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,3,4,4,4,4,4,4]
-	obs = ['x','y','a','b','c','d']*5
-	g_s0 = MCGT_state([randomProbabilities(len(obs)),s,obs])
-	g_s1 = MCGT_state([randomProbabilities(len(obs)),s,obs])
-	g_s2 = MCGT_state([randomProbabilities(len(obs)),s,obs])
-	g_s3 = MCGT_state([randomProbabilities(len(obs)),s,obs])
-	g_s4 = MCGT_state([randomProbabilities(len(obs)),s,obs])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0,"MCGT1_random")
 
 
 # ---- MCGS ---------------------------
