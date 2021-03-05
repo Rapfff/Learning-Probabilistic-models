@@ -71,12 +71,12 @@ class MCGT:
 			return 0.0
 			
 	def run(self,number_steps):
-		output = ""
+		output = []
 		current = self.initial_state
 
 		while len(output) < number_steps:
 			[next_state, symbol] = self.states[current].next()
-			output += symbol
+			output.append(symbol)
 			current = next_state
 
 		return output
