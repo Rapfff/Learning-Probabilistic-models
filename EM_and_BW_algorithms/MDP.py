@@ -1,5 +1,7 @@
 from tools import resolveRandom
 from math import log
+from functools import reduce
+from operator import mul
 
 class FiniteMemoryScheduler:
 	def __init__(self,action_matrix,transition_matrix):
@@ -129,6 +131,9 @@ class MDP:
 		res.sort()
 		return res
 
+	def actions_state(self,s):
+		return self.states[s].actions()
+
 	def observations(self):
 		res = []
 		for s in self.states:
@@ -186,44 +191,105 @@ class MDP:
 		print()
 
 	#-------------------------------------------
-	def allStatesPathTrace(self,trace):
-		res = [[0]]
-		c = 0
-		while c < len(trace):
-			new = []
-			for p in res:
-				for s in range(len(self.states)):
-					if self.g(p[-1],trace[c], s, trace[c+1]) > 0.0:
-						new.append(p+[trace[c],trace[c+1],s])
-			c += 2
-			res = new
-		return res
-
-	def probabilityStateActionObservation(self,path):
-		c = 0
-		p = 1
-		while p > 0.0 and c < len(path)-1:
-			p *= self.g(path[c],path[c+1],path[c+3],path[c+2])
-			c += 3
-		return p
-
-
-	def probabilityTrace(self,trace):
-		"""return the probability to get this trace"""
-		res = 0
-		for p in self.allStatesPathTrace(trace):
-			res += self.probabilityStateActionObservation(p)
-		return res
-
 	def logLikelihoodTraces(self,sequences):
+		probas = self.getProbaStateObservationsPaths(sequences[0])
 		res = 0
-		for i in range(len(sequences[0])):
-			p = self.probabilityTrace(sequences[0][i])
-			if p == 0:
+		for p in range(len(probas)):
+			if probas[p]== 0:
 				return -256
-			res += log(p) * sequences[1][i]
+			res += log(probas[p]) * sequences[1][p]
 		return res / sum(sequences[1])
 
+	def getProbaStateObservationsPaths(self,sequences):
+		sequences = [list(i) if type(i) == type('x') else i for i in sequences]
+		cur_state = self.initial_state
+		states = [self.initial_state]
+		final_probs = [[] for i in range(len(sequences))]
+
+		finished = False
+
+		prev_action = 0
+		actions = [self.actions_state(cur_state)[0]]
+
+		choices = [0]
+		prev_choice = 0
+		obs =   [self.states[cur_state].next_matrix[actions[-1]][2][0]]
+		probs = [self.states[cur_state].next_matrix[actions[-1]][0][0]]
+		states.append(self.states[cur_state].next_matrix[actions[-1]][1][0])
+		cur_state =  states[-1]
+		trace = []
+		for i in range(len(obs)):
+			trace.append(actions[i])
+			trace.append(obs[i])
+
+		while not finished:
+			if (trace in sequences) or (trace not in [ s[:len(trace)] for s in sequences]) or (probs[-1] <= 0.0):
+				if trace in sequences:
+					#save it
+					final_probs[sequences.index(trace)].append(reduce(mul, probs, 1))
+				
+				while True:
+					#roll back choice
+					obs = obs[:-1]
+					probs = probs[:-1]
+					prev_choice = choices[-1]
+					choices = choices[:-1]
+					states = states[:-1]
+					cur_state = states[-1]
+					
+					#if last choice
+					if prev_choice == len(self.states[cur_state].next_matrix[actions[-1]][0])-1:
+						#roll back action
+						prev_action = self.actions_state(cur_state).index(actions[-1])
+						actions = actions[:-1]
+					
+						#if not last action
+						if prev_action < len(self.actions_state(cur_state))-1:
+							#take next action
+							actions.append(self.actions_state(cur_state)[prev_action+1])
+							#take first choice
+							choices.append(0)
+							obs.append(   self.states[cur_state].next_matrix[actions[-1]][2][choices[-1]])
+							probs.append( self.states[cur_state].next_matrix[actions[-1]][0][choices[-1]])
+							states.append(self.states[cur_state].next_matrix[actions[-1]][1][choices[-1]])
+							cur_state =  states[-1]
+							break					
+						#if last action it will roll back choice again
+						#if last action AND in initial state then it's done
+						elif len(states) == 1:
+							finished = True
+							break
+
+					#if not last choice
+					else:
+						#take next choice
+						choices.append(prev_choice+1)
+						obs.append(   self.states[cur_state].next_matrix[actions[-1]][2][choices[-1]])
+						probs.append( self.states[cur_state].next_matrix[actions[-1]][0][choices[-1]])
+						states.append(self.states[cur_state].next_matrix[actions[-1]][1][choices[-1]])
+						cur_state =  states[-1]
+						break
+			
+			else:
+				#take first action
+				prev_action = 0
+				actions.append(self.actions_state(cur_state)[0])
+				#take first choice
+				choices.append(0)
+				obs.append(   self.states[cur_state].next_matrix[actions[-1]][2][choices[-1]])
+				probs.append( self.states[cur_state].next_matrix[actions[-1]][0][choices[-1]])
+				states.append(self.states[cur_state].next_matrix[actions[-1]][1][choices[-1]])
+				cur_state =  states[-1]
+
+			trace = []
+			for i in range(len(obs)):
+				trace.append(actions[i])
+				trace.append(obs[i])
+
+
+		final_probs = [sum(i) for i in final_probs]
+		return final_probs
+	
 	#-------------------------------------------
 	def allStatesPathObservations(self,seq_obs):
 		res = [[self.initial_state]]
