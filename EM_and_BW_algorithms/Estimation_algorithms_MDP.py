@@ -44,17 +44,20 @@ class Estimation_algorithm_MDP:
 	def hhat_g(self,s1,act,s2,obs):
 		return self.hhat.g(s1,act,s2,obs)
 	
-	def precomputeMatrices(self,sequence):
+	def precomputeMatrices(self,sequence,common):
 		"""Here we compute all the values alpha(k,t) and beta(t,k) for a given sequence"""
-		self.alpha_matrix = []
+		if common == -1:
+			common = 0
+			self.alpha_matrix = []
 
-		for s in range(len(self.h.states)):
-			if s == self.h.initial_state:
-				self.alpha_matrix.append([1.0])
-			else:
-				self.alpha_matrix.append([0.0])
-		
-		for k in range(len(sequence)):
+			for s in range(len(self.h.states)):
+				if s == self.h.initial_state:
+					self.alpha_matrix.append([1.0])
+				else:
+					self.alpha_matrix.append([0.0])
+				self.alpha_matrix[-1] += [None for i in range(len(sequence))]
+
+		for k in range(common,len(sequence)):
 			possible_actions = self.getActions(k)
 			for s in range(len(self.h.states)):
 				summ = 0.0
@@ -62,7 +65,7 @@ class Estimation_algorithm_MDP:
 					for action, proba_action in possible_actions:
 						p = self.h_g(ss,action,s,sequence[k])*proba_action
 						summ += self.alpha_matrix[ss][k]*p
-				self.alpha_matrix[s].append(summ)
+				self.alpha_matrix[s][k+1] = summ
 
 		self.beta_matrix = []
 
@@ -79,10 +82,12 @@ class Estimation_algorithm_MDP:
 						summ += self.beta_matrix[ss][1 if ss<s else 0]*p
 				self.beta_matrix[s].insert(0,summ)
 
-	def problem3(self,observations):
+	def problem3(self,observations,limit):
 		start_time = time()
 		counter = 0
+		prevloglikelihood = self.logLikelihood()
 		while True:
+			print(counter,end=' ')
 			new_states = []
 			for i in range(len(self.h.states)):
 				next_probas = []
@@ -110,14 +115,16 @@ class Estimation_algorithm_MDP:
 			self.hhat = MDP(new_states,self.h.initial_state)
 			
 			counter += 1
-			if self.checkEnd() or self.checkEndLikelihood(counter):
+			currentloglikelihood = self.logLikelihood()
+			if abs(prevloglikelihood -currentloglikelihood) < limit:
 				self.h = self.hhat
 				break
 			else:
+				prevloglikelihood = currentloglikelihood
 				self.h = self.hhat
-
+		print()
 		self.h.pprint()
-		return [self.prevloglikelihood,time()-start_time]
+		return [currentloglikelihood,time()-start_time]
 
 	def gamma(self,s,k):
 		"""
@@ -129,7 +136,7 @@ class Estimation_algorithm_MDP:
 	def xi(self,sequence,action,s1,s2,k):
 		"""
 		Returns the probabilty to move from state s1 to state s2 with action at time step k
-		Note: it's important to compute self.bigK and the TUKmatrix before
+		Note: it's important to compute self.bigK before
 		"""
 		return self.alpha_matrix[s1][k]*self.h_g(s1,action,s2,sequence[k])*self.beta_matrix[s2][k+1]/self.bigK
 
@@ -140,7 +147,7 @@ class Estimation_algorithm_MDP:
 		self.bigK = self.beta_matrix[self.h.initial_state][0]
 
 class Estimation_algorithm_MDP_sequences(Estimation_algorithm_MDP):
-	def problem3(self,traces):
+	def problem3(self,traces,limit=0.00001):
 		"""
 		Given a set of sequences of pairs action-observation,
 		it adapts the parameters of h in order to maximize the probability to get 
@@ -155,7 +162,7 @@ class Estimation_algorithm_MDP_sequences(Estimation_algorithm_MDP):
 				if not seq[i] in observations:
 					observations.append(seq[i])
 
-		return super().problem3(observations)
+		return super().problem3(observations,limit)
 
 	def logLikelihood(self):
 		return self.hhat.logLikelihoodTraces(self.traces)
@@ -169,6 +176,41 @@ class Estimation_algorithm_MDP_sequences(Estimation_algorithm_MDP):
 		returns the new values, for all the possible actions, for g[action][s1][s2][obs], format:
 		[p1,p2,p3,...] with p1 = g[action1][s1][s2][obs], p2 = g[action2][s1][s2][obs], ...
 		"""
+		num = []
+		den = []
+		sequences_sorted = self.traces[0]
+		sequences_sorted.sort()
+
+		for i in range(len(self.actions)):
+			num.append(0.0)
+			den.append(0.0)
+
+		for seq in range(len(sequences_sorted)):
+			self.sequence_actions = [sequences_sorted[seq][i] for i in range(0,len(sequences_sorted[seq]),2)]
+			sequence_obs = [sequences_sorted[seq][i+1] for i in range(0,len(sequences_sorted[seq]),2)]
+			times = self.traces[1][self.traces[0].index(sequences_sorted[seq])]
+			if seq == 0:
+				self.precomputeMatrices(sequence_obs,-1)
+			else:
+				common = 0 
+				while sequences_sorted[seq-1][common] == sequences_sorted[seq][common]:
+					common += 1
+				self.precomputeMatrices(sequence_obs,int(common/2))
+			self.computeK()
+			
+			for k in range(len(sequence_obs)):
+				den[self.actions.index(self.sequence_actions[k])] += self.gamma(s1,k) * times
+				if sequence_obs[k] == obs:
+					num[self.actions.index(self.sequence_actions[k])] += self.xi(sequence_obs,self.sequence_actions[k],s1,s2,k) * times
+		
+		return [num[i]/den[i] if den[i] != 0.0 else 0.0 for i in range(len(num))]
+
+	"""
+	def ghatmultiple(self,s1,s2,obs):
+	"""
+	#returns the new values, for all the possible actions, for g[action][s1][s2][obs], format:
+	#[p1,p2,p3,...] with p1 = g[action1][s1][s2][obs], p2 = g[action2][s1][s2][obs], ...
+	"""
 		num = []
 		den = []
 		for i in range(len(self.actions)):
@@ -189,11 +231,12 @@ class Estimation_algorithm_MDP_sequences(Estimation_algorithm_MDP):
 					num[self.actions.index(self.sequence_actions[k])] += self.xi(sequence_obs,self.sequence_actions[k],s1,s2,k) * times
 		
 		return [num[i]/den[i] if den[i] != 0.0 else 0.0 for i in range(len(num))]
+	"""
 
 
 
 class Estimation_algorithm_MDP_schedulers(Estimation_algorithm_MDP):
-	def problem3(self,data):
+	def problem3(self,data,limit=0.00001):
 		"""
 		Given a set of pairs scheduler-sequence of observations,
 		it adapts the parameters of h in order to maximize the probability to get 
@@ -203,7 +246,7 @@ class Estimation_algorithm_MDP_schedulers(Estimation_algorithm_MDP):
 		trace = [obs1,obs2,...]
 		"""
 		self.data = data
-		print(data)
+		#print(data)
 		observations = []
 		for sched in data:
 			for seq in sched[1][0]:
@@ -211,7 +254,7 @@ class Estimation_algorithm_MDP_schedulers(Estimation_algorithm_MDP):
 					if not i in observations:
 						observations.append(i)
 		observations.sort()
-		return super().problem3(observations)
+		return super().problem3(observations,limit)
 	
 	def logLikelihood(self):
 		return self.hhat.logLikelihoodObservationsScheduler(self.data)
@@ -228,6 +271,47 @@ class Estimation_algorithm_MDP_schedulers(Estimation_algorithm_MDP):
 		returns the new values, for all the possible actions, for g[action][s1][s2][obs], format:
 		[p1,p2,p3,...] with p1 = g[action1][s1][s2][obs], p2 = g[action2][s1][s2][obs], ...
 		"""
+		num = []
+		den = []
+
+		for i in range(len(self.actions)):
+			num.append(0.0)
+			den.append(0.0)
+
+		for data_index in range(len(self.actions)):
+			self.scheduler = self.data[data_index][0]
+			traces = self.data[data_index][1]
+
+			sequences_sorted = traces[0]
+			sequences_sorted.sort()
+
+			for seq in range(len(sequences_sorted)):
+				sequence = sequences_sorted[seq]
+				times = self.traces[1][self.traces[0].index(self.sequences_sorted[seq])]
+				self.seq_sched_state = self.scheduler.get_sequence_states(sequence)
+				
+				if seq == 0:
+					self.precomputeMatrices(sequence,-1)
+				else:
+					common = 0 
+					while sequences_sorted[seq-1][common] == sequences_sorted[seq][common]:
+						common += 1
+					self.precomputeMatrices(sequence,common)
+				self.computeK()
+				
+				for k in range(len(sequence)):
+					for act in range(len(self.actions)):
+						den[act] += self.gamma(s1,k) * times
+						if sequence[k] == obs:
+							num[act] += self.xi(sequence,self.actions[act],s1,s2,k) * times * self.scheduler.get_probability(self.actions[act],self.seq_sched_state[k])
+
+		return [num[i]/den[i] if den[i] != 0.0 else 0.0 for i in range(len(num))]
+	"""
+	def ghatmultiple(self,s1,s2,obs):
+	"""
+	#returns the new values, for all the possible actions, for g[action][s1][s2][obs], format:
+	#[p1,p2,p3,...] with p1 = g[action1][s1][s2][obs], p2 = g[action2][s1][s2][obs], ...
+	"""
 		num = []
 		den = []
 		for i in range(len(self.actions)):
@@ -254,3 +338,4 @@ class Estimation_algorithm_MDP_schedulers(Estimation_algorithm_MDP):
 							num[act] += self.xi(sequence,self.actions[act],s1,s2,k) * times * self.scheduler.get_probability(self.actions[act],self.seq_sched_state[k])
 
 		return [num[i]/den[i] if den[i] != 0.0 else 0.0 for i in range(len(num))]
+	"""
