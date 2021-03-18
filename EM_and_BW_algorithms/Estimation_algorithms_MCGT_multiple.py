@@ -29,14 +29,15 @@ class Estimation_algorithm_MCGT:
 		"""
 		return self.beta_matrix[self.h.initial_state][0]
 
-	def problem3(self,sequences):
+	def problem3(self,sequences,pp=''):
 		"""
 		Given sequences of observations it adapts the parameters of h in order to maximize the probability to get 
 		these sequences of observations.
 		sequences = [[sequence1,sequence2,...],[number_of_seq1,number_of_seq2,...]]
 		"""
 		c = 0
-		prevloglikelihood = self.h.logLikelihood(sequences)
+		self.betas0values = [None for i in range(len(sequences[0]))]
+		prevloglikelihood = -256 #it contains the loglikelihood of the previous h
 		start_time = time()
 		self.sequences = sequences
 		sequences = []
@@ -45,9 +46,9 @@ class Estimation_algorithm_MCGT:
 				if not j in sequences:
 					sequences.append(j)
 
-		while c<20:
+		while True:
 			c += 1
-			print(c)
+			print(datetime.datetime.now(),pp,c, prevloglikelihood)
 			new_states = []
 			for i in range(len(self.h.states)):
 				next_probas = []
@@ -68,16 +69,15 @@ class Estimation_algorithm_MCGT:
 				new_states.append(MCGT_state([ next_probas, next_states, next_obs]))
 			self.hhat = MCGT(new_states,self.h.initial_state)
 			
-			currentloglikelihood = self.hhat.logLikelihood(self.sequences)
-			#print(c,datetime.datetime.now(),"- loglikelihood ",currentloglikelihood)
-			if self.checkEnd() or prevloglikelihood == currentloglikelihood:#or time() - start_time > 120
+			currentloglikelihood = sum([ log(i) for i in self.betas0values]) # it contains the loglikelihood of h 
+			if abs(prevloglikelihood -currentloglikelihood)<0.0001:#or self.checkEnd() #or time() - start_time > 120
 				self.h = self.hhat
 				break
 			else:
 				prevloglikelihood = currentloglikelihood
 				self.h = self.hhat
 		#self.h.pprint()
-		return [self.h.logLikelihood(self.sequences),time()-start_time]
+		return [currentloglikelihood,time()-start_time]
 
 	def precomputeMatrices(self, common):
 		"""Here we compute all the values alpha(k,t) and beta(t,k) for a given self.sequence"""
@@ -94,7 +94,7 @@ class Estimation_algorithm_MCGT:
 		
 		for k in range(common,len(self.sequence)):
 			for s in range(len(self.h.states)):
-				summ = 0
+				summ = 0.0
 				for ss in range(len(self.h.states)):
 					p = self.h.states[ss].g(s,self.sequence[k])
 					summ += self.alpha_matrix[ss][k]*p
@@ -151,6 +151,8 @@ class Estimation_algorithm_MCGT:
 				while sequences_sorted[seq-1][common] == self.sequence[common]:
 					common += 1
 				self.precomputeMatrices(common)
+
+			self.betas0values[seq] = sum([ self.beta_matrix[s][0] for s in range(len(self.h.states)) ])
 
 			self.computeK()
 			for k in range(len(self.sequence)):
