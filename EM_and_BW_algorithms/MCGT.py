@@ -88,116 +88,39 @@ class MCGT:
 				if self.states[i].next_matrix[0][j] > 0.0:
 					print("s",i," - (",self.states[i].next_matrix[2][j],") -> s",self.states[i].next_matrix[1][j]," : ",self.states[i].next_matrix[0][j],sep='')
 		print()
-	
-	def logLikelihood(self,sequences):
-		probas = self.getProbaStateObservationsPaths(sequences[0])
-		res = 0
-		for p in range(len(probas)):
-			if probas[p]== 0:
-				return -256
-			res += log(probas[p]) * sequences[1][p]
-		return res / sum(sequences[1])
 
+	def logLikelihood(slf,sequences):
+		sequences_sorted = sequences[0]
+		sequences_sorted.sort()
+		loglikelihood = 0.0
 
-	def getProbaStateObservationsPaths(self,sequences):
-		sequences = [list(i) if type(i) == type('x') else i for i in sequences]
-		cur_state = self.initial_state
-		choices = []
-		obs = []
-		probs = []
-		states = [self.initial_state]
-		final_probs = [[] for i in range(len(sequences))]
-		prev_choice = -1
-
-		while not (len(states) == 1 and prev_choice == len(self.states[cur_state].next_matrix[0])-1):
-				
-			#take next choice
-			choices.append(prev_choice+1)
-			obs.append(   self.states[cur_state].next_matrix[2][choices[-1]])
-			probs.append( self.states[cur_state].next_matrix[0][choices[-1]])
-			states.append(self.states[cur_state].next_matrix[1][choices[-1]])
-			cur_state =  states[-1]
-			
-
-			if (obs in sequences) or (obs not in [ s[:len(obs)] for s in sequences]) or (probs[-1] <= 0.0):
-				if obs in sequences:
-					#save it
-					final_probs[sequences.index(obs)].append(reduce(mul, probs, 1))
-				#roll back
-				obs = obs[:-1]
-				probs = probs[:-1]
-				prev_choice = choices[-1]
-				choices = choices[:-1]
-				states = states[:-1]
-				cur_state = states[-1]
-				while prev_choice == len(self.states[cur_state].next_matrix[0])-1 and len(states)>1:
-					#roll back
-					obs = obs[:-1]
-					probs = probs[:-1]
-					prev_choice = choices[-1]
-					choices = choices[:-1]
-					states = states[:-1]
-					cur_state = states[-1]
+		alpha_matrix = []
+		for s in range(len(self.states)):
+			if s == self.initial_state:
+				alpha_matrix.append([1.0])
 			else:
-				prev_choice = -1
-		final_probs = [sum(i) for i in final_probs]
-		return final_probs
+				alpha_matrix.append([0.0])
+			alpha_matrix[-1] += [None for i in range(len(self.sequence))]
 
-	def allStatesPathIterative(self, start, obs_seq):
-		"""return all the states path from start that can generate obs_seq"""
-		res = []
-		for i in range(len(self.states[start].next_matrix[1])):
-			if self.states[start].next_matrix[0][i] > 0 and self.states[start].next_matrix[2][i] == obs_seq[0]:
-				if len(obs_seq) == 1:
-					res.append([start,self.states[start].next_matrix[1][i]])
-				else:
-					t = self.allStatesPathIterative(self.states[start].next_matrix[1][i],obs_seq[1:])
-					for j in t:
-						res.append([start]+j)
-		return res
-	
-	def allStatesPath(self,obs_seq):
-		"""return all the states path that can generate obs_seq"""
-		res = []
-		for j in self.allStatesPathIterative(self.initial_state,obs_seq):
-			res.append(j)
-		return res
+		for seq in range(len(sequences_sorted)):
+			sequence = sequences_sorted[seq]
+			times = sequences[1][sequences[0].index(sequence)]
+			common = 0
+			if seq > 0:
+				while sequences_sorted[seq-1][common] == sequence[common]:
+					common += 1
+			#-----compute alphas-----
+			for k in range(common,len(sequence)):
+				for s in range(len(self.states)):
+					summ = 0.0
+					for ss in range(len(self.states)):
+						p = self.states[ss].g(s,sequence[k])
+						summ += alpha_matrix[ss][k]*p
+					alpha_matrix[s][k+1] = summ
+			#------------------------
+			loglikelihood += log(sum([alpha_matrix[s][-1] for s in range(len(self.states))]))
 
-	def allStatesPathLength(self,size):
-		"""returns all states path of length <size>+1 """
-		combi = combinations_with_replacement([x for x in range(len(self.states))], size)
-		res = []
-		for i in list(combi)[:-1]:
-			res.append([self.initial_state]+list(i))
-		return res
-
-	def checkListOrLTL(self,lstprops):
-		res = 0.0
-		for i in lstprops:
-			#res += self.checkLTL(i)
-			res += self.probabilityObservations(i)
-		return res
-
-
-	def probabilityStatesObservations(self,states_path, obs_seq):
-		"""return the probability to get this states_path generating this observations sequence"""
-		if states_path[0] != self.initial_state:
-			return 0.0
-		else:
-			res = 1.0
-		for i in range(len(states_path)-1):
-			if res == 0.0:
-				return 0.0
-			res *= self.states[states_path[i]].g(states_path[i+1],obs_seq[i])
-		return res
-		#but sum_k alpha(seq[:k],states_path[k])*beta(seq[k:],states_path[k]) =? proba(states_path,seq)
-
-	def probabilityObservations(self,obs_seq):
-		res = 0
-		for p in self.allStatesPath(obs_seq):
-			res += self.probabilityStatesObservations(p,obs_seq)
-		return res
-
+		return loglikelihood
 
 	def UPPAAL_convert(self,outputfile="mcgt.xml"):
 		radius_uppaal_states = 300
@@ -397,7 +320,7 @@ def loadMCGT(file_path):
 	states = []
 	
 	l = f.readline()
-	while l:
+	while l and l != '\n':
 		p = [ float(i) for i in l[:-2].split(' ')]
 		
 		l = f.readline()[:-2].split(' ')
