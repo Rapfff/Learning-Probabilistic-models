@@ -192,104 +192,41 @@ class MDP:
 
 	#-------------------------------------------
 	def logLikelihoodTraces(self,sequences):
-		probas = self.getProbaStateObservationsPaths(sequences[0])
-		res = 0
-		for p in range(len(probas)):
-			if probas[p]== 0:
-				return -256
-			res += log(probas[p]) * sequences[1][p]
-		return res / sum(sequences[1])
+		sequences_sorted = sequences[0]
+		sequences_sorted.sort()
+		loglikelihood = 0.0
 
-	def getProbaStateObservationsPaths(self,sequences):
-		sequences = [list(i) if type(i) == type('x') else i for i in sequences]
-		cur_state = self.initial_state
-		states = [self.initial_state]
-		final_probs = [[] for i in range(len(sequences))]
-
-		finished = False
-
-		prev_action = 0
-		actions = [self.actions_state(cur_state)[0]]
-
-		choices = [0]
-		prev_choice = 0
-		obs =   [self.states[cur_state].next_matrix[actions[-1]][2][0]]
-		probs = [self.states[cur_state].next_matrix[actions[-1]][0][0]]
-		states.append(self.states[cur_state].next_matrix[actions[-1]][1][0])
-		cur_state =  states[-1]
-		trace = []
-		for i in range(len(obs)):
-			trace.append(actions[i])
-			trace.append(obs[i])
-
-		while not finished:
-			if (trace in sequences) or (trace not in [ s[:len(trace)] for s in sequences]) or (probs[-1] <= 0.0):
-				if trace in sequences:
-					#save it
-					final_probs[sequences.index(trace)].append(reduce(mul, probs, 1))
-				
-				while True:
-					#roll back choice
-					obs = obs[:-1]
-					probs = probs[:-1]
-					prev_choice = choices[-1]
-					choices = choices[:-1]
-					states = states[:-1]
-					cur_state = states[-1]
-					
-					#if last choice
-					if prev_choice == len(self.states[cur_state].next_matrix[actions[-1]][0])-1:
-						#roll back action
-						prev_action = self.actions_state(cur_state).index(actions[-1])
-						actions = actions[:-1]
-					
-						#if not last action
-						if prev_action < len(self.actions_state(cur_state))-1:
-							#take next action
-							actions.append(self.actions_state(cur_state)[prev_action+1])
-							#take first choice
-							choices.append(0)
-							obs.append(   self.states[cur_state].next_matrix[actions[-1]][2][choices[-1]])
-							probs.append( self.states[cur_state].next_matrix[actions[-1]][0][choices[-1]])
-							states.append(self.states[cur_state].next_matrix[actions[-1]][1][choices[-1]])
-							cur_state =  states[-1]
-							break					
-						#if last action it will roll back choice again
-						#if last action AND in initial state then it's done
-						elif len(states) == 1:
-							finished = True
-							break
-
-					#if not last choice
-					else:
-						#take next choice
-						choices.append(prev_choice+1)
-						obs.append(   self.states[cur_state].next_matrix[actions[-1]][2][choices[-1]])
-						probs.append( self.states[cur_state].next_matrix[actions[-1]][0][choices[-1]])
-						states.append(self.states[cur_state].next_matrix[actions[-1]][1][choices[-1]])
-						cur_state =  states[-1]
-						break
-			
+		alpha_matrix = []
+		for s in range(len(self.states)):
+			if s == self.initial_state:
+				alpha_matrix.append([1.0])
 			else:
-				#take first action
-				prev_action = 0
-				actions.append(self.actions_state(cur_state)[0])
-				#take first choice
-				choices.append(0)
-				obs.append(   self.states[cur_state].next_matrix[actions[-1]][2][choices[-1]])
-				probs.append( self.states[cur_state].next_matrix[actions[-1]][0][choices[-1]])
-				states.append(self.states[cur_state].next_matrix[actions[-1]][1][choices[-1]])
-				cur_state =  states[-1]
+				alpha_matrix.append([0.0])
+			alpha_matrix[-1] += [None for i in range(int(len(sequences[0][0])/2))]
 
-			trace = []
-			for i in range(len(obs)):
-				trace.append(actions[i])
-				trace.append(obs[i])
+		for seq in range(len(sequences_sorted)):
+			sequence_actions = [sequences_sorted[seq][i] for i in range(0,len(sequences_sorted[seq]),2)]
+			sequence_obs = [sequences_sorted[seq][i+1] for i in range(0,len(sequences_sorted[seq]),2)]
+			times = sequences[1][sequences[0].index(sequence)]
+			common = 0
+			if seq > 0:
+				while sequences_sorted[seq-1][common] == sequence[common]:
+					common += 1
+			common = int(common/2)
+			#-----compute alphas-----
+			for k in range(common,len(sequence)):
+				action = sequence_actions[k]
+				for s in range(len(self.states)):
+					summ = 0.0
+					for ss in range(len(self.states)):
+						p = self.states[ss].g(action,s,sequence[k])
+						summ += alpha_matrix[ss][k]*p
+					alpha_matrix[s][k+1] = summ
+			#------------------------
+			loglikelihood += log(sum([alpha_matrix[s][-1] for s in range(len(self.states))]))
 
-
-		final_probs = [sum(i) for i in final_probs]
-		return final_probs
-	
+		return loglikelihood
+		
 	#-------------------------------------------
 	def allStatesPathObservations(self,seq_obs):
 		res = [[self.initial_state]]

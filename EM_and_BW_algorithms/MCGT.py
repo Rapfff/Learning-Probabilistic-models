@@ -89,7 +89,7 @@ class MCGT:
 					print("s",i," - (",self.states[i].next_matrix[2][j],") -> s",self.states[i].next_matrix[1][j]," : ",self.states[i].next_matrix[0][j],sep='')
 		print()
 
-	def logLikelihood(slf,sequences):
+	def logLikelihood(self,sequences):
 		sequences_sorted = sequences[0]
 		sequences_sorted.sort()
 		loglikelihood = 0.0
@@ -100,7 +100,7 @@ class MCGT:
 				alpha_matrix.append([1.0])
 			else:
 				alpha_matrix.append([0.0])
-			alpha_matrix[-1] += [None for i in range(len(self.sequence))]
+			alpha_matrix[-1] += [None for i in range(len(sequences[0][0]))]
 
 		for seq in range(len(sequences_sorted)):
 			sequence = sequences_sorted[seq]
