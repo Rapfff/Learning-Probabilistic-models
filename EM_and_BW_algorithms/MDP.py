@@ -64,7 +64,7 @@ class MDP_state:
 		"""
 		for action in next_matrix:
 			if round(sum(next_matrix[action][0]),2) < 1.0:
-				print("Sum of the probabilies of the next_matrix should be 1.0 here it's ",sum(next_matrix[0]))
+				print("Sum of the probabilies of the next_matrix should be 1.0 here it's ",sum(next_matrix[action][0]))
 				return False
 		self.next_matrix = next_matrix
 
@@ -89,7 +89,7 @@ class MDP_state:
 	def __str__(self):
 		res = ""
 		for action in self.next_matrix:
-			res += action
+			res += str(action)
 			res += '\n'
 			for proba in self.next_matrix[action][0]:
 				res += str(proba)+' '
@@ -207,6 +207,7 @@ class MDP:
 		for seq in range(len(sequences_sorted)):
 			sequence_actions = [sequences_sorted[seq][i] for i in range(0,len(sequences_sorted[seq]),2)]
 			sequence_obs = [sequences_sorted[seq][i+1] for i in range(0,len(sequences_sorted[seq]),2)]
+			sequence = sequences_sorted[seq]
 			times = sequences[1][sequences[0].index(sequence)]
 			common = 0
 			if seq > 0:
@@ -214,12 +215,12 @@ class MDP:
 					common += 1
 			common = int(common/2)
 			#-----compute alphas-----
-			for k in range(common,len(sequence)):
+			for k in range(common,len(sequence_obs)):
 				action = sequence_actions[k]
 				for s in range(len(self.states)):
 					summ = 0.0
 					for ss in range(len(self.states)):
-						p = self.states[ss].g(action,s,sequence[k])
+						p = self.states[ss].g(action,s,sequence_obs[k])
 						summ += alpha_matrix[ss][k]*p
 					alpha_matrix[s][k+1] = summ
 			#------------------------
