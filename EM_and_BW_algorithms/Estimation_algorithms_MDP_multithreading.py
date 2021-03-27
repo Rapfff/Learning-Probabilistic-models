@@ -1,6 +1,7 @@
 from MDP import *
 from tools import correct_proba
 from random import randint
+from multiprocessing import cpu_count, Pool
 from time import time
 
 class Estimation_algorithm_MDP:
@@ -14,74 +15,43 @@ class Estimation_algorithm_MDP:
 		self.alphabet = alphabet
 		self.actions = actions
 
-	def checkEnd(self):
-		for i in range(len(self.h.states)):
-			for j in range(len(self.h.states)):
-				for act in self.actions:
-					for k in self.alphabet:
-						if self.h_g(i,act,j,k) != self.hhat_g(i,act,j,k):
-							return False
-		return True
-
-	def checkEndLikelihood(self,c):
-		if c < 10:
-			self.prevloglikelihood = -256
-			print(c)
-			return False
-		print(c,"- loglikelihood",end=" ")
-		currentloglikelihood = self.logLikelihood()
-		print(currentloglikelihood)
-		if self.prevloglikelihood == currentloglikelihood:
-			self.prevloglikelihood = currentloglikelihood
-			return True
-		else:
-			self.prevloglikelihood = currentloglikelihood
-			return False
-
 	def h_g(self,s1,act,s2,obs):
 		return self.h.g(s1,act,s2,obs)
 
 	def hhat_g(self,s1,act,s2,obs):
 		return self.hhat.g(s1,act,s2,obs)
 	
-	def precomputeMatrices(self,sequence,common):
-		"""Here we compute all the values alpha(k,t) and beta(t,k) for a given sequence"""
-		if common == -1:
-			common = 0
-			self.alpha_matrix = []
-
-			for s in range(len(self.h.states)):
-				if s == self.h.initial_state:
-					self.alpha_matrix.append([1.0])
-				else:
-					self.alpha_matrix.append([0.0])
-				self.alpha_matrix[-1] += [None for i in range(len(sequence))]
-
+	def computeAlphas(self,sequence,sequence_actions,common,alpha_matrix):
+		"""Here we compute all the values alpha(k,t) for a given sequence"""
 		for k in range(common,len(sequence)):
-			action = self.sequence_actions[k]
+			action = sequence_actions[k]
 			for s in range(len(self.h.states)):
 				summ = 0.0
 				for ss in range(len(self.h.states)):
 					p = self.h_g(ss,action,s,sequence[k])
-					summ += self.alpha_matrix[ss][k]*p
-				self.alpha_matrix[s][k+1] = summ
+					summ += alpha_matrix[ss][k]*p
+				alpha_matrix[s][k+1] = summ
 
-		self.beta_matrix = []
+		return alpha_matrix
 
+	def computeBetas(self,sequence,sequence_actions):
+		"""Here we compute all the values beta(t,k) for a given sequence"""
+		beta_matrix = []
 		for s in range(len(self.h.states)):
-			self.beta_matrix.append([1.0])
+			beta_matrix.append([1.0])
 		
 		for k in range(len(sequence)-1,-1,-1):
-			action = self.sequence_actions[k]
+			action = sequence_actions[k]
 			for s in range(len(self.h.states)):
 				summ = 0.0
 				for ss in range(len(self.h.states)):
 					p = self.h_g(s,action,ss,sequence[k])
-					summ += self.beta_matrix[ss][1 if ss<s else 0]*p
-				self.beta_matrix[s].insert(0,summ)
-	
+					summ += beta_matrix[ss][1 if ss<s else 0]*p
+				beta_matrix[s].insert(0,summ)
 
-	def problem3(self,traces,output_file="output_model.txt",limit=0.00001):
+		return beta_matrix
+
+	def problem3(self,traces,output_file="output_model.txt",limit=0.0001):
 		"""
 		Given a set of sequences of pairs action-observation,
 		it adapts the parameters of h in order to maximize the probability to get 
@@ -94,7 +64,7 @@ class Estimation_algorithm_MDP:
 		self.times = [ traces[1][traces[0].index(self.sequences_sorted[seq])] for seq in range(len(self.sequences_sorted))]
 
 		start_time = time()
-
+		
 		self.observations = []
 		for seq in self.sequences_sorted:
 			for i in range(1,len(seq),2):
@@ -102,7 +72,7 @@ class Estimation_algorithm_MDP:
 					self.observations.append(seq[i])
 
 		counter = 0
-		prevloglikelihood = self.logLikelihood()
+		prevloglikelihood = 10
 		while True:
 			print(counter,prevloglikelihood)
 			new_states = []
@@ -111,12 +81,23 @@ class Estimation_algorithm_MDP:
 				next_states = []
 				next_obs    = []
 
+				p = Pool(processes = cpu_count()-1)
+				tasks = []
 				for j in range(len(self.h.states)):
 					for k in self.observations:
-						next_probas.append(self.ghatmultiple(i,j,k))
-						next_states.append(j)
-						next_obs.append(k)
-						
+						tasks.append(p.apply_async(self.ghatmultiple, [i,j,k,]))
+				p.close()
+				temp = [res.get() for res in tasks]
+
+				next_probas = [ temp[t][2] for t in range(len(temp)) ]
+				next_states = [ temp[t][0] for t in range(len(temp)) ]
+				next_obs    = [ temp[t][1] for t in range(len(temp)) ]
+
+				for j in temp:
+					if len(j) == 4:
+						currentloglikelihood = j[3]
+				
+				for j in range(len(self.h.states)):			
 					for k in [ letter for letter in self.alphabet if not letter in self.observations ]:
 						next_probas.append([0.0]*len(self.actions))
 						next_states.append(j)
@@ -132,40 +113,16 @@ class Estimation_algorithm_MDP:
 			self.hhat = MDP(new_states,self.h.initial_state)
 			
 			counter += 1
-			currentloglikelihood = self.logLikelihood()
-			if abs(prevloglikelihood - currentloglikelihood) < limit:
-				self.h = self.hhat
+			if abs(prevloglikelihood - currentloglikelihood) < limit: #ici on compare h et celui avant(pas hhat)
 				break
 			else:
 				prevloglikelihood = currentloglikelihood
 				self.h = self.hhat
+
 		print()
 		self.h.pprint()
 		self.h.save(output_file)
 		return [currentloglikelihood,time()-start_time]
-
-	def gamma(self,s,k):
-		"""
-		Returns the probability to generate the kth obs of o in state s * bigK
-		Note: it's important to compute self.bigK before
-		"""
-		return self.alpha_matrix[s][k]*self.beta_matrix[s][k]/self.bigK
-
-	def xi(self,sequence,action,s1,s2,k):
-		"""
-		Returns the probabilty to move from state s1 to state s2 with action at time step k
-		Note: it's important to compute self.bigK before
-		"""
-		return self.alpha_matrix[s1][k]*self.h_g(s1,action,s2,sequence[k])*self.beta_matrix[s2][k+1]/self.bigK
-
-	def computeK(self):
-		"""
-		Returns sum over ss of alpha(k-1,ss) * beta(ss,k)
-		"""
-		self.bigK = self.beta_matrix[self.h.initial_state][0]
-
-	def logLikelihood(self):
-		return self.hhat.logLikelihoodTraces([self.sequences_sorted,self.times])
 
 	def ghatmultiple(self,s1,s2,obs):
 		"""
@@ -175,26 +132,51 @@ class Estimation_algorithm_MDP:
 		num = []
 		den = []
 
+		if s1 == 0 and s2 == 0 and self.observations.index(obs) == 0:
+			loglikelihood = 0.0
+		else:
+			loglikelihood = None
+
 		for i in range(len(self.actions)):
 			num.append(0.0)
 			den.append(0.0)
 
 		for seq in range(len(self.sequences_sorted)):
-			self.sequence_actions = [self.sequences_sorted[seq][i] for i in range(0,len(self.sequences_sorted[seq]),2)]
+			sequence_actions = [self.sequences_sorted[seq][i] for i in range(0,len(self.sequences_sorted[seq]),2)]
 			sequence_obs = [self.sequences_sorted[seq][i+1] for i in range(0,len(self.sequences_sorted[seq]),2)]
 			if seq == 0:
-				self.precomputeMatrices(sequence_obs,-1)
+				common = 0
+				alpha_matrix = []
+
+				for s in range(len(self.h.states)):
+					if s == self.h.initial_state:
+						alpha_matrix.append([1.0])
+					else:
+						alpha_matrix.append([0.0])
+					alpha_matrix[-1] += [None for i in range(len(sequence_obs))]
 			else:
 				common = 0 
 				while self.sequences_sorted[seq-1][common] == self.sequences_sorted[seq][common]:
 					common += 1
-				self.precomputeMatrices(sequence_obs,int(common/2))
-			self.computeK()
+			
+			alpha_matrix = self.computeAlphas(sequence_obs,sequence_actions,int(common/2),alpha_matrix)
+			beta_matrix  = self.computeBetas(sequence_obs,sequence_actions)
+			
+			bigK = beta_matrix[self.h.initial_state][0]
 			
 			for k in range(len(sequence_obs)):
-				den[self.actions.index(self.sequence_actions[k])] += self.gamma(s1,k) * self.times[seq]
+				gamma_s1_k = alpha_matrix[s1][k] * beta_matrix[s1][k] / bigK
+				
+				den[self.actions.index(sequence_actions[k])] += gamma_s1_k * self.times[seq]
+				
 				if sequence_obs[k] == obs:
-					num[self.actions.index(self.sequence_actions[k])] += self.xi(sequence_obs,self.sequence_actions[k],s1,s2,k) * self.times[seq]
+					num[self.actions.index(sequence_actions[k])] += alpha_matrix[s1][k]*self.h_g(s1,sequence_actions[k],s2,obs)*beta_matrix[s2][k+1] * self.times[seq] / bigK
 		
-		return [num[i]/den[i] if den[i] != 0.0 else 0.0 for i in range(len(num))]
+			if loglikelihood != None:
+				loglikelihood += log(sum([alpha_matrix[s][-1] for s in range(len(self.h.states))]))
+
+		if loglikelihood == None:
+			return (s2,obs,[num[i]/den[i] if den[i] != 0.0 else 0.0 for i in range(len(num))])
+
+		return (s2,obs,[num[i]/den[i] if den[i] != 0.0 else 0.0 for i in range(len(num))], loglikelihood)
 
