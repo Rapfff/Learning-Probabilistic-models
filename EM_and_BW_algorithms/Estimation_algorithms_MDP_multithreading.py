@@ -51,7 +51,7 @@ class Estimation_algorithm_MDP:
 
 		return beta_matrix
 
-	def problem3(self,traces,output_file="output_model.txt",limit=0.0001):
+	def problem3(self,traces,output_file="output_model.txt",limit=0.0001,pp=''):
 		"""
 		Given a set of sequences of pairs action-observation,
 		it adapts the parameters of h in order to maximize the probability to get 
@@ -74,7 +74,7 @@ class Estimation_algorithm_MDP:
 		counter = 0
 		prevloglikelihood = 10
 		while True:
-			print(counter,prevloglikelihood)
+			print(pp,counter,prevloglikelihood)
 			new_states = []
 			for i in range(len(self.h.states)):
 				next_probas = []
@@ -83,9 +83,11 @@ class Estimation_algorithm_MDP:
 
 				p = Pool(processes = cpu_count()-1)
 				tasks = []
+				#temp = []
 				for j in range(len(self.h.states)):
 					for k in self.observations:
 						tasks.append(p.apply_async(self.ghatmultiple, [i,j,k,]))
+						#temp.append(self.ghatmultiple(i,j,k))
 				p.close()
 				temp = [res.get() for res in tasks]
 

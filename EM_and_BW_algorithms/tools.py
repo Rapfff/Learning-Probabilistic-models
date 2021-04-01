@@ -46,7 +46,7 @@ def randomProbabilities(size):
 	rand.append(1.0)
 	return [rand[i]-rand[i-1] for i in range(1,len(rand))]
 
-def generateSet(model,set_size,sequence_size,scheduler=None,with_action=False):
+def generateSet(model,set_size,sequence_size,scheduler=None,with_action=True):
 	seq = []
 	val = []
 	for i in range(set_size):
