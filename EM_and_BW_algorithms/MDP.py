@@ -3,6 +3,13 @@ from math import log
 from functools import reduce
 from operator import mul
 
+class MemorylessScheduler:
+	def __init__(self,actions):
+		self.actions = actions
+
+	def get_action(self,current_state):
+		return self.actions[current_state]
+
 class FiniteMemoryScheduler:
 	def __init__(self,action_matrix,transition_matrix):
 		"""
@@ -177,8 +184,6 @@ class MDP:
 
 			current = next_state
 			current_len += 1
-
-		#return [output,actions]
 		return res
 
 	def pprint(self):
@@ -226,7 +231,7 @@ class MDP:
 			#------------------------
 			loglikelihood += log(sum([alpha_matrix[s][-1] for s in range(len(self.states))]))
 
-		return loglikelihood
+		return loglikelihood/sum(sequences[1])
 		
 	#-------------------------------------------
 	def allStatesPathObservations(self,seq_obs):
@@ -273,6 +278,63 @@ class MDP:
 				res += log(p) * sequences[1][i]
 		return res / nb_seq
 
+def maxReachabilityScheduler(m,s):
+	#Return the memoryless scheduler that maximizes the probability to reach 
+	# state s in MDP m
+	observations = m.observations()
+	bad_states = [i for i in range(len(m.states))]
+	bad_states.remove(s)
+	good_states = [s]
+	f = True
+	while f:
+		f = False
+		for ss in bad_states:
+			next_ss = False
+			for o in observations:
+				for a in m.states[ss].actions():
+					for sss in good_states:
+						if m.states[ss].g(a,sss,o) > 0:
+							bad_states.remove(ss)
+							good_states.append(ss)
+							next_ss = True
+							f = True
+							break
+					if next_ss:
+						break
+				if next_ss:
+					break
+	old_x = [0 if i!=s else 1 for i in range(len(m.states))]
+	while True:
+		x = []
+		for ss in range(len(m.states)):
+			if ss == s:
+				x.append(1)
+			elif ss in bad_states:
+				x.append(0)
+			else:
+				t = [0.0 for i in range(len(m.states[ss].actions())) ]
+				for a_i in range(len(m.states[ss].actions())):
+					a = m.states[ss].actions()[a_i]
+					for o in observations:
+						for sss in good_states:
+							t[a_i] += m.states[ss].g(a,sss,o)*old_x[sss]
+				x.append(max(t))
+		if max([abs(x[i] - old_x[i]) for i in range(len(x))]) < 0.001:
+			break
+		else:
+			old_x = x
+
+	memoryless_sched = [] 
+	for ss in range(len(m.states)):
+		t = [0.0 for i in range(len(m.states[ss].actions())) ]
+		for a_i in range(len(m.states[ss].actions())):
+			a = m.states[ss].actions()[a_i]
+			for o in observations:
+				for sss in good_states:
+					t[a_i] += m.states[ss].g(a,sss,o)*old_x[sss]
+		memoryless_sched.append(m.states[ss].actions()[t.index(max(t))])
+
+	return MemorylessScheduler(memoryless_sched)
 
 def loadMDP(file_path):
 	f = open(file_path,'r')
