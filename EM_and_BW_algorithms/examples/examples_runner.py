@@ -20,18 +20,19 @@ from HMM import *
 
 
 ###################INPUTS##########################
-model_to_learn = modelMCGT_game() #element of MDP,MCGT or HMM class
-type_of_model = MCGT #here put HMM, MCGT or MDP
+from tictactoeMDP import TicTacToe
+model_to_learn = TicTacToe() #element of MDP,MCGT or HMM class
+type_of_model = MDP #here put HMM, MCGT or MDP
 
 ## *** training set ***
-number_of_sequences = 100000 #int
-length_of_each_sequence = 5 #int
+number_of_sequences = 100 #int
+length_of_each_sequence = 7 #int
 #if we are learning an MDP (if not just set it to False)
-schedulers = False #Should be a list (it can have one element) or False
-fixed_action = False #bool
+schedulers = [scheduler_uniform(model_to_learn.actions())] #Should be a list (it can have one element) or False
+fixed_action = True #bool
 
 ## *** initial model ***
-number_of_states = 3 #int
+number_of_states = 5 #int
 ###################################################
 
 def generateTrainingSet(model,set_size,sequence_size,scheduler,with_action):
@@ -88,7 +89,7 @@ def runningExperiment(type_of_model,model_to_learn,number_of_sequences,length_of
 	initial_model = generateRandomModel(type_of_model, number_of_states, observations, actions)
 	initial_model.pprint()
 	algo = chooseLearningAlgorithm(initial_model, type_of_model, fixed_action, observations, actions)
-
+	
 	final_loglikelihood, running_time = algo.problem3(training_set)
 	output_model = algo.h
 	output_model.pprint()

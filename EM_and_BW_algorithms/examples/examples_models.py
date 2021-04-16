@@ -284,8 +284,19 @@ def modelMDP5():
 	m_s3 = MDP_state({'a': [[1.0],[3],['A']], 'b': [[1.0],[0],['A']]})
 	return MDP([m_s0,m_s1,m_s2,m_s3],0,"MDP5")
 
+def modelMDP6():
+	m_s0 = MDP_state({'a': [[1.0],[1],['A']], 'b': [[1/3,2/3],[2,4],['A','A']]})
+	m_s1 = MDP_state({'a': [[0.5,1/9,7/18],[1,3,2],['A','A','A']]})
+	m_s2 = MDP_state({'a': [[1.0],[2],['A']]})
+	m_s3 = MDP_state({'a': [[1.0],[3],['A']]})
+	m_s4 = MDP_state({'a': [[0.25,0.75],[5,6],['A','A']]})
+	m_s5 = MDP_state({'a': [[1.0],[6],['A']], 'b': [[1/3,2/3],[2,7],['A','A']]})
+	m_s6 = MDP_state({'a': [[3/5,2/5],[6,5],['A','A']]})
+	m_s7 = MDP_state({'a': [[0.5,0.5],[2,3],['A','A']]})
+	return MDP([m_s0,m_s1,m_s2,m_s3,m_s4,m_s5,m_s6,m_s7],0,"MDP6")
 
-def scheduler_random(actions):
+
+def scheduler_uniform(actions):
 	return FiniteMemoryScheduler({0:[[1/len(actions)]*len(actions),actions]},{})
 
 def scheduler_always_same(action):
