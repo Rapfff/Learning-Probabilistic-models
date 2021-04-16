@@ -35,11 +35,14 @@ class ActiveLearningScheduler:
 				alpha_matrix[s][k+1] = summ
 		
 		t = [alpha_matrix[s][-1] for s in range(nb_states)]
+		tot = sum(t)
+		if tot <= 0.0:
+			t = [1/len(t) for i in t]
+		else:
+			t = [i/tot for i in t]
 		s_i = resolveRandom(t)
 		act = self.memoryless_scheduler.get_action(s_i)
 		self.seq_act.append(act)
-
-		
 		return act
 
 	def add_observation(self,obs):
@@ -53,33 +56,46 @@ class Active_Learning_MDP:
 		"""
 		self.algo  = Estimation_algorithm_MDP(h,alphabet,actions)
 
-	def learn(self,traces,omega,output_file="output_model.txt",limit=0.0001,pp=''):
+	def learn(self,traces,omega,learning_rate,nb_sequences,max_iteration,output_file="output_model.txt",limit=0.0001,pp=''):
 		number_steps = int(len(traces[0][0])/2)
 		self.algo.problem3(traces,output_file,limit,pp)
 
 		missing_info_states = self.findMissingInfoStates(omega,traces)
-		print(len(missing_info_states),"missing_info_states...")
+		print(len(missing_info_states),"missing_info_states")
 		c = 1
-		while len(missing_info_states) > 0 and c<25 :
+		while len(missing_info_states) > 0 and  c < max_iteration :
+			old_h = self.algo.h
+			traces = [[],[]]
 			for s in missing_info_states:
-				traces = self.addTraces(s,traces,number_steps)
+				traces = self.addTraces(s,traces,number_steps,nb_sequences)
 			self.algo.problem3(traces,output_file,limit,pp)
-			c +=1
+			self.mergeModels(old_h,self.algo.h,learning_rate)
+			c += 1
 			missing_info_states = self.findMissingInfoStates(omega,traces)
 			print(len(missing_info_states),"missing_info_states")
 
 		self.h = self.algo.h
+
+	def mergeModels(self,old_h,new_h,lr):
+		for s in range(len(new_h.states)):
+			for a in new_h.states[s].actions():
+				if a in old_h.states[s].actions():
+					for p in range(len(new_h.states[s][a][0])):
+						new_h.states[s][a][0][p] = (1-lr)*old_h.states[s][a][0][p]+lr*new_h.states[s][a][0][p]
+			for a in [i for i in old_h.states[s].actions() if not i in new_h.states[s].actions()]:
+				new_h.states[s][a] = old_h.states[s][a]
+		self.algo.h = new_h
 
 	def findMissingInfoStates(self,omega,traces):
 		probas_states = self.computeProbas()
 		training_set_size = sum([traces[1][i]*(len(traces[0][i])+1)/2 for i in range(len(traces[0]))])
 		return [ s for s in range(len(probas_states)) if probas_states[s] <= omega*training_set_size]
 
-	def addTraces(self,s,traces,number_steps):
+	def addTraces(self,s,traces,number_steps,nb_sequences):
 		memoryless_scheduler = maxReachabilityScheduler(self.algo.h,s)
 		scheduler = ActiveLearningScheduler(memoryless_scheduler,self.algo.h)
 		#traces = [[],[]]
-		for n in range(10):
+		for n in range(nb_sequences):
 			seq = self.algo.h.run(number_steps,scheduler)
 			if not seq in traces[0]:
 				traces[0].append(seq)

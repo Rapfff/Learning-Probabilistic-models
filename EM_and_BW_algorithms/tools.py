@@ -11,10 +11,13 @@ def resolveRandom(m):
 	m = [proba1,proba2,...]
 	return index of the probability choosen
 	"""
-	r = random()
-	i = 0
-	while r > sum(m[:i+1]):
-		i += 1
+	while True:
+		r = random()
+		i = 0
+		while r > sum(m[:i+1]) and i < len(m):
+			i += 1
+		if i < len(m):
+			break
 	return i
 
 def correct_proba(ll,accuracy = 5,times=1):

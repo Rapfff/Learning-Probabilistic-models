@@ -81,7 +81,7 @@ class Estimation_algorithm_MDP:
 				self.beta_matrix[s].insert(0,summ)
 	
 
-	def problem3(self,traces,output_file="output_model.txt",limit=0.00001):
+	def problem3(self,traces,output_file="output_model.txt",limit=0.00001,pp=''):
 		"""
 		Given a set of sequences of pairs action-observation,
 		it adapts the parameters of h in order to maximize the probability to get 

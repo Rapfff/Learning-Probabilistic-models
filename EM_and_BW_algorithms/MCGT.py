@@ -26,17 +26,20 @@ class MCGT_state:
 		return 0.0
 
 	def __str__(self):
-		res = ""
-		for proba in self.next_matrix[0]:
-			res += str(proba)+' '
-		res += '\n'
-		for state in self.next_matrix[1]:
-			res += str(state)+' '
-		res += '\n'
-		for obs in self.next_matrix[2]:
-			res += str(obs)+' '
-		res += '\n'
-		return res
+		if len(self.next_matrix[0]) == 0: #end state
+			return "-\n"
+		else:
+			res = ""
+			for proba in self.next_matrix[0]:
+				res += str(proba)+' '
+			res += '\n'
+			for state in self.next_matrix[1]:
+				res += str(state)+' '
+			res += '\n'
+			for obs in self.next_matrix[2]:
+				res += str(obs)+' '
+			res += '\n'
+			return res
 
 class MCGT:
 
@@ -82,6 +85,8 @@ class MCGT:
 		return output
 
 	def pprint(self):
+		print(self.name)
+		print(self.initial_state)
 		for i in range(len(self.states)):
 			print("\n----STATE s",i,"----",sep='')
 			for j in range(len(self.states[i].next_matrix[0])):
@@ -118,9 +123,12 @@ class MCGT:
 						summ += alpha_matrix[ss][k]*p
 					alpha_matrix[s][k+1] = summ
 			#------------------------
-			loglikelihood += log(sum([alpha_matrix[s][-1] for s in range(len(self.states))]))
+			if sum([alpha_matrix[s][-1] for s in range(len(self.states))]) <= 0:
+				print(sequences_sorted[seq])
+			else:
+				loglikelihood += log(sum([alpha_matrix[s][-1] for s in range(len(self.states))])) * times
 
-		return loglikelihood
+		return loglikelihood / sum(sequences[1])
 
 	def UPPAAL_convert(self,outputfile="mcgt.xml"):
 		radius_uppaal_states = 300
@@ -321,14 +329,15 @@ def loadMCGT(file_path):
 	
 	l = f.readline()
 	while l and l != '\n':
-		p = [ float(i) for i in l[:-2].split(' ')]
-		
-		l = f.readline()[:-2].split(' ')
-		s = [ int(i) for i in l ]
-		
-		o = f.readline()[:-2].split(' ')
-		
-		states.append(MCGT_state([p,s,o]))
+		if l == '-\n':
+			states.append(MCGT_state([[],[],[]]))
+		else:
+			p = [ float(i) for i in l[:-2].split(' ')]
+			l = f.readline()[:-2].split(' ')
+			s = [ int(i) for i in l ]
+			o = f.readline()[:-2].split(' ')
+			states.append(MCGT_state([p,s,o]))
+
 		l = f.readline()
 
 	return MCGT(states,initial_state,name)

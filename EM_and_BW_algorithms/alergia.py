@@ -3,14 +3,17 @@ from math import sqrt, log
 from tools import correct_proba
 class Alergia:
 
-	def __init__(self,sample,alpha):
+	def __init__(self,sample,alpha,alphabet=None):
 		"""
 		Given a set of seq of observations return the MCGT learned by ALERGIA
 		sample = [[seq1,seq2,...],[val1,val2,...]]
 		all seq have same length
 		"""
 		self.alpha = alpha
-		self.alphabet = getAlphabetFromSequences(sample[0])
+		if alphabet == None:
+			self.alphabet = getAlphabetFromSequences(sample[0])
+		else:
+			self.alphabet = alphabet
 
 		N = sum(sample[1])
 		n = len(sample[0][0])
@@ -56,7 +59,6 @@ class Alergia:
 					s2 += 1
 
 	def learn(self):
-
 		for j in range(1,len(self.states_lbl)):
 			if self.states_lbl[j] != None:
 				for i in range(j):
@@ -66,6 +68,19 @@ class Alergia:
 							break
 
 		return self.toMCGT()
+
+	"""
+	def learnRecursive(self):
+		for j in range(1,len(self.states_lbl)):
+			if self.states_lbl[j] != None:
+				for i in range(j):
+					if self.states_lbl[i] != None:
+						if self.compatibleMergeRecursive(i,j):
+							j -= 1
+							break
+
+		return self.toMCGT()
+	"""
 
 	def transitionStateAction(self,state,action):
 		try:
@@ -88,8 +103,41 @@ class Alergia:
 
 
 	def compatibleMerge(self,i,j):
-		#input()
-		#print(i,j)
+
+		choices = [0]
+		pairs = [(i,j)]
+
+		while True:
+			a = self.alphabet[choices[-1]]
+			if self.different(i,j,a): #stop
+				return False
+
+			i = self.transitionStateAction(i,a)
+			j = self.transitionStateAction(j,a)
+
+
+			if i == None or j == None or i == j:
+				i = pairs[-1][0]
+				j = pairs[-1][1]
+				choices[-1] += 1 #next 
+				
+				while choices[-1] == len(self.alphabet):#roll back
+					choices = choices[:-1]
+					self.merge(i,j)
+					pairs = pairs[:-1]
+					if len(pairs) == 0:
+						return True
+					i = pairs[-1][0]
+					j = pairs[-1][1]
+					choices[-1] += 1
+
+			else: #deeper
+				choices.append(0)
+				pairs.append((i,j))
+
+	"""
+	def compatibleMergeRecursive(self,i,j):
+		#if i and j are compatible then merge them and return true, otherwise return false
 		if i == None or j == None:
 			return True
 
@@ -97,17 +145,19 @@ class Alergia:
 			return True
 
 		for a in self.alphabet:
-			#print("looking for action",a)
 			if self.different(i,j,a):
 				return False
-			if not self.compatibleMerge(self.transitionStateAction(i,a),self.transitionStateAction(j,a)):
+			if not self.compatibleMergeRecursive(self.transitionStateAction(i,a),self.transitionStateAction(j,a)):
 				return False
 		self.merge(i,j)
 		return True
+	"""
 
 	def merge(self,i,j):
-		for state in range(j):
-			if self.states_lbl != None:
+		if i > j :
+			j,i = i,j
+		for state in range(len(self.states_lbl)):
+			if self.states_lbl[state] != None:
 				for transition in range(len(self.states_transitions[state][1])):
 					if self.states_transitions[state][1][transition] == j:
 						self.states_transitions[state][1][transition] = i
@@ -127,7 +177,8 @@ class Alergia:
 
 		self.states_counter[i] += self.states_counter[j]
 		self.states_lbl[j] = None
-
+		self.states_transitions[j] = None
+		self.states_counter[j] = None
 
 	def toMCGT(self):
 		states = []

@@ -153,7 +153,7 @@ class IOFTPA:
 
 class IOAlergia:
 
-	def __init__(self,sample,alpha):
+	def __init__(self,sample,alpha,actions=None,observations=None):
 		"""
 		Given a set of seq of observations return the MCGT learned by ALERGIA
 		sample = [[seq1,seq2,...],[val1,val2,...]]
@@ -161,15 +161,24 @@ class IOAlergia:
 		"""
 		self.alpha = alpha
 		self.sample = sample
+
+
+		if actions == None or observations == None:
+			self.observations = []
+			self.actions = []
+			for seq in sample[0]:
+				for i in range(1,len(seq),2):
+					if observations == None:
+						if not seq[i] in self.observations:
+							self.observations.append(seq[i])
+					if actions == None:
+						if not seq[i-1] in self.actions:
+							self.actions.append(seq[i-1])
 		
-		self.observations = []
-		self.actions = []
-		for seq in sample[0]:
-			for i in range(1,len(seq),2):
-				if not seq[i] in self.observations:
-					self.observations.append(seq[i])
-				if not seq[i-1] in self.actions:
-					self.actions.append(seq[i-1])
+		if actions != None:
+			self.actions = actions
+		if observations != None:
+			self.observations = observations
 
 		self.actions.sort()
 		self.observations.sort()

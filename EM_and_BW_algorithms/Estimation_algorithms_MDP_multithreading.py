@@ -81,15 +81,15 @@ class Estimation_algorithm_MDP:
 				next_states = []
 				next_obs    = []
 
-				p = Pool(processes = cpu_count()-1)
-				tasks = []
-				#temp = []
+				#p = Pool(processes = 2)
+				#tasks = []
+				temp = []
 				for j in range(len(self.h.states)):
 					for k in self.observations:
-						tasks.append(p.apply_async(self.ghatmultiple, [i,j,k,]))
-						#temp.append(self.ghatmultiple(i,j,k))
-				p.close()
-				temp = [res.get() for res in tasks]
+						#tasks.append(p.apply_async(self.ghatmultiple, [i,j,k,]))
+						temp.append(self.ghatmultiple(i,j,k))
+				#p.close()
+				#temp = [res.get() for res in tasks]
 
 				next_probas = [ temp[t][2] for t in range(len(temp)) ]
 				next_states = [ temp[t][0] for t in range(len(temp)) ]
