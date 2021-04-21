@@ -3,6 +3,7 @@ from tools import correct_proba
 from random import randint
 from multiprocessing import cpu_count, Pool
 from time import time
+import datetime
 
 class Estimation_algorithm_MDP:
 	def __init__(self,h,alphabet,actions):
@@ -74,7 +75,7 @@ class Estimation_algorithm_MDP:
 		counter = 0
 		prevloglikelihood = 10
 		while True:
-			print(pp,counter,prevloglikelihood)
+			print(datetime.datetime.now(),pp,counter, prevloglikelihood)
 			new_states = []
 			for i in range(len(self.h.states)):
 				next_probas = []

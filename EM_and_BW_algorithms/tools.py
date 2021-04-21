@@ -53,7 +53,7 @@ def mergeSets(s1,s2):
 	for i in range(len(s2[0])):
 		if not s2[0][i] in s1[0]:
 			s1[0].append(s2[0][i])
-			s1[1].append(1)
+			s1[1].append(s2[1][i])
 		else:
 			s1[1][s1[0].index(s2[0][i])] += s2[1][i]
 	return s1
