@@ -49,6 +49,15 @@ def randomProbabilities(size):
 	rand.append(1.0)
 	return [rand[i]-rand[i-1] for i in range(1,len(rand))]
 
+def mergeSets(s1,s2):
+	for i in range(len(s2[0])):
+		if not s2[0][i] in s1[0]:
+			s1[0].append(s2[0][i])
+			s1[1].append(1)
+		else:
+			s1[1][s1[0].index(s2[0][i])] += s2[1][i]
+	return s1
+
 def generateSet(model,set_size,sequence_size,scheduler=None,with_action=True):
 	seq = []
 	val = []
@@ -67,6 +76,21 @@ def generateSet(model,set_size,sequence_size,scheduler=None,with_action=True):
 		val[seq.index(trace)] += 1
 
 	return [seq,val]
+
+def generateSetUnique(model,set_size,sequence_size,scheduler=None,with_action=True):
+	seq = []
+	while len(seq) < set_size:
+		if scheduler and with_action:
+			trace = model.run(sequence_size,scheduler,True)
+		elif scheduler:
+			trace = model.run(sequence_size,scheduler,False)
+		else:
+			trace = model.run(sequence_size)
+
+		if not trace in seq:
+			seq.append(trace)
+
+	return seq
 
 def randomLTL(depth, width, alphabet):
 	"""
