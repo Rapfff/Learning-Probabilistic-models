@@ -1,0 +1,4 @@
+Results original model training_set, test_set:-4.235674340542503, -3.907655598547617
+Results EM model (training_set, test_set, test_set_log):-4.92333367377973,0.616030010585755,-4.890177352462772
+Results EM model (training_set, test_set, test_set_log):-4.9115435329749335,0.5913815881483774,-4.7490853530427515
+Results EM model (training_set, test_set, test_set_log):-4.901841899656395,0.5459347255190397,-4.680168340818108

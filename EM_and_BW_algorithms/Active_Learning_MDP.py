@@ -56,7 +56,7 @@ class Active_Learning_MDP:
 		self.algo  = Estimation_algorithm_MDP(h,alphabet,actions)
 
 	def learn(self,traces,omega,learning_rate,nb_sequences,max_iteration,output_file="output_model.txt",limit=0.01,pp=''):
-		#self.history = []
+		self.history = []
 		total_traces = traces
 		number_steps = int(len(traces[0][0])/2)
 		self.algo.problem3(traces,"active_models/active_models_0.txt",limit,pp)
@@ -68,7 +68,7 @@ class Active_Learning_MDP:
 			old_h = self.algo.h
 			for s in missing_info_states:
 				traces = self.addTraces(s,number_steps,nb_sequences)
-			#self.history.append((len(missing_info_states)*nb_sequences)+sum(self.history))
+			self.history.append((len(missing_info_states)*nb_sequences)+sum(self.history))
 			self.algo.problem3(traces,"active_models/active_models_"+str(c)+".txt",limit,str(c))
 			self.mergeModels(old_h,self.algo.h,learning_rate)
 			c += 1

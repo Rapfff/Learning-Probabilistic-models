@@ -1,0 +1,200 @@
+['N', 'Mud', 'W', 'Sand', 'W', 'Wall', 'S', 'Grass', 'N', 'Sand', 'N', 'Wall', 'S', 'Mud', 'N', 'Sand', 'E', 'Mud', 'S', 'Grass']
+1
+['E', 'Concrete', 'S', 'Sand', 'S', 'Wall', 'S', 'Wall', 'W', 'Grass', 'W', 'Wall', 'N', 'Mud', 'N', 'Sand', 'W', 'Wall', 'S', 'Mud']
+1
+['W', 'Sand', 'S', 'Mud', 'W', 'Wall', 'S', 'Grass', 'S', 'Wall', 'S', 'Wall', 'S', 'Wall', 'E', 'Grass', 'E', 'Concrete', 'S', 'Mud']
+1
+['E', 'Concrete', 'S', 'Mud', 'E', 'Wall', 'E', 'Wall', 'W', 'Grass', 'W', 'Sand', 'E', 'Mud', 'S', 'Grass', 'E', 'Concrete', 'W', 'Grass']
+1
+['W', 'Mud', 'N', 'Mud', 'N', 'Wall', 'S', 'Grass', 'W', 'Mud', 'W', 'Wall', 'S', 'Grass', 'S', 'Wall', 'S', 'Wall', 'N', 'Mud']
+1
+['E', 'Concrete', 'E', 'Wall', 'E', 'Wall', 'N', 'Grass', 'E', 'Wall', 'S', 'Concrete', 'W', 'Grass', 'W', 'Mud', 'E', 'Grass', 'E', 'Concrete']
+1
+['W', 'Grass', 'E', 'Sand', 'N', 'Mud', 'W', 'Wall', 'N', 'Sand', 'E', 'Mud', 'S', 'Concrete', 'E', 'Wall', 'E', 'Wall', 'W', 'Grass']
+1
+['W', 'Grass', 'E', 'Sand', 'E', 'Mud', 'N', 'Concrete', 'S', 'Mud', 'S', 'Wall', 'N', 'Concrete', 'S', 'Sand', 'S', 'Wall', 'N', 'Grass']
+1
+['N', 'Mud', 'W', 'Sand', 'S', 'Mud', 'N', 'Sand', 'W', 'Wall', 'N', 'Wall', 'W', 'Wall', 'W', 'Wall', 'E', 'Mud', 'W', 'Mud']
+1
+['S', 'Sand', 'N', 'Grass', 'N', 'Mud', 'W', 'Sand', 'S', 'Mud', 'W', 'Wall', 'S', 'Grass', 'E', 'Sand', 'N', 'Grass', 'S', 'Sand']
+1
+['S', 'Sand', 'E', 'Mud', 'E', 'Wall', 'E', 'Wall', 'E', 'Wall', 'W', 'Sand', 'S', 'Wall', 'N', 'Grass', 'N', 'Mud', 'W', 'Mud']
+1
+['E', 'Concrete', 'N', 'Grass', 'S', 'Concrete', 'W', 'Grass', 'S', 'Sand', 'S', 'Wall', 'N', 'Grass', 'N', 'Mud', 'S', 'Grass', 'E', 'Concrete']
+1
+['W', 'Sand', 'W', 'Wall', 'E', 'Grass', 'S', 'Sand', 'N', 'Grass', 'W', 'Mud', 'N', 'Sand', 'E', 'Grass', 'W', 'Mud', 'W', 'Wall']
+1
+['W', 'Mud', 'N', 'Sand', 'N', 'Wall', 'S', 'Mud', 'W', 'Wall', 'N', 'Mud', 'S', 'Grass', 'W', 'Grass', 'E', 'Sand', 'S', 'Wall']
+1
+['W', 'Sand', 'N', 'Wall', 'E', 'Grass', 'S', 'Sand', 'E', 'Concrete', 'W', 'Grass', 'N', 'Sand', 'S', 'Grass', 'W', 'Grass', 'S', 'Wall']
+1
+['W', 'Mud', 'S', 'Sand', 'E', 'Concrete', 'E', 'Wall', 'N', 'Grass', 'S', 'Concrete', 'S', 'Mud', 'S', 'Wall', 'E', 'Wall', 'W', 'Sand']
+1
+['E', 'Concrete', 'E', 'Wall', 'E', 'Wall', 'S', 'Mud', 'W', 'Sand', 'S', 'Wall', 'E', 'Concrete', 'E', 'Wall', 'E', 'Wall', 'N', 'Mud']
+1
+['S', 'Sand', 'S', 'Wall', 'E', 'Concrete', 'N', 'Mud', 'E', 'Concrete', 'N', 'Grass', 'W', 'Grass', 'W', 'Mud', 'W', 'Wall', 'S', 'Grass']
+1
+['S', 'Sand', 'E', 'Mud', 'S', 'Wall', 'S', 'Wall', 'W', 'Grass', 'S', 'Sand', 'N', 'Grass', 'N', 'Sand', 'S', 'Grass', 'W', 'Mud']
+1
+['W', 'Mud', 'W', 'Wall', 'S', 'Sand', 'S', 'Wall', 'N', 'Grass', 'S', 'Sand', 'E', 'Concrete', 'N', 'Grass', 'W', 'Grass', 'E', 'Concrete']
+1
+['S', 'Mud', 'E', 'Wall', 'S', 'Wall', 'W', 'Grass', 'E', 'Concrete', 'S', 'Sand', 'S', 'Wall', 'S', 'Wall', 'S', 'Wall', 'W', 'Grass']
+1
+['W', 'Mud', 'S', 'Grass', 'W', 'Wall', 'W', 'Wall', 'E', 'Grass', 'E', 'Concrete', 'W', 'Grass', 'W', 'Sand', 'E', 'Grass', 'E', 'Concrete']
+1
+['S', 'Sand', 'E', 'Mud', 'N', 'Concrete', 'W', 'Grass', 'S', 'Sand', 'W', 'Grass', 'S', 'Wall', 'W', 'Wall', 'S', 'Wall', 'N', 'Grass']
+1
+['S', 'Sand', 'N', 'Grass', 'W', 'Mud', 'W', 'Wall', 'S', 'Grass', 'S', 'Wall', 'N', 'Grass', 'E', 'Concrete', 'E', 'Wall', 'S', 'Mud']
+1
+['E', 'Concrete', 'N', 'Mud', 'E', 'Grass', 'W', 'Mud', 'S', 'Grass', 'N', 'Sand', 'W', 'Wall', 'S', 'Mud', 'N', 'Sand', 'E', 'Mud']
+1
+['W', 'Mud', 'W', 'Wall', 'N', 'Mud', 'W', 'Sand', 'W', 'Wall', 'N', 'Wall', 'S', 'Grass', 'E', 'Concrete', 'W', 'Grass', 'N', 'Sand']
+1
+['S', 'Sand', 'N', 'Grass', 'E', 'Concrete', 'S', 'Sand', 'N', 'Grass', 'S', 'Sand', 'E', 'Mud', 'N', 'Concrete', 'W', 'Grass', 'E', 'Concrete']
+1
+['N', 'Sand', 'W', 'Wall', 'W', 'Wall', 'S', 'Mud', 'S', 'Grass', 'N', 'Mud', 'W', 'Wall', 'E', 'Grass', 'W', 'Sand', 'E', 'Mud']
+1
+['N', 'Grass', 'W', 'Grass', 'N', 'Mud', 'W', 'Sand', 'N', 'Wall', 'S', 'Grass', 'N', 'Sand', 'E', 'Mud', 'S', 'Grass', 'W', 'Mud']
+1
+['W', 'Mud', 'E', 'Grass', 'N', 'Grass', 'W', 'Mud', 'E', 'Grass', 'E', 'Wall', 'S', 'Concrete', 'N', 'Grass', 'W', 'Grass', 'N', 'Mud']
+1
+['W', 'Sand', 'W', 'Wall', 'E', 'Mud', 'E', 'Grass', 'W', 'Grass', 'E', 'Concrete', 'W', 'Grass', 'N', 'Grass', 'S', 'Concrete', 'W', 'Grass']
+1
+['E', 'Concrete', 'W', 'Grass', 'E', 'Concrete', 'E', 'Wall', 'S', 'Mud', 'W', 'Sand', 'E', 'Mud', 'W', 'Sand', 'S', 'Wall', 'N', 'Grass']
+1
+['W', 'Sand', 'W', 'Wall', 'W', 'Wall', 'N', 'Wall', 'W', 'Wall', 'E', 'Mud', 'E', 'Concrete', 'W', 'Grass', 'N', 'Sand', 'N', 'Wall']
+1
+['N', 'Sand', 'S', 'Grass', 'N', 'Grass', 'E', 'Wall', 'W', 'Mud', 'N', 'Wall', 'W', 'Sand', 'W', 'Wall', 'S', 'Grass', 'S', 'Sand']
+1
+['N', 'Mud', 'E', 'Grass', 'E', 'Wall', 'N', 'Wall', 'S', 'Concrete', 'N', 'Grass', 'W', 'Grass', 'N', 'Sand', 'W', 'Wall', 'N', 'Wall']
+1
+['E', 'Concrete', 'N', 'Grass', 'E', 'Wall', 'E', 'Wall', 'W', 'Mud', 'W', 'Mud', 'N', 'Mud', 'W', 'Sand', 'W', 'Wall', 'N', 'Wall']
+1
+['E', 'Concrete', 'W', 'Grass', 'N', 'Grass', 'E', 'Wall', 'W', 'Mud', 'N', 'Wall', 'S', 'Grass', 'S', 'Sand', 'S', 'Wall', 'E', 'Concrete']
+1
+['N', 'Mud', 'E', 'Grass', 'E', 'Wall', 'E', 'Wall', 'N', 'Wall', 'E', 'Wall', 'N', 'Wall', 'W', 'Grass', 'E', 'Concrete', 'W', 'Grass']
+1
+['S', 'Mud', 'N', 'Concrete', 'S', 'Mud', 'S', 'Wall', 'N', 'Concrete', 'N', 'Grass', 'W', 'Mud', 'S', 'Concrete', 'N', 'Grass', 'N', 'Wall']
+1
+['W', 'Mud', 'S', 'Grass', 'E', 'Sand', 'N', 'Concrete', 'E', 'Wall', 'E', 'Wall', 'N', 'Grass', 'E', 'Wall', 'N', 'Wall', 'E', 'Wall']
+1
+['S', 'Sand', 'N', 'Grass', 'N', 'Mud', 'W', 'Sand', 'S', 'Grass', 'E', 'Concrete', 'W', 'Sand', 'W', 'Grass', 'W', 'Wall', 'N', 'Mud']
+1
+['W', 'Mud', 'E', 'Grass', 'W', 'Mud', 'W', 'Wall', 'S', 'Grass', 'S', 'Wall', 'E', 'Sand', 'N', 'Concrete', 'W', 'Sand', 'W', 'Mud']
+1
+['E', 'Concrete', 'N', 'Grass', 'E', 'Wall', 'E', 'Wall', 'W', 'Grass', 'N', 'Mud', 'E', 'Grass', 'S', 'Concrete', 'S', 'Mud', 'N', 'Concrete']
+1
+['E', 'Concrete', 'W', 'Mud', 'E', 'Grass', 'N', 'Wall', 'N', 'Wall', 'N', 'Wall', 'E', 'Wall', 'N', 'Wall', 'N', 'Wall', 'E', 'Wall']
+1
+['N', 'Mud', 'E', 'Grass', 'N', 'Wall', 'W', 'Grass', 'N', 'Mud', 'S', 'Grass', 'N', 'Mud', 'S', 'Concrete', 'N', 'Grass', 'W', 'Grass']
+1
+['E', 'Concrete', 'E', 'Wall', 'S', 'Mud', 'N', 'Concrete', 'N', 'Grass', 'E', 'Wall', 'N', 'Wall', 'N', 'Wall', 'S', 'Concrete', 'S', 'Mud']
+1
+['S', 'Sand', 'W', 'Grass', 'S', 'Wall', 'W', 'Wall', 'S', 'Wall', 'N', 'Mud', 'N', 'Sand', 'W', 'Wall', 'E', 'Grass', 'N', 'Mud']
+1
+['N', 'Mud', 'N', 'Wall', 'E', 'Concrete', 'N', 'Grass', 'E', 'Wall', 'S', 'Concrete', 'N', 'Mud', 'W', 'Sand', 'W', 'Wall', 'E', 'Mud']
+1
+['S', 'Sand', 'E', 'Mud', 'S', 'Wall', 'S', 'Wall', 'W', 'Grass', 'E', 'Concrete', 'N', 'Mud', 'N', 'Wall', 'N', 'Wall', 'N', 'Wall']
+1
+['S', 'Sand', 'W', 'Grass', 'N', 'Grass', 'E', 'Concrete', 'N', 'Grass', 'W', 'Grass', 'S', 'Mud', 'N', 'Concrete', 'E', 'Wall', 'E', 'Wall']
+1
+['E', 'Concrete', 'W', 'Grass', 'W', 'Grass', 'S', 'Wall', 'N', 'Grass', 'S', 'Sand', 'W', 'Grass', 'N', 'Mud', 'W', 'Wall', 'W', 'Wall']
+1
+['E', 'Concrete', 'S', 'Sand', 'N', 'Grass', 'W', 'Grass', 'N', 'Grass', 'E', 'Concrete', 'E', 'Wall', 'W', 'Grass', 'W', 'Mud', 'W', 'Wall']
+1
+['S', 'Sand', 'W', 'Grass', 'S', 'Wall', 'S', 'Wall', 'W', 'Wall', 'W', 'Wall', 'E', 'Sand', 'S', 'Wall', 'S', 'Wall', 'E', 'Mud']
+1
+['N', 'Mud', 'S', 'Grass', 'E', 'Concrete', 'W', 'Mud', 'E', 'Grass', 'E', 'Wall', 'E', 'Wall', 'W', 'Grass', 'E', 'Concrete', 'N', 'Grass']
+1
+['E', 'Concrete', 'W', 'Grass', 'N', 'Mud', 'E', 'Grass', 'N', 'Wall', 'E', 'Wall', 'S', 'Concrete', 'N', 'Mud', 'E', 'Grass', 'E', 'Wall']
+1
+['W', 'Sand', 'N', 'Wall', 'S', 'Mud', 'W', 'Wall', 'E', 'Grass', 'W', 'Mud', 'E', 'Grass', 'W', 'Sand', 'S', 'Mud', 'E', 'Grass']
+1
+['S', 'Sand', 'S', 'Wall', 'E', 'Concrete', 'S', 'Mud', 'W', 'Sand', 'W', 'Mud', 'N', 'Sand', 'E', 'Mud', 'N', 'Wall', 'N', 'Wall']
+1
+['N', 'Grass', 'E', 'Wall', 'E', 'Wall', 'S', 'Concrete', 'N', 'Grass', 'N', 'Wall', 'E', 'Wall', 'W', 'Grass', 'E', 'Concrete', 'W', 'Grass']
+1
+['N', 'Mud', 'N', 'Wall', 'S', 'Grass', 'W', 'Mud', 'S', 'Sand', 'N', 'Concrete', 'W', 'Grass', 'W', 'Mud', 'S', 'Grass', 'W', 'Wall']
+1
+['S', 'Sand', 'S', 'Wall', 'N', 'Grass', 'W', 'Sand', 'E', 'Mud', 'S', 'Concrete', 'W', 'Grass', 'W', 'Sand', 'E', 'Mud', 'W', 'Mud']
+1
+['N', 'Sand', 'N', 'Wall', 'N', 'Wall', 'W', 'Wall', 'W', 'Wall', 'N', 'Wall', 'W', 'Wall', 'N', 'Wall', 'E', 'Mud', 'S', 'Grass']
+1
+['S', 'Sand', 'S', 'Wall', 'S', 'Wall', 'E', 'Mud', 'W', 'Sand', 'W', 'Grass', 'W', 'Wall', 'S', 'Wall', 'S', 'Wall', 'S', 'Wall']
+1
+['S', 'Sand', 'S', 'Wall', 'W', 'Mud', 'E', 'Grass', 'N', 'Grass', 'N', 'Wall', 'S', 'Concrete', 'S', 'Mud', 'W', 'Grass', 'W', 'Sand']
+1
+['N', 'Sand', 'E', 'Mud', 'S', 'Grass', 'N', 'Mud', 'E', 'Grass', 'W', 'Grass', 'S', 'Sand', 'S', 'Wall', 'E', 'Concrete', 'N', 'Mud']
+1
+['W', 'Mud', 'N', 'Mud', 'N', 'Wall', 'N', 'Wall', 'S', 'Concrete', 'W', 'Grass', 'E', 'Concrete', 'W', 'Grass', 'E', 'Concrete', 'N', 'Grass']
+1
+['S', 'Sand', 'E', 'Mud', 'N', 'Concrete', 'S', 'Mud', 'N', 'Concrete', 'S', 'Mud', 'S', 'Wall', 'N', 'Concrete', 'E', 'Wall', 'W', 'Grass']
+1
+['W', 'Sand', 'E', 'Mud', 'E', 'Grass', 'S', 'Concrete', 'S', 'Mud', 'W', 'Sand', 'S', 'Wall', 'N', 'Grass', 'S', 'Sand', 'W', 'Grass']
+1
+['S', 'Mud', 'E', 'Wall', 'N', 'Concrete', 'W', 'Grass', 'N', 'Mud', 'S', 'Grass', 'E', 'Concrete', 'E', 'Wall', 'S', 'Sand', 'S', 'Wall']
+1
+['E', 'Concrete', 'E', 'Wall', 'W', 'Grass', 'W', 'Grass', 'W', 'Wall', 'N', 'Grass', 'W', 'Mud', 'W', 'Wall', 'W', 'Wall', 'W', 'Wall']
+1
+['W', 'Mud', 'E', 'Sand', 'W', 'Grass', 'S', 'Wall', 'E', 'Sand', 'N', 'Grass', 'S', 'Sand', 'E', 'Mud', 'N', 'Concrete', 'S', 'Mud']
+1
+['E', 'Concrete', 'E', 'Wall', 'S', 'Sand', 'W', 'Mud', 'W', 'Wall', 'N', 'Sand', 'N', 'Wall', 'S', 'Grass', 'W', 'Grass', 'W', 'Wall']
+1
+['S', 'Sand', 'W', 'Grass', 'N', 'Grass', 'W', 'Mud', 'E', 'Grass', 'W', 'Mud', 'S', 'Grass', 'W', 'Wall', 'W', 'Wall', 'W', 'Wall']
+1
+['W', 'Mud', 'W', 'Wall', 'S', 'Grass', 'W', 'Wall', 'N', 'Mud', 'E', 'Grass', 'S', 'Sand', 'W', 'Grass', 'E', 'Grass', 'E', 'Concrete']
+1
+['N', 'Sand', 'E', 'Grass', 'N', 'Sand', 'E', 'Grass', 'N', 'Mud', 'S', 'Grass', 'S', 'Sand', 'S', 'Wall', 'N', 'Grass', 'N', 'Mud']
+1
+['N', 'Mud', 'N', 'Wall', 'E', 'Grass', 'S', 'Concrete', 'E', 'Wall', 'W', 'Grass', 'S', 'Sand', 'W', 'Mud', 'E', 'Grass', 'N', 'Sand']
+1
+['E', 'Concrete', 'W', 'Grass', 'E', 'Concrete', 'S', 'Sand', 'N', 'Grass', 'W', 'Mud', 'S', 'Grass', 'E', 'Sand', 'N', 'Grass', 'E', 'Concrete']
+1
+['S', 'Sand', 'N', 'Mud', 'E', 'Grass', 'S', 'Mud', 'S', 'Wall', 'W', 'Sand', 'S', 'Wall', 'E', 'Mud', 'N', 'Concrete', 'S', 'Sand']
+1
+['E', 'Concrete', 'S', 'Mud', 'S', 'Wall', 'W', 'Grass', 'N', 'Mud', 'N', 'Wall', 'W', 'Sand', 'E', 'Grass', 'W', 'Mud', 'S', 'Grass']
+1
+['E', 'Concrete', 'E', 'Wall', 'N', 'Grass', 'E', 'Wall', 'W', 'Mud', 'W', 'Sand', 'W', 'Wall', 'S', 'Mud', 'E', 'Grass', 'E', 'Concrete']
+1
+['N', 'Grass', 'E', 'Wall', 'E', 'Wall', 'E', 'Wall', 'N', 'Wall', 'E', 'Wall', 'N', 'Wall', 'E', 'Wall', 'S', 'Concrete', 'S', 'Mud']
+1
+['W', 'Grass', 'E', 'Sand', 'S', 'Wall', 'E', 'Concrete', 'E', 'Wall', 'E', 'Wall', 'N', 'Grass', 'W', 'Grass', 'E', 'Concrete', 'E', 'Wall']
+1
+['S', 'Mud', 'W', 'Sand', 'S', 'Wall', 'S', 'Wall', 'E', 'Concrete', 'E', 'Wall', 'S', 'Sand', 'W', 'Grass', 'N', 'Grass', 'E', 'Concrete']
+1
+['N', 'Mud', 'E', 'Grass', 'N', 'Wall', 'W', 'Grass', 'S', 'Sand', 'S', 'Wall', 'E', 'Mud', 'E', 'Wall', 'N', 'Concrete', 'N', 'Grass']
+1
+['W', 'Mud', 'N', 'Sand', 'W', 'Wall', 'S', 'Mud', 'S', 'Grass', 'E', 'Sand', 'S', 'Wall', 'W', 'Grass', 'E', 'Sand', 'W', 'Grass']
+1
+['E', 'Concrete', 'N', 'Mud', 'S', 'Grass', 'W', 'Mud', 'N', 'Sand', 'S', 'Mud', 'S', 'Sand', 'E', 'Concrete', 'W', 'Grass', 'E', 'Concrete']
+1
+['S', 'Sand', 'E', 'Mud', 'S', 'Wall', 'N', 'Concrete', 'S', 'Sand', 'W', 'Grass', 'S', 'Wall', 'S', 'Wall', 'S', 'Wall', 'S', 'Wall']
+1
+['E', 'Concrete', 'N', 'Grass', 'S', 'Concrete', 'W', 'Grass', 'W', 'Sand', 'W', 'Wall', 'E', 'Grass', 'N', 'Grass', 'E', 'Wall', 'E', 'Wall']
+1
+['N', 'Mud', 'W', 'Sand', 'W', 'Wall', 'W', 'Wall', 'N', 'Wall', 'S', 'Grass', 'S', 'Mud', 'W', 'Sand', 'N', 'Grass', 'E', 'Concrete']
+1
+['S', 'Sand', 'N', 'Concrete', 'E', 'Wall', 'S', 'Mud', 'W', 'Grass', 'W', 'Mud', 'E', 'Mud', 'N', 'Wall', 'N', 'Wall', 'W', 'Sand']
+1
+['S', 'Sand', 'E', 'Mud', 'E', 'Wall', 'S', 'Wall', 'S', 'Wall', 'W', 'Sand', 'S', 'Wall', 'W', 'Grass', 'S', 'Wall', 'S', 'Wall']
+1
+['S', 'Sand', 'W', 'Mud', 'N', 'Sand', 'E', 'Mud', 'S', 'Grass', 'E', 'Concrete', 'N', 'Mud', 'N', 'Wall', 'N', 'Wall', 'S', 'Grass']
+1
+['E', 'Concrete', 'W', 'Grass', 'E', 'Concrete', 'E', 'Wall', 'W', 'Grass', 'W', 'Mud', 'S', 'Grass', 'W', 'Wall', 'N', 'Mud', 'N', 'Sand']
+1
+['E', 'Concrete', 'E', 'Wall', 'S', 'Mud', 'S', 'Wall', 'E', 'Wall', 'W', 'Sand', 'S', 'Wall', 'E', 'Concrete', 'W', 'Sand', 'W', 'Grass']
+1
+['N', 'Mud', 'W', 'Sand', 'S', 'Mud', 'E', 'Grass', 'E', 'Concrete', 'S', 'Mud', 'N', 'Concrete', 'W', 'Grass', 'E', 'Concrete', 'E', 'Wall']
+1
+['E', 'Concrete', 'N', 'Grass', 'N', 'Wall', 'E', 'Wall', 'W', 'Mud', 'E', 'Concrete', 'E', 'Wall', 'S', 'Mud', 'E', 'Wall', 'E', 'Wall']
+1
+['E', 'Concrete', 'E', 'Wall', 'S', 'Mud', 'E', 'Wall', 'E', 'Wall', 'N', 'Concrete', 'S', 'Mud', 'N', 'Concrete', 'S', 'Sand', 'N', 'Grass']
+1
+['N', 'Mud', 'E', 'Concrete', 'W', 'Grass', 'E', 'Concrete', 'S', 'Sand', 'S', 'Wall', 'N', 'Grass', 'N', 'Mud', 'W', 'Sand', 'S', 'Mud']
+1
+['N', 'Mud', 'N', 'Wall', 'W', 'Sand', 'E', 'Mud', 'N', 'Wall', 'N', 'Wall', 'S', 'Grass', 'S', 'Sand', 'E', 'Concrete', 'N', 'Grass']
+1
+['W', 'Mud', 'W', 'Wall', 'E', 'Grass', 'W', 'Sand', 'E', 'Mud', 'N', 'Wall', 'W', 'Sand', 'E', 'Grass', 'E', 'Concrete', 'S', 'Mud']
+1
+['E', 'Concrete', 'E', 'Wall', 'E', 'Wall', 'W', 'Grass', 'W', 'Mud', 'E', 'Mud', 'S', 'Grass', 'S', 'Sand', 'S', 'Wall', 'N', 'Grass']
+1

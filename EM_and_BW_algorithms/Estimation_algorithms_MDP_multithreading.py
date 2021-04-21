@@ -80,8 +80,8 @@ class Estimation_algorithm_MDP:
 				next_probas = []
 				next_states = []
 				next_obs    = []
-
-				p = Pool(processes = cpu_count() - 1)
+				
+				p = Pool(processes = cpu_count()-1)
 				tasks = []
 				#temp = []
 				for j in range(len(self.h.states)):
@@ -122,7 +122,7 @@ class Estimation_algorithm_MDP:
 				self.h = self.hhat
 
 		print()
-		self.h.pprint()
+		#self.h.pprint()
 		self.h.save(output_file)
 		return [currentloglikelihood,time()-start_time]
 

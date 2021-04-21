@@ -94,19 +94,32 @@ class MCGT:
 					print("s",i," - (",self.states[i].next_matrix[2][j],") -> s",self.states[i].next_matrix[1][j]," : ",self.states[i].next_matrix[0][j],sep='')
 		print()
 
-	def logLikelihood(self,sequences):
-		sequences_sorted = sequences[0]
-		sequences_sorted.sort()
-		loglikelihood = 0.0
+	def computeAlphaMatrix(self,sequence,common,alpha_matrix):
+		for k in range(common,len(sequence)):
+			for s in range(len(self.states)):
+				summ = 0.0
+				for ss in range(len(self.states)):
+					p = self.states[ss].g(s,sequence[k])
+					summ += alpha_matrix[ss][k]*p
+				alpha_matrix[s][k+1] = summ
+		return alpha_matrix
 
+	def initAlphaMatrix(self,len_seq):
 		alpha_matrix = []
 		for s in range(len(self.states)):
 			if s == self.initial_state:
 				alpha_matrix.append([1.0])
 			else:
 				alpha_matrix.append([0.0])
-			alpha_matrix[-1] += [None for i in range(len(sequences[0][0]))]
+			alpha_matrix[-1] += [None for i in range(len_seq)]
+		return alpha_matrix
 
+	def logLikelihood(self,sequences):
+		sequences_sorted = sequences[0]
+		sequences_sorted.sort()
+		loglikelihood = 0.0
+
+		alpha_matrix = self.initAlphaMatrix(len(sequences_sorted[0]))
 		for seq in range(len(sequences_sorted)):
 			sequence = sequences_sorted[seq]
 			times = sequences[1][sequences[0].index(sequence)]
@@ -114,21 +127,31 @@ class MCGT:
 			if seq > 0:
 				while sequences_sorted[seq-1][common] == sequence[common]:
 					common += 1
-			#-----compute alphas-----
-			for k in range(common,len(sequence)):
-				for s in range(len(self.states)):
-					summ = 0.0
-					for ss in range(len(self.states)):
-						p = self.states[ss].g(s,sequence[k])
-						summ += alpha_matrix[ss][k]*p
-					alpha_matrix[s][k+1] = summ
-			#------------------------
+			alpha_matrix = self.computeAlphaMatrix(sequence,common,alpha_matrix)
+
 			if sum([alpha_matrix[s][-1] for s in range(len(self.states))]) <= 0:
 				print(sequences_sorted[seq])
 			else:
 				loglikelihood += log(sum([alpha_matrix[s][-1] for s in range(len(self.states))])) * times
 
 		return loglikelihood / sum(sequences[1])
+
+	def probasSequences(self,sequences):
+		#given sequences = [seq1,seq2...] /!\ all sequences should be pairwise different
+		#return probas   = [prob_seq1,prob_seq2,...]
+		sequences_sorted = sequences
+		sequences_sorted.sort()
+		alpha_matrix = self.initAlphaMatrix(len(sequences_sorted[0]))
+		probas = []
+		for seq in range(len(sequences_sorted)):
+			sequence = sequences_sorted[seq]
+			common = 0
+			if seq > 0:
+				while sequences_sorted[seq-1][common] == sequence[common]:
+					common += 1
+			alpha_matrix = self.computeAlphaMatrix(sequence,common,alpha_matrix)
+			probas.append(sum([alpha_matrix[s][-1] for s in range(len(self.states))]))
+		return probas
 
 	def UPPAAL_convert(self,outputfile="mcgt.xml"):
 		radius_uppaal_states = 300
@@ -209,6 +232,19 @@ class MCGT:
 
 		document.close()
 
+def KLDivergence(m1,m2,test_set):
+	pm1 = m1.probasSequences(test_set)
+	tot_m1 = sum(pm1)
+	pm2 = m2.probasSequences(test_set)
+	res = 0.0
+	for seq in range(len(test_set)):
+		if pm2[seq] <= 0.0:
+			print(test_set[seq])
+			return 256
+		if tot_m1 > 0.0 and pm1[seq] > 0.0:
+			res += (pm1[seq]/tot_m1)*log(pm1[seq]/pm2[seq])
+	return res
+
 
 def comparisonMCGTs(mcgt1,mcgt2,lstlstprops):
 	maxx = 0.0
@@ -227,6 +263,29 @@ def HMMtoMCGT(h):
 				transitions[2].append(sh.output_matrix[1][sy])
 		states_g.append(MCGT_state(transitions))
 	return MCGT(states_g,h.initial_state)
+
+
+def loadMCGT(file_path):
+	f = open(file_path,'r')
+	name = f.readline()[:-1]
+	initial_state = int(f.readline()[:-1])
+	states = []
+	
+	l = f.readline()
+	while l and l != '\n':
+		if l == '-\n':
+			states.append(MCGT_state([[],[],[]]))
+		else:
+			p = [ float(i) for i in l[:-2].split(' ')]
+			l = f.readline()[:-2].split(' ')
+			s = [ int(i) for i in l ]
+			o = f.readline()[:-2].split(' ')
+			states.append(MCGT_state([p,s,o]))
+
+		l = f.readline()
+
+	return MCGT(states,initial_state,name)
+
 
 #UPPAAL PACK
 
@@ -320,24 +379,3 @@ def UPPAAL_probas(next_mat,digits=3):
 		i += 1
 	return next_mat
 
-
-def loadMCGT(file_path):
-	f = open(file_path,'r')
-	name = f.readline()[:-1]
-	initial_state = int(f.readline()[:-1])
-	states = []
-	
-	l = f.readline()
-	while l and l != '\n':
-		if l == '-\n':
-			states.append(MCGT_state([[],[],[]]))
-		else:
-			p = [ float(i) for i in l[:-2].split(' ')]
-			l = f.readline()[:-2].split(' ')
-			s = [ int(i) for i in l ]
-			o = f.readline()[:-2].split(' ')
-			states.append(MCGT_state([p,s,o]))
-
-		l = f.readline()
-
-	return MCGT(states,initial_state,name)

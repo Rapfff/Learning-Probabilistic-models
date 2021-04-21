@@ -188,7 +188,11 @@ class MDP:
 
 	def pprint(self):
 		for i in range(len(self.states)):
-			print("\n----STATE s",i,"----",sep='')
+			print("\n----STATE s",i,"----",sep='',end='')
+			if i == self.initial_state:
+				print("(initial_state)")
+			else:
+				print()
 			for action in self.states[i].next_matrix:
 				for j in range(len(self.states[i].next_matrix[action][0])):
 					if self.states[i].next_matrix[action][0][j] > 0.0:
@@ -201,14 +205,7 @@ class MDP:
 		sequences_sorted.sort()
 		loglikelihood = 0.0
 
-		alpha_matrix = []
-		for s in range(len(self.states)):
-			if s == self.initial_state:
-				alpha_matrix.append([1.0])
-			else:
-				alpha_matrix.append([0.0])
-			alpha_matrix[-1] += [None for i in range(int(len(sequences[0][0])/2))]
-
+		alpha_matrix = self.initAlphaMatrix(int(len(sequences[0][0])/2))
 		for seq in range(len(sequences_sorted)):
 			sequence_actions = [sequences_sorted[seq][i] for i in range(0,len(sequences_sorted[seq]),2)]
 			sequence_obs = [sequences_sorted[seq][i+1] for i in range(0,len(sequences_sorted[seq]),2)]
@@ -219,64 +216,68 @@ class MDP:
 				while sequences_sorted[seq-1][common] == sequence[common]:
 					common += 1
 			common = int(common/2)
-			#-----compute alphas-----
-			for k in range(common,len(sequence_obs)):
-				action = sequence_actions[k]
-				for s in range(len(self.states)):
-					summ = 0.0
-					for ss in range(len(self.states)):
-						p = self.states[ss].g(action,s,sequence_obs[k])
-						summ += alpha_matrix[ss][k]*p
-					alpha_matrix[s][k+1] = summ
-			#------------------------
-			loglikelihood += log(sum([alpha_matrix[s][-1] for s in range(len(self.states))]))
+			alpha_matrix = self.computeAlphaMatrix(sequence_obs,sequence_actions,common,alpha_matrix)
+			if sum([alpha_matrix[s][-1] for s in range(len(self.states))]) <= 0.0:
+				return None
+			else:
+				loglikelihood += log(sum([alpha_matrix[s][-1] for s in range(len(self.states))]))
 
 		return loglikelihood/sum(sequences[1])
-		
+
+	def computeAlphaMatrix(self,sequence_obs,sequence_actions,common,alpha_matrix):
+		for k in range(common,len(sequence_obs)):
+			action = sequence_actions[k]
+			for s in range(len(self.states)):
+				summ = 0.0
+				for ss in range(len(self.states)):
+					p = self.states[ss].g(action,s,sequence_obs[k])
+					summ += alpha_matrix[ss][k]*p
+				alpha_matrix[s][k+1] = summ
+		return alpha_matrix
+
+	def initAlphaMatrix(self,len_seq):
+		alpha_matrix = []
+		for s in range(len(self.states)):
+			if s == self.initial_state:
+				alpha_matrix.append([1.0])
+			else:
+				alpha_matrix.append([0.0])
+			alpha_matrix[-1] += [None for i in range(len_seq)]
+		return alpha_matrix
+
+	def probasSequences(self,sequences):
+		#given sequences = [seq1,seq2...] /!\ all sequences should be pairwise different
+		#return probas   = [prob_seq1,prob_seq2,...]
+		sequences_sorted = sequences
+		sequences_sorted.sort()
+		alpha_matrix = self.initAlphaMatrix(int(len(sequences[0])/2))
+		probas = []
+		for seq in range(len(sequences_sorted)):
+			sequence_actions = [sequences_sorted[seq][i] for i in range(0,len(sequences_sorted[seq]),2)]
+			sequence_obs = [sequences_sorted[seq][i+1] for i in range(0,len(sequences_sorted[seq]),2)]
+			sequence = sequences_sorted[seq]
+			common = 0
+			if seq > 0:
+				while sequences_sorted[seq-1][common] == sequence[common]:
+					common += 1
+			common = int(common/2)
+			alpha_matrix = self.computeAlphaMatrix(sequence_obs,sequence_actions,common,alpha_matrix)
+			probas.append(sum([alpha_matrix[s][-1] for s in range(len(self.states))]))
+		return probas	
 	#-------------------------------------------
-	def allStatesPathObservations(self,seq_obs):
-		res = [[self.initial_state]]
-		c = 0
-		while c < len(seq_obs):
-			new = []
-			for p in res:
-				for act in self.states[p[-1]].actions():
-					for s in range(len(self.states)):
-						if self.g(p[-1],act, s, seq_obs[c]) > 0.0:
-							new.append(p+[act,seq_obs[c],s])
-			c += 1
-			res = new
-		return res
 
-	def probabilityStateActionObservationWithScheduler(self,path,scheduler):
-		scheduler.reset()
-		c = 0
-		p = 1
-		while p > 0.0 and c < len(path)-1:
-			p *= scheduler.get_probability(path[c+1])
-			p *= self.g(path[c],path[c+1],path[c+3],path[c+2])
-			scheduler.add_observation(path[c+2])
-			c += 3
-		return p
-
-	def probabilityObservationsScheduler(self,seq_obs,scheduler):
-		"""return the probability to get this sequence of observations with this scheduler"""
-		res = 0
-		for p in self.allStatesPathObservations(seq_obs):
-			res += self.probabilityStateActionObservationWithScheduler(p,scheduler)
-		return res
-
-	def logLikelihoodObservationsScheduler(self,data):
-		res = 0
-		nb_seq = 0
-		for scheduler,sequences in data:
-			nb_seq += sum(sequences[1])
-			for i in range(len(sequences[0])):
-				p = self.probabilityObservationsScheduler(sequences[0][i],scheduler)
-				if p == 0:
-					return -256
-				res += log(p) * sequences[1][i]
-		return res / nb_seq
+def KLDivergence(m1,m2,test_set):
+	pm1 = m1.probasSequences(test_set)
+	tot_m1 = sum(pm1)
+	pm2 = m2.probasSequences(test_set)
+	res = 0.0
+	for seq in range(len(test_set)):
+		if pm2[seq] <= 0.0:
+			print(test_set[seq])
+			return None
+		if tot_m1 > 0.0 and pm1[seq] > 0.0:
+			res += (pm1[seq]/tot_m1)*log(pm1[seq]/pm2[seq])
+	return res
 
 def maxReachabilityScheduler(m,s):
 	#Return the memoryless scheduler that maximizes the probability to reach 
@@ -355,3 +356,52 @@ def loadMDP(file_path):
 		states.append(MDP_state(d))
 		l = f.readline()
 	return MDP(states,initial_state,name)
+
+def loadPrismMDP(file_path):
+	f = open(file_path)
+	f.readline()
+	f.readline()
+	l = f.readline()
+	l = l.split(' ')
+
+	states = []
+	init = int(l[-1][:-2])
+	for i in range(int(l[2][4:-1])+1):
+		states.append({})
+
+	l = f.readline()
+	while l[:-1] != "endmodule":
+		act = l[1]
+		state = int(l[l.find('=')+1:l.find('-')-1])
+		l = (' '+f.readline()).split('+')
+		states[state][act] = []
+		states[state][act].append([ float(i[1:i.find(':')-1]) for i in l ]) #add proba
+		states[state][act].append([ int(i[i.find('=')+1:i.find(')')]) for i in l ]) #add state
+
+		l = f.readline()
+
+	map_s_o = {}
+	l = f.readline()
+
+	while l:
+		l = l[:-2]
+		if not "goal" in l:
+			obs = l[l.find('"')+1:l.rfind('"')]
+			obs = obs[0].upper() + obs[1:]
+			l = l.split('|')
+			s = [int(i[i.rfind('=')+1:]) for i in l]
+			for ss in s:
+				map_s_o[ss] = obs
+		l = f.readline()
+
+	for state in range(len(states)):
+		for a in states[state]:
+			states[state][a].append( [ map_s_o[states[state][a][1][i]] for i in range(len(states[state][a][1])) ] )
+
+
+	states = [MDP_state(i) for i in states]
+
+	m = MDP(states,init,file_path[:-6])
+	#m.pprint()
+	#m.save(file_path[:-6]+".txt")
+	return m
