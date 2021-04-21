@@ -81,15 +81,12 @@ class Active_Learning_MDP:
 		for s in range(len(new_h.states)):
 			for a in new_h.states[s].actions():
 				if a in old_h.states[s].actions():
-					print(old_h.states[s].next_matrix[a],'\n',new_h.states[s].next_matrix[a])
-
+					
 					for p in range(len(new_h.states[s].next_matrix[a][0])):
 						o = new_h.states[s].next_matrix[a][2][p]
 						sprime = new_h.states[s].next_matrix[a][1][p]
 						new_h.states[s].next_matrix[a][0][p] = (1-lr)*old_h.states[s].g(a,sprime,o)+lr*new_h.states[s].next_matrix[a][0][p]
 					
-					print(new_h.states[s].next_matrix[a])
-					input()
 			for a in [i for i in old_h.states[s].actions() if not i in new_h.states[s].actions()]:
 				new_h.states[s].next_matrix[a] = old_h.states[s].next_matrix[a]
 		self.algo.h = new_h
@@ -99,7 +96,7 @@ class Active_Learning_MDP:
 		training_set_size = sum([traces[1][i]*(len(traces[0][i])+1)/2 for i in range(len(traces[0]))])
 		return [ s for s in range(len(probas_states)) if probas_states[s] <= omega*training_set_size]
 
-	def addTraces(self,s,traces,number_steps,nb_sequences):
+	def addTraces(self,s,number_steps,nb_sequences):
 		memoryless_scheduler = maxReachabilityScheduler(self.algo.h,s)
 		scheduler = ActiveLearningScheduler(memoryless_scheduler,self.algo.h)
 		traces = [[],[]]
@@ -112,7 +109,8 @@ class Active_Learning_MDP:
 		return traces
 
 	def computeProbas(self,traces): #mutlithread it
-		sequences_sorted = traces[0].sort()
+		sequences_sorted = traces[0]
+		sequences_sorted.sort()
 		times = [ traces[1][traces[0].index(sequences_sorted[seq])] for seq in range(len(sequences_sorted))]
 
 		nb_states = len(self.algo.h.states)
