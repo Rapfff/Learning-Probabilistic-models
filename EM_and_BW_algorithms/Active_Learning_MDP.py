@@ -1,6 +1,7 @@
 from Estimation_algorithms_MDP_multithreading import Estimation_algorithm_MDP
 from MDP import maxReachabilityScheduler
 from tools import resolveRandom, mergeSets
+from multiprocessing import cpu_count, Pool
 
 class ActiveLearningScheduler:
 	def __init__(self,memoryless_scheduler,m):	
@@ -56,7 +57,7 @@ class Active_Learning_MDP:
 		self.algo  = Estimation_algorithm_MDP(h,alphabet,actions)
 
 	def learn(self,traces,omega,learning_rate,nb_sequences,max_iteration,output_file="output_model.txt",limit=0.01,pp=''):
-		self.probas_states = [0.0 for i in range(nb_states)]
+		self.probas_states = [0.0 for i in range(len(self.algo.h.states))]
 		#self.history = []
 		total_traces = traces
 		training_set_size = sum([total_traces[1][i]*(len(total_traces[0][i])+1)/2 for i in range(len(total_traces[0]))])
@@ -99,7 +100,9 @@ class Active_Learning_MDP:
 	def findMissingInfoStates(self,omega,traces,training_set_size):
 		p = Pool(processes = cpu_count()-1)
 		tasks = []
+		#temp = []
 		for seq in range(len(traces[0])):
+			#temp.append(self.computeProbas(traces[0][seq],traces[1][seq]))
 			tasks.append(p.apply_async(self.computeProbas, [traces[0][seq],traces[1][seq],]))
 		p.close()
 		temp = [res.get() for res in tasks]
@@ -134,7 +137,7 @@ class Active_Learning_MDP:
 			else:
 				alpha_matrix.append([0.0])
 			alpha_matrix[-1] += [None for i in range(len(sequence_obs))]
-		for k in range(len(seq)):
+		for k in range(len(sequence_obs)):
 			action = sequence_actions[k]
 			for s in range(nb_states):
 				summ = 0.0
@@ -146,17 +149,17 @@ class Active_Learning_MDP:
 		beta_matrix = []
 		for s in range(nb_states):
 			beta_matrix.append([1.0])
-		for k in range(len(sequence)-1,-1,-1):
+		for k in range(len(sequence_obs)-1,-1,-1):
 			action = sequence_actions[k]
 			for s in range(nb_states):
 				summ = 0.0
 				for ss in range(nb_states):
-					p = self.algo.h_g(s,action,ss,sequence[k])
+					p = self.algo.h_g(s,action,ss,sequence_obs[k])
 					summ += beta_matrix[ss][1 if ss<s else 0]*p
 				beta_matrix[s].insert(0,summ)
 
 		res = []
 		for s in range(nb_states):
 			for k in range(len(alpha_matrix[s])):
-				res.append(alpha_matrix[s][k]*beta_matrix[s][k]*times[seq]/beta_matrix[self.algo.h.initial_state][0])
+				res.append(alpha_matrix[s][k]*beta_matrix[s][k]*time/beta_matrix[self.algo.h.initial_state][0])
 		return res
