@@ -86,7 +86,7 @@ class MDP_state:
 
 	def g(self,action,state,obs):
 		if action not in self.actions():
-			print("Not",action,"in",self.actions())
+			#print("Not",action,"in",self.actions())
 			return 0.0
 		for i in range(len(self.next_matrix[action][0])):
 			if self.next_matrix[action][1][i] == state and self.next_matrix[action][2][i] == obs:
@@ -129,6 +129,12 @@ class MDP:
 		for s in self.states:
 			f.write(str(s))
 		f.close()
+
+	def saveTerminal(self):
+		print(self.name)
+		print(str(self.initial_state))
+		for s in self.states:
+			print(str(s))
 
 	def actions(self):
 		res = []
@@ -266,6 +272,47 @@ class MDP:
 		return probas	
 	#-------------------------------------------
 
+	def saveToMathematica(self,output_file):
+		f = open(output_file,'w',encoding="utf-8")
+		f.write('L={"start","')
+		f.write('","'.join(self.observations()))
+		f.write('"};\n')
+		f.write('A={"')
+		f.write('","'.join(self.actions()))
+		f.write('"};\n')
+		f.write('S={')
+		f.write(','.join([str(i) for i in range(len(self.states))]))
+		f.write('};\n')
+		f.write('iota={ {"start",'+str(self.initial_state)+'} -> 1};\n')
+
+		f.write('tau={')
+		flag = False
+		for s1 in range(len(self.states)):
+			for a in self.actions():
+				if flag:
+					f.write(',')
+				f.write('\n\t{"'+str(a)+'",'+str(s1)+'} -> { ')
+				if not a in self.actions_state(s1):
+					f.write('{"error",'+str(s1)+'} -> 1')
+					#add error with prob 0 for other states
+					#add 0 probtransition for all other obs
+				else:
+					ss = ""
+					for s2 in range(len(self.states)):
+						for o in self.observations():
+							ss += '{"'+str(o)+'",'+str(s2)+'} -> '+str(self.g(s1,a,s2,o))+', '
+							#f.write('{"'+str(o)+'",'+str(s2)+'} -> '+str(self.g(s1,a,s2,o))+', ')
+						#add error with 0 prob
+					ss = ss[:-2]
+					f.write(ss)
+				f.write('}')
+		f.write('\n};\n')
+
+		f.write("M = MDP[S,iota,tau];")
+		f.close()
+
+
+
 def KLDivergence(m1,m2,test_set):
 	pm1 = m1.probasSequences(test_set)
 	tot_m1 = sum(pm1)
@@ -356,6 +403,14 @@ def loadMDP(file_path):
 		states.append(MDP_state(d))
 		l = f.readline()
 	return MDP(states,initial_state,name)
+
+def MDPFileToMathematica(file_path,output_file):
+	m = loadMDP(file_path)
+	m.saveToMathematica(output_file)
+
+def prismToMathematica(file_path,output_file):
+	m = loadPrismMDP(file_path)
+	m.saveToMathematica(output_file)
 
 def loadPrismMDP(file_path):
 	f = open(file_path)

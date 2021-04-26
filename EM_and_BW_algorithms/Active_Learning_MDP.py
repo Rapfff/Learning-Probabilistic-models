@@ -56,23 +56,28 @@ class Active_Learning_MDP:
 		self.algo  = Estimation_algorithm_MDP(h,alphabet,actions)
 
 	def learn(self,traces,omega,learning_rate,nb_sequences,max_iteration,output_file="output_model.txt",limit=0.01,pp=''):
-		self.history = []
+		self.probas_states = [0.0 for i in range(nb_states)]
+		#self.history = []
 		total_traces = traces
+		training_set_size = sum([total_traces[1][i]*(len(total_traces[0][i])+1)/2 for i in range(len(total_traces[0]))])
+	
 		number_steps = int(len(traces[0][0])/2)
 		self.algo.problem3(traces,"active_models/active_models_0.txt",limit,pp)
 
-		missing_info_states = self.findMissingInfoStates(omega,total_traces)
+		missing_info_states = self.findMissingInfoStates(omega,total_traces,training_set_size)
 		print(len(missing_info_states),"missing_info_states")
 		c = 1
 		while len(missing_info_states) > 0 and  c < max_iteration :
 			old_h = self.algo.h
 			for s in missing_info_states:
 				traces = self.addTraces(s,number_steps,nb_sequences)
-			self.history.append((len(missing_info_states)*nb_sequences)+sum(self.history))
+			total_traces = mergeSets(total_traces,traces)
+			training_set_size = sum([total_traces[1][i]*(len(total_traces[0][i])+1)/2 for i in range(len(total_traces[0]))])
+			#self.history.append((len(missing_info_states)*nb_sequences)+sum(self.history))
 			self.algo.problem3(traces,"active_models/active_models_"+str(c)+".txt",limit,str(c))
 			self.mergeModels(old_h,self.algo.h,learning_rate)
 			c += 1
-			missing_info_states = self.findMissingInfoStates(omega,total_traces)
+			missing_info_states = self.findMissingInfoStates(omega,traces,training_set_size)
 			print(len(missing_info_states),"missing_info_states")
 
 		self.h = self.algo.h
@@ -91,10 +96,18 @@ class Active_Learning_MDP:
 				new_h.states[s].next_matrix[a] = old_h.states[s].next_matrix[a]
 		self.algo.h = new_h
 
-	def findMissingInfoStates(self,omega,traces):
-		probas_states = self.computeProbas(traces)
-		training_set_size = sum([traces[1][i]*(len(traces[0][i])+1)/2 for i in range(len(traces[0]))])
-		return [ s for s in range(len(probas_states)) if probas_states[s] <= omega*training_set_size]
+	def findMissingInfoStates(self,omega,traces,training_set_size):
+		p = Pool(processes = cpu_count()-1)
+		tasks = []
+		for seq in range(len(traces[0])):
+			tasks.append(p.apply_async(self.computeProbas, [traces[0][seq],traces[1][seq],]))
+		p.close()
+		temp = [res.get() for res in tasks]
+		for p in temp:
+			for s in range(len(self.probas_states)):
+				self.probas_states[s] += p[s]
+
+		return [ s for s in range(len(self.probas_states)) if self.probas_states[s] <= omega*training_set_size]
 
 	def addTraces(self,s,number_steps,nb_sequences):
 		memoryless_scheduler = maxReachabilityScheduler(self.algo.h,s)
@@ -108,38 +121,42 @@ class Active_Learning_MDP:
 			traces[1][traces[0].index(seq)] += 1
 		return traces
 
-	def computeProbas(self,traces): #mutlithread it
-		sequences_sorted = traces[0]
-		sequences_sorted.sort()
-		times = [ traces[1][traces[0].index(sequences_sorted[seq])] for seq in range(len(sequences_sorted))]
-
+	def computeProbas(self,seq,time): 
 		nb_states = len(self.algo.h.states)
-		res = [0.0 for i in range(nb_states)]
 
-		nb_seq = len(sequences_sorted)
-		for seq in range(nb_seq):
-			sequence_actions = [sequences_sorted[seq][i] for i in range(0,len(sequences_sorted[seq]),2)]
-			sequence_obs = [sequences_sorted[seq][i+1] for i in range(0,len(sequences_sorted[seq]),2)]
-			if seq == 0:
-				common = 0
-				alpha_matrix = []
+		sequence_actions = [seq[i] for i in range(0,len(seq),2)]
+		sequence_obs = [seq[i+1] for i in range(0,len(seq),2)]
 
-				for s in range(nb_states):
-					if s == self.algo.h.initial_state:
-						alpha_matrix.append([1.0])
-					else:
-						alpha_matrix.append([0.0])
-					alpha_matrix[-1] += [None for i in range(len(sequence_obs))]
+		alpha_matrix = []
+		for s in range(nb_states):
+			if s == self.algo.h.initial_state:
+				alpha_matrix.append([1.0])
 			else:
-				common = 0 
-				while sequences_sorted[seq-1][common] == sequences_sorted[seq][common]:
-					common += 1
-			
-			alpha_matrix = self.algo.computeAlphas(sequence_obs,sequence_actions,int(common/2),alpha_matrix)
-			beta_matrix  = self.algo.computeBetas(sequence_obs,sequence_actions)
-
+				alpha_matrix.append([0.0])
+			alpha_matrix[-1] += [None for i in range(len(sequence_obs))]
+		for k in range(len(seq)):
+			action = sequence_actions[k]
 			for s in range(nb_states):
-				for k in range(len(alpha_matrix[s])):
-					res[s] += alpha_matrix[s][k]*beta_matrix[s][k]*times[seq]/beta_matrix[self.algo.h.initial_state][0]
+				summ = 0.0
+				for ss in range(nb_states):
+					p = self.algo.h_g(ss,action,s,sequence_obs[k])
+					summ += alpha_matrix[ss][k]*p
+				alpha_matrix[s][k+1] = summ
 
+		beta_matrix = []
+		for s in range(nb_states):
+			beta_matrix.append([1.0])
+		for k in range(len(sequence)-1,-1,-1):
+			action = sequence_actions[k]
+			for s in range(nb_states):
+				summ = 0.0
+				for ss in range(nb_states):
+					p = self.algo.h_g(s,action,ss,sequence[k])
+					summ += beta_matrix[ss][1 if ss<s else 0]*p
+				beta_matrix[s].insert(0,summ)
+
+		res = []
+		for s in range(nb_states):
+			for k in range(len(alpha_matrix[s])):
+				res.append(alpha_matrix[s][k]*beta_matrix[s][k]*times[seq]/beta_matrix[self.algo.h.initial_state][0])
 		return res

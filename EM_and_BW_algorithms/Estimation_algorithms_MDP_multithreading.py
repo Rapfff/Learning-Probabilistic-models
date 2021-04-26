@@ -124,7 +124,7 @@ class Estimation_algorithm_MDP:
 
 		print()
 		#self.h.pprint()
-		self.h.save(output_file)
+		self.h.saveTerminal()
 		return [currentloglikelihood,time()-start_time]
 
 	def ghatmultiple(self,s1,s2,obs):
