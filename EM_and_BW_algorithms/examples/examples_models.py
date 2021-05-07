@@ -1,185 +1,5 @@
-import os, sys
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
-
-from HMM import *
-from MCGT import *
-from MCGS import *
 from MDP import *
 from tools import randomProbabilities
-
-# ---- HMM ----------------------------
-
-def modelHMM1():
-	h_s0 = HMM_state([[1.0],['$']],[[0.3,0.4,0.3],[1,2,3]])
-	h_s1 = HMM_state([[1.0],['a']],[[1.0],[4]])
-	h_s2 = HMM_state([[1.0],['b']],[[1.0],[4]])
-	h_s3 = HMM_state([[1.0],['c']],[[1.0],[4]])
-	h_s4 = HMM_state([[1.0],['d']],[[1.0],[4]])
-	return HMM([h_s0,h_s1,h_s2,h_s3,h_s4],0,"HMM1")
-
-
-def modelHMM1_equiprobable():
-	h_s0 = HMM_state([[0.2,0.2,0.2,0.2,0.2],['$','a','b','c','d']],[[0.2,0.2,0.2,0.2,0.2],[0,1,2,3,4]])
-	h_s1 = HMM_state([[0.2,0.2,0.2,0.2,0.2],['$','a','b','c','d']],[[0.2,0.2,0.2,0.2,0.2],[0,1,2,3,4]])
-	h_s2 = HMM_state([[0.2,0.2,0.2,0.2,0.2],['$','a','b','c','d']],[[0.2,0.2,0.2,0.2,0.2],[0,1,2,3,4]])
-	h_s3 = HMM_state([[0.2,0.2,0.2,0.2,0.2],['$','a','b','c','d']],[[0.2,0.2,0.2,0.2,0.2],[0,1,2,3,4]])
-	h_s4 = HMM_state([[0.2,0.2,0.2,0.2,0.2],['$','a','b','c','d']],[[0.2,0.2,0.2,0.2,0.2],[0,1,2,3,4]])
-	return HMM([h_s0,h_s1,h_s2,h_s3,h_s4],0,"HMM1_equiprobable")
-
-def modelHMM2():
-	h_s0 = HMM_state([[0.5,0.5],['x','y']],[[0.3,0.7,0.0],[1,2,3]])
-	h_s1 = HMM_state([[1.0],['a']],[[1.0],[3]])
-	h_s2 = HMM_state([[1.0],['b']],[[1.0],[3]])
-	h_s4 = HMM_state([[1.0],['d']],[[1.0],[3]])
-	return HMM([h_s0,h_s1,h_s2,h_s4],0,"HMM2")
-
-def modelHMM2_random():
-	h_s0 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(4),[0,1,2,3]])
-	h_s1 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(4),[0,1,2,3]])
-	h_s2 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(4),[0,1,2,3]])
-	h_s3 = HMM_state([randomProbabilities(5),['x','y','a','b','d']],[randomProbabilities(4),[0,1,2,3]])
-	return HMM([h_s0,h_s1,h_s2,h_s3],0,"HMM2_random")
-
-def modelHMM2_equiprobable():
-	h_s0 = HMM_state([[0.25,0.25,0.25,0.25,0.0],['x','y','a','b','d']],[[0.25,0.25,0.25,0.25],[0,1,2,3]])
-	h_s1 = HMM_state([[0.25,0.25,0.25,0.25,0.0],['x','y','a','b','d']],[[0.25,0.25,0.25,0.25],[0,1,2,3]])
-	h_s2 = HMM_state([[0.25,0.25,0.25,0.25,0.0],['x','y','a','b','d']],[[0.25,0.25,0.25,0.25],[0,1,2,3]])
-	h_s3 = HMM_state([[0.0,0.0,0.0,0.0,1.0],['x','y','a','b','d']],[[0.25,0.25,0.25,0.25],[0,1,2,3]])
-	return HMM([h_s0,h_s1,h_s2,h_s3],0,"HMM2_equiprobable")
-
-
-def modelHMM3():
-	h_s0 = HMM_state([[1.0],['$']],[[0.5,0.5],[1,2]])
-	h_s1 = HMM_state([[0.8,0.2],['a','b']],[[1.0],[0]])
-	h_s2 = HMM_state([[0.2,0.8],['a','b']],[[1.0],[0]])
-	return HMM([h_s0,h_s1,h_s2],0,"HMM3")
-
-def modelHMM4():
-	h_s0 = HMM_state([[0.4,0.6],['x','y']],[[0.5,0.5],[1,2]])
-	h_s1 = HMM_state([[0.8,0.2],['a','b']],[[1.0],[3]])
-	h_s2 = HMM_state([[0.1,0.9],['a','b']],[[1.0],[4]])
-	h_s3 = HMM_state([[0.5,0.5],['x','y']],[[0.8,0.1,0.1],[0,1,2]])
-	h_s4 = HMM_state([[1.0],['y']],[[1.0],[3]])
-	return HMM([h_s0,h_s1,h_s2,h_s3,h_s4],0,"HMM4")
-
-def modelHMM_random(number_states, alphabet):
-	states = []
-	for s in range(number_states):
-		states.append(HMM_state([randomProbabilities(len(alphabet)),alphabet],[randomProbabilities(number_states),list(range(number_states))]))
-	return HMM(states,0)
-
-# ---- MCGT ---------------------------
-
-def modelMCGT1():
-	g_s0 = MCGT_state([[0.15,0.15,0.2,0.2,0.15,0.15],[1,1,2,2,3,3],['x','y','x','y','x','y']])
-	g_s1 = MCGT_state([[1.0],[4],['a']])
-	g_s2 = MCGT_state([[1.0],[4],['b']])
-	g_s3 = MCGT_state([[1.0],[4],['c']])
-	g_s4 = MCGT_state([[0.5,0.5],[4,4],['d','e']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0,"MCGT1")
-
-def modelMCGT2():
-	g_s0 = MCGT_state([[0.2,0.2,0.3,0.3],[1,1,2,2],['x','y','x','y']])
-	g_s1 = MCGT_state([[1.0],[3],['a']])
-	g_s2 = MCGT_state([[1.0],[3],['b']])
-	g_s3 = MCGT_state([[1.0],[3],['d']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3],0,"MCGT2")
-
-def modelMCGT3():
-	g_s0 = MCGT_state([[1/3,1/3,1/3],[1,2,3],['$','$','$']])
-	g_s1 = MCGT_state([[1.0],[4],['a']])
-	g_s2 = MCGT_state([[1.0],[4],['b']])
-	g_s3 = MCGT_state([[1.0],[4],['c']])
-	g_s4 = MCGT_state([[1.0],[4],['d']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0,"MCGT3")
-
-def modelMCGT4():
-	g_s0 = MCGT_state([[0.5,0.5],[1,2],['x','y']])
-	g_s1 = MCGT_state([[0.4,0.1,0.35,0.15],[3,3,4,4],['a','b','a','b']])
-	g_s2 = MCGT_state([[0.3,0.2,0.1,0.4],[1,1,4,4],['b','a','a','b']])
-	g_s3 = MCGT_state([[0.5,0.5],[4,5],['c','c']])
-	g_s4 = MCGT_state([[1.0],[5],['d']])
-	g_s5 = MCGT_state([[1.0],[5],['e']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5],0,"MCGT4")
-
-def modelMCGT_game():
-	s_dice = MCGT_state([[1/3,1/3,1/3],[0,0,1],['1-2','3-4','5-6']])
-	s_cards= MCGT_state([[10/13,3/13],[1,2],["Number","Face"]])
-	s_win  = MCGT_state([[1.0],[2],["Win"]])
-	return MCGT([s_dice,s_cards,s_win],0,"MCGT_games")
-
-def modelMCGT_REBER():
-	g_s0 = MCGT_state([[1.0],[1],['B']])
-	g_s1 = MCGT_state([[0.5,0.5],[2,3],['T','P']])
-	g_s2 = MCGT_state([[0.6,0.4],[2,4],['S','X']])
-	g_s3 = MCGT_state([[0.7,0.3],[3,5],['T','V']])
-	g_s4 = MCGT_state([[0.5,0.5],[3,6],['X','S']])
-	g_s5 = MCGT_state([[0.5,0.5],[4,6],['P','V']])
-	g_s6 = MCGT_state([[1.0],[6],['E']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5,g_s6],0,"MCGT_REBER")
-
-def modelMCGT_REBERlight():
-	g_s0 = MCGT_state([[0.5,0.5],[1,2],['T','P']])
-	g_s1 = MCGT_state([[1.0],[3],['X']])
-	g_s2 = MCGT_state([[1.0],[4],['V']])
-	g_s3 = MCGT_state([[0.5,0.5],[2,5],['X','S']])
-	g_s4 = MCGT_state([[0.5,0.5],[3,5],['P','V']])
-	g_s5 = MCGT_state([[1.0],[5],['E']])
-	g_s6 = MCGT_state([[1.0],[0],['B']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5,g_s6],6,"MCGT_REBER")
-
-def modelMCGT1_assist():
-	g_s0 = MCGT_state([randomProbabilities(6),[1,1,2,2,3,3],['x','y','x','y','x','y']])
-	g_s1 = MCGT_state([randomProbabilities(4),[1,2,3,4],['a','a','a','a']])
-	g_s2 = MCGT_state([randomProbabilities(4),[1,2,3,4],['b','b','b','b']])
-	g_s3 = MCGT_state([randomProbabilities(4),[1,2,3,4],['c','c','c','c']])
-	g_s4 = MCGT_state([randomProbabilities(4),[1,2,3,4],['d','d','d','d']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0,"MCGT1_assist")
-
-def modelMCGT_equiprobable(nb_states,alphabet):
-	s = []
-	for i in range(nb_states):
-		s += [i] * len(alphabet)
-	obs = alphabet*nb_states
-	
-	states = []
-	for i in range(nb_states):
-		states.append(MCGT_state([[1/len(obs)]*len(obs),s,obs]))
-	return MCGT(states,0,"MCGT_equiprobable_"+str(nb_states)+"states")
-
-def modelMCGT_random(nb_states,alphabet):
-	s = []
-	for i in range(nb_states):
-		s += [i] * len(alphabet)
-	obs = alphabet*nb_states
-	
-	states = []
-	for i in range(nb_states):
-		states.append(MCGT_state([randomProbabilities(len(obs)),s,obs]))
-	return MCGT(states,0,"MCGT_random_"+str(nb_states)+"states")
-
-def modelMCGT1_equiprobable():
-	return modelMCGT_equiprobable(5,['x','y','a','b','c','d'])
-
-
-# ---- MCGS ---------------------------
-
-def modelMCGS1():
-	m_s0  = MCGS_state('',[[0.5,0.5],[5,6]])
-	m_s0x = MCGS_state('x',[[0.3,0.4,0.3],[1,2,3]])
-	m_s0y = MCGS_state('y',[[0.3,0.4,0.3],[1,2,3]])
-	m_s1  = MCGS_state('',[[1.0],[7]])
-	m_s1a = MCGS_state('a',[[1.0],[4]])
-	m_s2  = MCGS_state('',[[1.0],[8]])
-	m_s2b = MCGS_state('b',[[1.0],[4]])
-	m_s3  = MCGS_state('',[[1.0],[9]])
-	m_s3c = MCGS_state('c',[[1.0],[4]])
-	m_s4  = MCGS_state('',[[1.0],[10]])
-	m_s4d = MCGS_state('d',[[1.0],[4]])
-	return MCGS([m_s0,m_s1,m_s2,m_s3,m_s4,m_s0x,m_s0y,m_s1a,m_s2b,m_s3c,m_s4d],[[1.0],[0]])
-
 
 # ---- MDP ----------------------------
 
@@ -295,6 +115,26 @@ def modelMDP6():
 	m_s7 = MDP_state({'a': [[0.5,0.5],[2,3],['A','A']]})
 	return MDP([m_s0,m_s1,m_s2,m_s3,m_s4,m_s5,m_s6,m_s7],0,"MDP6")
 
+def modelMDP_smallstreet(p=0.75):
+	m_s_same = MDP_state({'m': [[p,1-p],[0,1],['M','S']], 's': [[p,1-p],[1,0],['M','S']]})
+	m_s_diff = MDP_state({'m': [[1.0],[1],['OK']],        's': [[1.0],[1],['OK']]})
+	return MDP([m_s_same,m_s_diff],0,"smallstreet")
+
+
+def modelMDP_midstreet(p=0.75):
+	m_s_rr = MDP_state({'m': [[p,1-p],[1,3],['L','R']], 's': [[p,1-p],[2,0],['L','R']]})
+	m_s_ll = MDP_state({'m': [[p,1-p],[0,2],['R','L']], 's': [[p,1-p],[3,1],['R','L']]})
+	m_s_rl = MDP_state({'m': [[1.0],[2],['OK']],        's': [[1.0],[2],['OK']]})
+	m_s_lr = MDP_state({'m': [[1.0],[3],['OK']],        's': [[1.0],[3],['OK']]})
+	return MDP([m_s_rr,m_s_ll,m_s_rl,m_s_lr],0,"midstreet")
+
+def modelMDP_bigstreet(p=0.75):
+	m_s_rr = MDP_state({'m': [[p,1-p],[1,2],['L','R']], 's': [[p,1-p],[2,0],['L','R']]})
+	m_s_ll = MDP_state({'m': [[p,1-p],[0,2],['R','L']], 's': [[p,1-p],[2,1],['R','L']]})
+	m_s_di = MDP_state({'m': [[1.0],[3],['HIT']],       's': [[1.0],[4],['OK']]})
+	m_s_de = MDP_state({'m': [[1.0],[3],['HIT']],       's': [[1.0],[3],['HIT']]})
+	m_s_vi = MDP_state({'m': [[1.0],[4],['OK']],        's': [[1.0],[4],['OK']]})
+	return MDP([m_s_rr,m_s_ll,m_s_di,m_s_de,m_s_vi],0,"bigstreet")
 
 def scheduler_uniform(actions):
 	return FiniteMemoryScheduler({0:[[1/len(actions)]*len(actions),actions]},{})
