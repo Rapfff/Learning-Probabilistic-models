@@ -224,6 +224,7 @@ class MDP:
 			common = int(common/2)
 			alpha_matrix = self.computeAlphaMatrix(sequence_obs,sequence_actions,common,alpha_matrix)
 			if sum([alpha_matrix[s][-1] for s in range(len(self.states))]) <= 0.0:
+				print(sequences_sorted[seq])
 				return None
 			else:
 				loglikelihood += log(sum([alpha_matrix[s][-1] for s in range(len(self.states))]))
@@ -291,6 +292,7 @@ class MDP:
 			for a in self.actions():
 				if flag:
 					f.write(',')
+				flag = True
 				f.write('\n\t{"'+str(a)+'",'+str(s1)+'} -> { ')
 				if not a in self.actions_state(s1):
 					f.write('{"error",'+str(s1)+'} -> 1')
@@ -310,7 +312,6 @@ class MDP:
 
 		f.write("M = MDP[S,iota,tau];")
 		f.close()
-
 
 
 def KLDivergence(m1,m2,test_set):

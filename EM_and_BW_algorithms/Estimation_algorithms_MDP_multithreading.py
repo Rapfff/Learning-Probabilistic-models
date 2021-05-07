@@ -109,8 +109,9 @@ class Estimation_algorithm_MDP:
 				dic = {}
 				for act in range(len(self.actions)):
 					probas = [k[act] for k in next_probas]
-					probas = correct_proba(probas)
-					dic[self.actions[act]] = [probas, next_states, next_obs]
+					if sum(probas) != 0.0 :
+						probas = correct_proba(probas)
+						dic[self.actions[act]] = [probas, next_states, next_obs]
 				new_states.append(MDP_state(dic))
 
 			self.hhat = MDP(new_states,self.h.initial_state)
@@ -123,8 +124,7 @@ class Estimation_algorithm_MDP:
 				self.h = self.hhat
 
 		print()
-		#self.h.pprint()
-		self.h.saveTerminal()
+		self.h.save(output_file)
 		return [currentloglikelihood,time()-start_time]
 
 	def ghatmultiple(self,s1,s2,obs):

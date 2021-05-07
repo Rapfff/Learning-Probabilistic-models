@@ -1,10 +1,31 @@
 from random import random, randint
-from fractions import gcd
 from functools import reduce
-
+"""
+from fractions import gcd
 def find_gcd(ll):
 	x = reduce(gcd, ll)
 	return x
+"""
+def loadSet(file_path):
+	res_set = [[],[]]
+	f = open(file_path,'r')
+	l = f.readline()
+	while l:
+		l = l.replace("'",'')
+		l = l.replace(' ','')
+		res_set[0].append(l[1:-2].split(','))
+		l = f.readline()
+		res_set[1].append(int(l[:-1]))
+		l = f.readline()
+	f.close()
+	return res_set
+
+def saveSet(t_set,file_path):
+	f = open(file_path,'w')
+	for i in range(len(t_set[0])):
+		f.write(str(t_set[0][i])+'\n')
+		f.write(str(t_set[1][i])+'\n')
+	f.close()
 
 def resolveRandom(m):
 	"""
