@@ -238,7 +238,7 @@ class MDP:
 			for s in range(len(self.states)):
 				summ = 0.0
 				for ss in range(len(self.states)):
-					p = self.states[ss].g(action,s,sequence_obs[k])
+					p = self.g(ss,action,s,sequence_obs[k])
 					summ += alpha_matrix[ss][k]*p
 				alpha_matrix[s][k+1] = summ
 		return alpha_matrix
