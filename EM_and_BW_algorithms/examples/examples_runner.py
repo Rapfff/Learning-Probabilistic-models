@@ -29,7 +29,9 @@ test_set = None
 #------------------------------------------------------------------------------
 
 
-def run_experiment(training_set,output_folder,kind_model,algorithm,test_set=None,model=None,alpha=None,nb_states=None,epsilon=None,df=None,lr=None,nb_sequences=None,nb_iteration=None):
+def run_experiment(training_set,output_folder,kind_model,algorithm,
+				   test_set=None,model=None,alpha=None,nb_states=None,
+				   epsilon=None,df=None,lr=None,nb_sequences=None,nb_iteration=None):
 	saveSet(training_set,output_folder+"/training_set.txt")
 	if test_set != None:
 		saveSet(test_set,output_folder+"/test_set.txt")
