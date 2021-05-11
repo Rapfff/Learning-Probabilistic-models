@@ -121,8 +121,8 @@ def getActionsObservationsFromSequences(sequences):
 	actions = []
 	observations = []
 	for seq in range(len(sequences)):
-		sequence_actions = [sequences[seq][i] for i in range(0,len(self.sequences[seq]),2)]
-		sequence_obs = [sequences[seq][i+1] for i in range(0,len(self.sequences[seq]),2)]
+		sequence_actions = [sequences[seq][i] for i in range(0,len(sequences[seq]),2)]
+		sequence_obs = [sequences[seq][i+1] for i in range(0,len(sequences[seq]),2)]
 		for x in sequence_actions:
 			if x not in actions:
 				actions.append(x)
