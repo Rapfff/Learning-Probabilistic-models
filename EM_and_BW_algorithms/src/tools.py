@@ -106,6 +106,7 @@ def generateSetUnique(model,set_size,sequence_size,scheduler=None):
 
 
 def getAlphabetFromSequences(sequences):
+	sequences = sequence[0]
 	if type(sequences) == str:
 		return list(set(sequences))
 	else:
@@ -118,6 +119,7 @@ def getAlphabetFromSequences(sequences):
 		return observations
 
 def getActionsObservationsFromSequences(sequences):
+	sequences = sequence[0]
 	actions = []
 	observations = []
 	for seq in range(len(sequences)):
