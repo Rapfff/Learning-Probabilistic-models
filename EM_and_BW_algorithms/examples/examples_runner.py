@@ -20,7 +20,7 @@ MDP = 1
 model = None
 alpha = None
 nb_states = None
-epsilon = None
+limit = None
 df = None
 lr = None
 nb_sequences = None
@@ -31,7 +31,7 @@ test_set = None
 
 def run_experiment(training_set,output_folder,kind_model,algorithm,
 				   test_set=None,model=None,alpha=None,nb_states=None,
-				   epsilon=None,df=None,lr=None,nb_sequences=None,nb_iteration=None):
+				   limit=None,df=None,lr=None,nb_sequences=None,nb_iteration=None):
 	saveSet(training_set,output_folder+"/training_set.txt")
 	if test_set != None:
 		saveSet(test_set,output_folder+"/test_set.txt")
@@ -49,7 +49,7 @@ def run_experiment(training_set,output_folder,kind_model,algorithm,
 	if algorithm in ["IOAlergia","Alergia"]:
 		f.write("alpha: "+str(alpha)+'\n')
 	else:
-		f.write("epsilon: "+str(epsilon)+'\n')
+		f.write("epsilon: "+str(limit)+'\n')
 		if algorithm == "Active MDP-BW":
 			f.write("discount factor: "+str(df)+'\n')
 			f.write("learning rate: "+str(lr)+'\n')
@@ -104,6 +104,9 @@ def run_experiment(training_set,output_folder,kind_model,algorithm,
 	if test_set != None:
 		f.write("Loglikelihood on the test set: "+str(output_model.logLikelihood(test_set))+'\n')
 	f.close()
+
+	print("Results written in "+output_folder+"/parameters.txt")
+
 
 
 if __name__ == '__main__':
@@ -267,4 +270,4 @@ if __name__ == '__main__':
 	output_folder = input()
 
 
-	run_experiment(training_set,output_folder,kind_model,algorithm,test_set,model,alpha,nb_states,epsilon,df,lr,nb_sequences,nb_iteration)
+	run_experiment(training_set,output_folder,kind_model,algorithm,test_set,model,alpha,nb_states,limit,df,lr,nb_sequences,nb_iteration)
