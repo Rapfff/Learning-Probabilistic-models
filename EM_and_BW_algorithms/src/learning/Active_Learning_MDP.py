@@ -39,7 +39,7 @@ class ActiveLearningScheduler:
 					summ += self.alpha_matrix[ss][-2]*p
 				self.alpha_matrix[s][-1] = summ
 		
-		t = [alpha_matrix[s][-1] for s in range(nb_states)]
+		t = [self.alpha_matrix[s][-1] for s in range(self.nb_states)]
 		tot = sum(t)
 		if tot <= 0.0:
 			t = [1/len(t) for i in t]
