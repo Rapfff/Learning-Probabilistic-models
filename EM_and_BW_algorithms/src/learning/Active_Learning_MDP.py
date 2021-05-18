@@ -8,37 +8,38 @@ from tools import resolveRandom, mergeSets
 from multiprocessing import cpu_count, Pool
 
 class ActiveLearningScheduler:
-	def __init__(self,memoryless_scheduler,m):	
-		self.seq_obs = []
-		self.seq_act = []
-		self.memoryless_scheduler = memoryless_scheduler
+	def __init__(self,memoryless_scheduler,m):
 		self.m = m
-
+		self.nb_states = len(self.m.states)
+		self.reset()
+		self.memoryless_scheduler = memoryless_scheduler
+		
+		
 	def reset(self):
 		self.seq_obs = []
 		self.seq_act = []
+		self.alpha_matrix = []
+
+		for s in range(self.nb_states):
+			if s == self.m.initial_state:
+				self.alpha_matrix.append([1.0])
+			else:
+				self.alpha_matrix.append([0.0])
 
 	def get_action(self):
 		"""return an action to execute by the agent"""
-		alpha_matrix = []
-		nb_states = len(self.m.states)
-
-		for s in range(nb_states):
-			if s == self.m.initial_state:
-				alpha_matrix.append([1.0])
-			else:
-				alpha_matrix.append([0.0])
-			alpha_matrix[-1] += [None for i in range(len(self.seq_obs))]
-			
-		for k in range(len(self.seq_obs)):
-			for s in range(nb_states):
+		if len(self.seq_act) != 0:
+			for s in range(self.nb_states):
+				self.alpha_matrix[ss].append(None)
+				
+			for s in range(self.nb_states):
 				summ = 0.0
-				for ss in range(nb_states):
-					p = self.m.g(ss,self.seq_act[k],s,self.seq_obs[k])
-					summ += alpha_matrix[ss][k]*p
-				alpha_matrix[s][k+1] = summ
+				for ss in range(self.nb_states):
+					p = self.m.g(ss,self.seq_act[-1],s,self.seq_obs[-1])
+					summ += self.alpha_matrix[ss][-2]*p
+				self.alpha_matrix[s][-1] = summ
 		
-		t = [alpha_matrix[s][-1] for s in range(nb_states)]
+		t = [self.alpha_matrix[s][-1] for s in range(self.nb_states)]
 		tot = sum(t)
 		if tot <= 0.0:
 			t = [1/len(t) for i in t]
@@ -137,6 +138,61 @@ def strategy(m,traces,l):
 	p.close()
 	temp = [res.get() for res in tasks]
 
+	scheduler = []
+
+	for s in range(nb_states):
+		ss = []
+		for a in range(len(m.actions())):
+			ss.append(sum( [ temp[t][s][a] for t in range(len(temp)) ] ))
+
+		scheduler.append(m.actions()[ss.index(min(ss))])
+
+	return MemorylessScheduler(scheduler)
+
+def computeProbas(m,seq,time):
+	#ma solution
+	nb_states = len(m.states)
+	sequence_actions = [seq[i] for i in range(0,len(seq),2)]
+	sequence_obs = [seq[i+1] for i in range(0,len(seq),2)]
+
+	alpha_matrix = []
+	for s in range(nb_states):
+		if s == m.initial_state:
+			alpha_matrix.append([1.0])
+		else:
+			alpha_matrix.append([0.0])
+		alpha_matrix[-1] += [None for i in range(len(sequence_obs))]
+	for k in range(len(sequence_obs)):
+		action = sequence_actions[k]
+		for s in range(nb_states):
+			summ = 0.0
+			for ss in range(nb_states):
+				p = m.g(ss,action,s,sequence_obs[k])
+				summ += alpha_matrix[ss][k]*p
+			alpha_matrix[s][k+1] = summ
+
+	res = [ [0.0 for a in m.actions()] for i in range(nb_states) ]
+
+	for k in len(seq_act):
+		tot = sum([alpha_matrix[s][k] for s in range(len(nb_states))])
+		if tot <= 0.0:
+			break
+		fact = time/tot
+		for s in range(nb_states):
+			res[s][m.actions().index(seq_act[k])] += alpha_matrix[s][k] * fact
+	return res
+
+"""
+def strategy(m,traces,l):
+	nb_states = len(m.states)
+
+	p = Pool(processes = cpu_count()-1)
+	tasks = []
+	for seq in range(len(traces[0])):
+		tasks.append(p.apply_async(computeProbas, [m,traces[0][seq],traces[1][seq],]))
+	p.close()
+	temp = [res.get() for res in tasks]
+
 	p = []
 	for s in range(nb_states):
 		p.append( sum([ g[s] for g in temp ]) )
@@ -210,6 +266,7 @@ def computeProbas(m,seq,time):
 		res = [0.0 for i in range(nb_states)]
 
 	return res
+"""
 """
 def computeProbas(m,seq,time):
 	#action based
