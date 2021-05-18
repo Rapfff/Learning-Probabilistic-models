@@ -3,7 +3,7 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from learning.Estimation_algorithm_MDP import Estimation_algorithm_MDP
-from models.MDP import MemorylessScheduler
+from models.MDP import MemorylessScheduler, loadMDP
 from tools import resolveRandom, mergeSets
 from multiprocessing import cpu_count, Pool
 
@@ -61,32 +61,33 @@ class Active_Learning_MDP:
 		self.algo  = Estimation_algorithm_MDP(h,alphabet,actions)
 		self.nb_states = len(h.states)
 
-	def learn(self,traces,df,lr,nb_sequences,max_iteration,output_folder="active_learning_models",limit=0.01,pp=''):
+	def learn(self,traces,df,lr,nb_sequences,max_iteration,output_folder="active_learning_models",epsilon=0.01,pp=''):
 		self.probas_states = [0.0 for i in range(self.nb_states)]
 		total_traces = traces
-	
 		number_steps = int(len(traces[0][0])/2)
-		self.algo.problem3(traces,output_folder+"/model_0.txt",limit,pp)
+
+		self.algo.h = loadMDP(output_folder+"/model_0.txt")
+		#self.algo.learn(traces,output_folder+"/model_0.txt",epsilon,pp)
 
 		c = 1
 		while c < max_iteration :
-
+			self.algo.h.pprint()
 			traces = self.addTraces(number_steps,nb_sequences,total_traces,df)
 			total_traces = mergeSets(total_traces,traces)
 			
 			if lr == "dynamic":
 				old_h = self.algo.h
 				lr_it = sum(traces[1])/(sum(total_traces[1])-sum(traces[1]))
-				self.algo.problem3(traces,output_folder+"/temp.txt",limit,str(c))
+				self.algo.learn(traces,output_folder+"/temp.txt",epsilon,str(c))
 				self.mergeModels(old_h,self.algo.h,lr_it)
 				self.algo.h.save(output_folder+"/active_models_"+str(c)+".txt")
 			
 			elif lr == 0:
-				self.algo.problem3(total_traces,output_folder+"/active_models_"+str(c)+".txt",limit,str(c))
+				self.algo.learn(total_traces,output_folder+"/active_models_"+str(c)+".txt",epsilon,str(c))
 			
 			elif type(lr) == type(0.2):
 				old_h = self.algo.h
-				self.algo.problem3(traces,output_folder+"/temp.txt",limit,str(c))
+				self.algo.learn(traces,output_folder+"/temp.txt",epsilon,str(c))
 				self.mergeModels(old_h,self.algo.h,lr)
 				self.algo.h.save(output_folder+"/active_models_"+str(c)+".txt")
 
@@ -139,7 +140,7 @@ def strategy(m,traces,l):
 	p = []
 	for s in range(nb_states):
 		p.append( sum([ g[s] for g in temp ]) )
-
+	print("Probas qu'on passe par s dans le training set:",'\n',p)
 
 	old_x = [0.0 for i in range(nb_states)]
 	while True:
@@ -153,15 +154,16 @@ def strategy(m,traces,l):
 				for ss in range(nb_states):
 					for o in m.observations():
 						t[-1] += m.g(s,a,ss,o)*old_x[ss]
-		
+
 			memoryless_sched.append(m.states[s].actions()[t.index(min(t))])
 			x.append(min(t)*l + p[s])
-
 		if max([abs(x[i] - old_x[i]) for i in range(nb_states)]) < 0.01:
 			break
 		else:
 			old_x = x
-
+	print(x)
+	print(memoryless_sched)
+	input()
 	return MemorylessScheduler(memoryless_sched)
 
 def computeProbas(m,seq,time):

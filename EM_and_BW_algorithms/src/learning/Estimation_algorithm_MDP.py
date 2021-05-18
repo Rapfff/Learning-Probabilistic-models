@@ -56,7 +56,7 @@ class Estimation_algorithm_MDP:
 
 		return beta_matrix
 
-	def learn(self,traces,output_file="output_model.txt",limit=0.01,pp=''):
+	def learn(self,traces,output_file="output_model.txt",epsilon=0.01,pp=''):
 		"""
 		Given a set of sequences of pairs action-observation,
 		it adapts the parameters of h in order to maximize the probability to get 
@@ -121,7 +121,7 @@ class Estimation_algorithm_MDP:
 			self.hhat = MDP(new_states,self.h.initial_state)
 			
 			counter += 1
-			if abs(prevloglikelihood - currentloglikelihood) < limit: #ici on compare h et celui avant(pas hhat)
+			if abs(prevloglikelihood - currentloglikelihood) < epsilon: #ici on compare h et celui avant(pas hhat)
 				break
 			else:
 				prevloglikelihood = currentloglikelihood

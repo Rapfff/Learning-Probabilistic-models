@@ -178,7 +178,6 @@ def modelMDP_random(nb_states,alphabet,actions):
 	for i in range(nb_states):
 		s += [i] * len(alphabet)
 	obs = alphabet*nb_states
-	
 	states = []
 	for i in range(nb_states):
 		dic = {}
@@ -192,7 +191,7 @@ def modelMDP1_fullyobservable():
 	m_s1 = MDP_state({'a': [[0.8,0.2],[2,3],['2','3']], 'b': [[0.9,0.1],[3,4],['3','4']]})
 	m_s2 = MDP_state({'a': [[0.9,0.1],[6,4],['6','4']], 'b': [[1.0],[2],['2']]})
 	m_s3 = MDP_state({'a': [[0.9,0.1],[1,2],['1','2']], 'b': [[1.0],[1],['1']]})
-	m_s4 = MDP_state({'a': [[1.0],[5],['5']], 'b': [[1.0],[2],['4']]})
+	m_s4 = MDP_state({'a': [[1.0],[5],['5']], 'b': [[1.0],[2],['2']]})
 	m_s5 = MDP_state({'a': [[1.0],[0],['0']], 'b': [[1.0],[0],['0']]})
 	m_s6 = MDP_state({'a': [[1.0],[4],['4']], 'b': [[1.0],[4],['4']]})
 	return MDP([m_s0,m_s1,m_s2,m_s3,m_s4,m_s5,m_s6],0,"MDP1_fullyobservable")

@@ -202,7 +202,7 @@ class MDP:
 				print()
 			for action in self.states[i].next_matrix:
 				for j in range(len(self.states[i].next_matrix[action][0])):
-					if self.states[i].next_matrix[action][0][j] > 0.0:
+					if self.states[i].next_matrix[action][0][j] > 0.0001:
 						print("s",i," - (",action,") -> s",self.states[i].next_matrix[action][1][j]," : ",self.states[i].next_matrix[action][2][j],' : ',self.states[i].next_matrix[action][0][j],sep='')
 		print()
 

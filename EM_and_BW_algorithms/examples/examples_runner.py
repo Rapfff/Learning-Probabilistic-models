@@ -9,7 +9,7 @@ from src.learning.Active_Learning_MDP import Active_Learning_MDP
 from src.tools import loadSet, generateSet, saveSet, getAlphabetFromSequences, getActionsObservationsFromSequences
 from src.learning.alergia import *
 from src.learning.IOalergia import *
-from examples_models import *
+from examples.examples_models import *
 from src.models.MDP import *
 from src.models.MCGT import *
 from time import time
@@ -20,7 +20,7 @@ MDP = 1
 model = None
 alpha = None
 nb_states = None
-limit = None
+epsilon = None
 df = None
 lr = None
 nb_sequences = None
@@ -31,14 +31,14 @@ test_set = None
 
 def run_experiment(training_set,output_folder,kind_model,algorithm,
 				   test_set=None,model=None,alpha=None,nb_states=None,
-				   limit=None,df=None,lr=None,nb_sequences=None,nb_iteration=None):
+				   epsilon=None,df=None,lr=None,nb_sequences=None,nb_iteration=None):
 	saveSet(training_set,output_folder+"/training_set.txt")
 	if test_set != None:
 		saveSet(test_set,output_folder+"/test_set.txt")
 	if model != None:
 		model.save(output_folder+'/model_to_learn.txt')
 
-	f = open(output_folder+"/parameters.txt",'w')
+	f = open(output_folder+"/results.txt",'w')
 	f.write("Model to learn: ")
 	if model != None:
 		f.write(model.name+'\n')
@@ -49,7 +49,7 @@ def run_experiment(training_set,output_folder,kind_model,algorithm,
 	if algorithm in ["IOAlergia","Alergia"]:
 		f.write("alpha: "+str(alpha)+'\n')
 	else:
-		f.write("epsilon: "+str(limit)+'\n')
+		f.write("epsilon: "+str(epsilon)+'\n')
 		if algorithm == "Active MDP-BW":
 			f.write("discount factor: "+str(df)+'\n')
 			f.write("learning rate: "+str(lr)+'\n')
@@ -82,7 +82,7 @@ def run_experiment(training_set,output_folder,kind_model,algorithm,
 		initial_model = modelMCGT_random(nb_states,observations)
 		initial_model.save(output_folder+'/initial_model.txt')
 		algo = Estimation_algorithm_MCGT(initial_model,observations)
-		output_model = algo.learn(training_set,output_folder+'/output_model.txt',limit)
+		output_model = algo.learn(training_set,output_folder+'/output_model.txt',epsilon)
 
 	else:
 		initial_model = modelMDP_random(nb_states,observations,actions)
@@ -90,10 +90,10 @@ def run_experiment(training_set,output_folder,kind_model,algorithm,
 
 		if algorithm == "Passive MDP-BW":
 			algo = Estimation_algorithm_MDP(initial_model,observations,actions)
-			output_model = algo.learn(training_set,output_folder+'/output_model.txt',limit)
+			output_model = algo.learn(training_set,output_folder+'/output_model.txt',epsilon)
 		else:
 			algo = Active_Learning_MDP(initial_model,observations,actions)
-			output_model = algo.learn(training_set,df,lr,nb_sequences,nb_iteration,output_folder,limit)
+			output_model = algo.learn(training_set,df,lr,nb_sequences,nb_iteration,output_folder,epsilon)
 
 	delta_time = time()-start_time
 	f.write("number of states in the output model: "+str(len(output_model.states))+'\n')
@@ -105,7 +105,7 @@ def run_experiment(training_set,output_folder,kind_model,algorithm,
 		f.write("Loglikelihood on the test set: "+str(output_model.logLikelihood(test_set))+'\n')
 	f.close()
 
-	print("Results written in "+output_folder+"/parameters.txt")
+	print("Results written in "+output_folder+"/results.txt")
 
 
 
@@ -223,7 +223,7 @@ if __name__ == '__main__':
 		print("(8/17) Enter the number of states in the output model:")
 		nb_states = int(input())	
 		print("(9/17) Enter the value for the epsilon parameter (default is 0.01):")
-		limit = float(input())
+		epsilon = float(input())
 		if algorithm == "Active MDP-BW":
 			print("(10/17) Enter the value for the discount factor (default 0.9):")
 			df = float(input())
@@ -270,4 +270,4 @@ if __name__ == '__main__':
 	output_folder = input()
 
 
-	run_experiment(training_set,output_folder,kind_model,algorithm,test_set,model,alpha,nb_states,limit,df,lr,nb_sequences,nb_iteration)
+	run_experiment(training_set,output_folder,kind_model,algorithm,test_set,model,alpha,nb_states,epsilon,df,lr,nb_sequences,nb_iteration)

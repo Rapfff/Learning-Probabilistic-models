@@ -50,7 +50,7 @@ class Estimation_algorithm_MCGT:
 
 		return beta_matrix
 
-	def learn(self,sequences,output_file="output_model.txt",limit=0.01,pp=''):
+	def learn(self,sequences,output_file="output_model.txt",epsilon=0.01,pp=''):
 		"""
 		Given sequences of observations it adapts the parameters of h in order to maximize the probability to get 
 		these sequences of observations.
@@ -105,7 +105,7 @@ class Estimation_algorithm_MCGT:
 
 			self.hhat = MCGT(new_states,self.h.initial_state)
 			
-			if abs(prevloglikelihood -currentloglikelihood) < limit:#or self.checkEnd() #or time() - start_time > 120
+			if abs(prevloglikelihood -currentloglikelihood) < epsilon:#or self.checkEnd() #or time() - start_time > 120
 				break
 			else:
 				prevloglikelihood = currentloglikelihood
