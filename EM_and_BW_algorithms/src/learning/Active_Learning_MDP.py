@@ -30,7 +30,7 @@ class ActiveLearningScheduler:
 		"""return an action to execute by the agent"""
 		if len(self.seq_act) != 0:
 			for s in range(self.nb_states):
-				self.alpha_matrix[ss].append(None)
+				self.alpha_matrix[s].append(None)
 				
 			for s in range(self.nb_states):
 				summ = 0.0
@@ -67,8 +67,8 @@ class Active_Learning_MDP:
 		total_traces = traces
 		number_steps = int(len(traces[0][0])/2)
 
-		self.algo.h = loadMDP(output_folder+"/model_0.txt")
-		#self.algo.learn(traces,output_folder+"/model_0.txt",epsilon,pp)
+		#self.algo.h = loadMDP(output_folder+"/model_0.txt")
+		self.algo.learn(traces,output_folder+"/model_0.txt",epsilon,pp)
 
 		c = 1
 		while c < max_iteration :
@@ -173,13 +173,13 @@ def computeProbas(m,seq,time):
 
 	res = [ [0.0 for a in m.actions()] for i in range(nb_states) ]
 
-	for k in len(seq_act):
-		tot = sum([alpha_matrix[s][k] for s in range(len(nb_states))])
+	for k in range(len(sequence_actions)):
+		tot = sum([alpha_matrix[s][k] for s in range(nb_states)])
 		if tot <= 0.0:
 			break
 		fact = time/tot
 		for s in range(nb_states):
-			res[s][m.actions().index(seq_act[k])] += alpha_matrix[s][k] * fact
+			res[s][m.actions().index(sequence_actions[k])] += alpha_matrix[s][k] * fact
 	return res
 
 """

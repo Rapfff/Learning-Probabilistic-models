@@ -170,14 +170,14 @@ class Estimation_algorithm_MDP:
 			beta_matrix  = self.computeBetas(sequence_obs,sequence_actions)
 			
 			bigK = beta_matrix[self.h.initial_state][0]
-			
-			for k in range(len(sequence_obs)):
-				gamma_s1_k = alpha_matrix[s1][k] * beta_matrix[s1][k] / bigK
-				
-				den[self.actions.index(sequence_actions[k])] += gamma_s1_k * self.times[seq]
-				
-				if sequence_obs[k] == obs:
-					num[self.actions.index(sequence_actions[k])] += alpha_matrix[s1][k]*self.h_g(s1,sequence_actions[k],s2,obs)*beta_matrix[s2][k+1] * self.times[seq] / bigK
+			if bigK != 0.0:
+				for k in range(len(sequence_obs)):
+					gamma_s1_k = alpha_matrix[s1][k] * beta_matrix[s1][k] / bigK
+					
+					den[self.actions.index(sequence_actions[k])] += gamma_s1_k * self.times[seq]
+					
+					if sequence_obs[k] == obs:
+						num[self.actions.index(sequence_actions[k])] += alpha_matrix[s1][k]*self.h_g(s1,sequence_actions[k],s2,obs)*beta_matrix[s2][k+1] * self.times[seq] / bigK
 		
 			if loglikelihood != None:
 				loglikelihood += log(sum([alpha_matrix[s][-1] for s in range(len(self.h.states))]))
