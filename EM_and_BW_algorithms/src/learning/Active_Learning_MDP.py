@@ -62,18 +62,26 @@ class Active_Learning_MDP:
 		self.algo  = Estimation_algorithm_MDP(h,alphabet,actions)
 		self.nb_states = len(h.states)
 
-	def learn(self,traces,df,lr,nb_sequences,max_iteration,output_folder="active_learning_models",epsilon=0.01,pp=''):
+	def learn(self,traces,lr,nb_sequences,max_iteration,output_folder="active_learning_models",epsilon=0.01,number_steps=None,pp=''):
 		self.probas_states = [0.0 for i in range(self.nb_states)]
 		total_traces = traces
-		number_steps = int(len(traces[0][0])/2)
+		
+		if number_steps == None:
+			number_steps = int(len(traces[0][0])/2)
+		elif type(number_steps) == list:
+			if len(number_steps) != max_iteration:
+				return None
 
 		#self.algo.h = loadMDP(output_folder+"/model_0.txt")
 		self.algo.learn(traces,output_folder+"/model_0.txt",epsilon,pp)
 
 		c = 1
-		while c < max_iteration :
+		while c <= max_iteration :
 			self.algo.h.pprint()
-			traces = self.addTraces(number_steps,nb_sequences,total_traces,df)
+			if type(number_steps) == int:
+				traces = self.addTraces(number_steps,nb_sequences,total_traces)
+			else:
+				traces = self.addTraces(number_steps[c-1],nb_sequences,total_traces)
 			total_traces = mergeSets(total_traces,traces)
 			
 			if lr == "dynamic":
@@ -116,8 +124,8 @@ class Active_Learning_MDP:
 			for a in [i for i in old_h.states[s].actions() if not i in new_h.states[s].actions()]:
 				self.algo.h.states[s].next_matrix[a] = old_h.states[s].next_matrix[a]
 
-	def addTraces(self,number_steps,nb_sequences,traces,df):
-		memoryless_scheduler = strategy(self.algo.h,traces,df)
+	def addTraces(self,number_steps,nb_sequences,traces):
+		memoryless_scheduler = strategy(self.algo.h,traces)
 		scheduler = ActiveLearningScheduler(memoryless_scheduler,self.algo.h)
 		traces = [[],[]]
 		for n in range(nb_sequences):
@@ -128,7 +136,7 @@ class Active_Learning_MDP:
 			traces[1][traces[0].index(seq)] += 1
 		return traces
 
-def strategy(m,traces,l):
+def strategy(m,traces):
 	nb_states = len(m.states)
 
 	p = Pool(processes = cpu_count()-1)

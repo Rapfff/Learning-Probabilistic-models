@@ -10,14 +10,19 @@ from src.tools import generateSet, loadSet, mergeSets
 from src.models.MDP import loadMDP
 from src.learning.Estimation_algorithm_MDP import Estimation_algorithm_MDP
 import matplotlib.pyplot as plt
+from numpy.random import geometric
+
 
 tr_size = 50
 tr_len  = 6
 nb_sta = 5
-nb_seq = 2
+nb_seq = 1
 nb_it = 50
 output_folder = "/home/anna/Desktop/active_vs_passive_results"
 kind_model = MDP
+
+nb_steps = list(geometric(0.75,nb_it))
+nb_steps = [i+3 for i in nb_steps]
 
 algorithm = "Active MDP-BW"
 
@@ -33,29 +38,28 @@ run_experiment(training_set,
 			   model=original,
 			   nb_states=nb_sta,
 			   epsilon=0.01,
-			   df=0.9,
 			   lr=0,
 			   nb_sequences=nb_seq,
-			   nb_iteration=nb_it)
+			   nb_iteration=nb_it,
+			   nb_steps=nb_steps)
 
 
 training_set = loadSet(output_folder+'/training_set.txt')
 m = loadMDP(output_folder+"/model_0.txt")
 algo = Estimation_algorithm_MDP(m,original.observations(),original.actions())
 for i in range(1,nb_it+1):
-	t = generateSet(original,nb_seq,tr_len,scheduler_uniform(original.actions()))
+	t = generateSet(original,nb_seq,nb_steps[i-1],scheduler_uniform(original.actions()))
 	training_set = mergeSets(training_set,t)
 	algo.learn(training_set,output_file=output_folder+'/passive_models_'+str(i)+".txt",pp=str(i))
 
 test_set = generateSet(original,200,tr_len,scheduler_uniform(original.actions()))
 
 x = range(nb_it)
-
 m = loadMDP(output_folder+"/model_0.txt")
 y1 = [m.logLikelihood(test_set)]
 y2 = [y1[0]]
 
-for i in range(1,nb_it):
+for i in range(1,nb_it+1):
 	m = loadMDP(output_folder+"/active_models_"+str(i)+".txt")
 	y1.append(m.logLikelihood(test_set))
 	m = loadMDP(output_folder+"/passive_models_"+str(i)+".txt")

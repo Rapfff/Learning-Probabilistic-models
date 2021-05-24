@@ -21,7 +21,6 @@ model = None
 alpha = None
 nb_states = None
 epsilon = None
-df = None
 lr = None
 nb_sequences = None
 nb_iteration = None
@@ -31,7 +30,7 @@ test_set = None
 
 def run_experiment(training_set,output_folder,kind_model,algorithm,
 				   test_set=None,model=None,alpha=None,nb_states=None,
-				   epsilon=None,df=None,lr=None,nb_sequences=None,nb_iteration=None):
+				   epsilon=None,lr=None,nb_sequences=None,nb_iteration=None,nb_steps=None):
 	saveSet(training_set,output_folder+"/training_set.txt")
 	if test_set != None:
 		saveSet(test_set,output_folder+"/test_set.txt")
@@ -51,7 +50,6 @@ def run_experiment(training_set,output_folder,kind_model,algorithm,
 	else:
 		f.write("epsilon: "+str(epsilon)+'\n')
 		if algorithm == "Active MDP-BW":
-			f.write("discount factor: "+str(df)+'\n')
 			f.write("learning rate: "+str(lr)+'\n')
 			f.write("active learning sample size: "+str(nb_sequences)+'\n')
 			f.write("active learning iterations: "+str(nb_iteration)+'\n')
@@ -93,7 +91,7 @@ def run_experiment(training_set,output_folder,kind_model,algorithm,
 			output_model = algo.learn(training_set,output_folder+'/output_model.txt',epsilon)
 		else:
 			algo = Active_Learning_MDP(initial_model,observations,actions)
-			output_model = algo.learn(training_set,df,lr,nb_sequences,nb_iteration,output_folder,epsilon)
+			output_model = algo.learn(training_set,lr,nb_sequences,nb_iteration,output_folder,epsilon,nb_steps)
 
 	delta_time = time()-start_time
 	f.write("number of states in the output model: "+str(len(output_model.states))+'\n')
@@ -110,34 +108,34 @@ def run_experiment(training_set,output_folder,kind_model,algorithm,
 
 
 if __name__ == '__main__':
-	print("(1/17) Which kind of model do you want to learn? (1: MDP, 2: MC)")
+	print("(1/16) Which kind of model do you want to learn? (1: MDP, 2: MC)")
 	kind_model = int(input())
 	while kind_model not in [1,2]:
 		kind_model = int(input())
 
-	print("(2/17) Do you already have the training set or do you want me to generate it? (y: yes, I have the training set, n: no I don't, please generate it)")
+	print("(2/16) Do you already have the training set or do you want me to generate it? (y: yes, I have the training set, n: no I don't, please generate it)")
 	answer = input()
 	while answer not in ['y','n']:
 		answer = input()
 
 	if answer == 'y':
-		print("(3/17) Enter the location of the training set file:")
+		print("(3/16) Enter the location of the training set file:")
 		training_set = loadSet(input())
 		model = None
 		print("Questions 4, 5 and 6 skipped...")
 	else:
-		print("(3/17) Do you want to learn a model saved in a file or to choose one from the example list? (y: yes, from a file, n: no, I would like to choose from the list)")
+		print("(3/16) Do you want to learn a model saved in a file or to choose one from the example list? (y: yes, from a file, n: no, I would like to choose from the list)")
 		answer = input()
 		while answer not in ['y','n']:
 			answer = input()
 		if answer == 'y':
-			print("(4/17) Enter the location of the model file:\n")
+			print("(4/16) Enter the location of the model file:\n")
 			if kind_model == MDP:
 				model = loadMDP(answer)
 			else:
 				model = loadMCGT(answer)
 		else:
-			print("(4/17) You can choose between:")
+			print("(4/16) You can choose between:")
 			if kind_model == MC:
 				l = ["MC 1          (states: 5, labels: 7)",
 					 "MC 2          (states: 4, labels: 5)",
@@ -188,9 +186,9 @@ if __name__ == '__main__':
 					model = modelMDP_bigstreet()
 
 
-		print("(5/17) How many sequences do you want in the training set?")
+		print("(5/16) How many sequences do you want in the training set?")
 		size_training_set = int(input())
-		print("(6/17) How many labels should contains each sequence?")
+		print("(6/16) How many labels should contains each sequence?")
 		len_training_set = int(input())
 		print("Generating the training set...")
 		if kind_model == MDP:
@@ -199,7 +197,7 @@ if __name__ == '__main__':
 		else:
 			training_set = generateSet(model,size_training_set,len_training_set)
 
-	print("(7/17) Which learning algorithm do you want to use? ",end="")
+	print("(7/16) Which learning algorithm do you want to use? ",end="")
 	if kind_model == MC:
 		print("(1: MC-BW, 2: Alergia)")
 		answer = int(input())
@@ -216,18 +214,16 @@ if __name__ == '__main__':
 
 
 	if algorithm in ["IOAlergia","Alergia"]:
-		print("(8/17) Enter the value for the alpha parameter (between 0 and 1):")
+		print("(8/16) Enter the value for the alpha parameter (between 0 and 1):")
 		alpha = float(input())
 		print("Questions 9, 10, 11, 12 and 13 skipped...")
 	else:
-		print("(8/17) Enter the number of states in the output model:")
+		print("(8/16) Enter the number of states in the output model:")
 		nb_states = int(input())	
-		print("(9/17) Enter the value for the epsilon parameter (default is 0.01):")
+		print("(9/16) Enter the value for the epsilon parameter (default is 0.01):")
 		epsilon = float(input())
 		if algorithm == "Active MDP-BW":
-			print("(10/17) Enter the value for the discount factor (default 0.9):")
-			df = float(input())
-			print("(11/17) Enter the value for the learning rate ('dynamic', 0, or a number between 0 and 1):")
+			print("(11/16) Enter the value for the learning rate ('dynamic', 0, or a number between 0 and 1):")
 			answer = input()
 			if answer == '0':
 				lr = 0
@@ -235,27 +231,27 @@ if __name__ == '__main__':
 				lr = 'dynamic'
 			else:
 				lr = float(answer)
-			print("(12/17) Enter the size of the sample for each active learning iteration:")
+			print("(12/16) Enter the size of the sample for each active learning iteration:")
 			nb_sequences = int(input())
-			print("(13/17) Enter the number of active learning iterations:")
+			print("(13/16) Enter the number of active learning iterations:")
 			nb_iteration = int(input())
 		else:
 			print("Questions 10, 11, 12 and 13 skipped...")
 
-	print("(14/17) Do you have a test set? (y: yes, g: no but I want you to generate one, n: no and I don't want to have one)")
+	print("(14/16) Do you have a test set? (y: yes, g: no but I want you to generate one, n: no and I don't want to have one)")
 	answer = input()
 	while answer not in ['y','g','n']:
 		answer = input()
 	if answer == 'y':
-		print("(15/17) Enter the location of your test set file:")
+		print("(15/16) Enter the location of your test set file:")
 		test_set = loadSet(input())
 		print("Question 16 skipped...")
 	elif answer == 'g' and model == None:
 		print("I cannot generate a test set since I don't have the original model...")
 	elif answer == 'g' and model != None:
-		print("(15/17) Enter the size of the test set:")
+		print("(15/16) Enter the size of the test set:")
 		size_test_set = int(input())
-		print("(16/17) How many labels should contains each sequence?")
+		print("(16/16) How many labels should contains each sequence?")
 		len_test_set = int(input())
 		print("Generating the test set...")
 		if kind_model == MDP:
@@ -266,8 +262,8 @@ if __name__ == '__main__':
 	else:
 		print("Questions 15 and 16 skipped...")
 
-	print("(17/17) Finally enter the output folder (it should be already created):")
+	print("(16/16) Finally enter the output folder (it should be already created):")
 	output_folder = input()
 
 
-	run_experiment(training_set,output_folder,kind_model,algorithm,test_set,model,alpha,nb_states,epsilon,df,lr,nb_sequences,nb_iteration)
+	run_experiment(training_set,output_folder,kind_model,algorithm,test_set,model,alpha,nb_states,epsilon,lr,nb_sequences,nb_iteration)

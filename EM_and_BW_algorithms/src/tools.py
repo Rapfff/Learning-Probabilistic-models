@@ -1,5 +1,6 @@
 from random import random, randint
 from functools import reduce
+from numpy.random import geometric
 
 def loadSet(file_path):
 	res_set = [[],[]]
@@ -74,14 +75,23 @@ def mergeSets(s1,s2):
 			s1[1][s1[0].index(s2[0][i])] += s2[1][i]
 	return s1
 
-def generateSet(model,set_size,sequence_size,scheduler=None):
+def generateSet(model,set_size,sequence_size,scheduler=None,distribution=None,min_size=None):
+	"""
+	If distribution=='geo' then the sequence length will be distributed by a geometric law 
+	such that the expected length is min_size+sequence_size
+	"""
 	seq = []
 	val = []
 	for i in range(set_size):
-		if scheduler:
-			trace = model.run(sequence_size,scheduler)
+		if distribution == 'geo':
+			curr_size = min_size + int(geometric(sequence_size))
 		else:
-			trace = model.run(sequence_size)
+			curr_size = sequence_size
+
+		if scheduler:
+			trace = model.run(curr_size,scheduler)
+		else:
+			trace = model.run(curr_size)
 
 		if not trace in seq:
 			seq.append(trace)
