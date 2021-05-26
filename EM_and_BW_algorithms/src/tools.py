@@ -75,18 +75,23 @@ def mergeSets(s1,s2):
 			s1[1][s1[0].index(s2[0][i])] += s2[1][i]
 	return s1
 
-def generateSet(model,set_size,sequence_size,scheduler=None,distribution=None,min_size=None):
+def generateSet(model,set_size,param,scheduler=None,distribution=None,min_size=None):
 	"""
 	If distribution=='geo' then the sequence length will be distributed by a geometric law 
-	such that the expected length is min_size+sequence_size
+	such that the expected length is min_size+(1/param).
+	if distribution==None param can be an int, in this case all the seq will have the same len (param),
+					   or param can be a list of int
 	"""
 	seq = []
 	val = []
 	for i in range(set_size):
 		if distribution == 'geo':
-			curr_size = min_size + int(geometric(sequence_size))
+			curr_size = min_size + int(geometric(param))
 		else:
-			curr_size = sequence_size
+			if type(param) == list:
+				curr_size = param[i]
+			elif type(param) == int:
+				curr_size = param
 
 		if scheduler:
 			trace = model.run(curr_size,scheduler)
@@ -111,7 +116,6 @@ def generateSetUnique(model,set_size,sequence_size,scheduler=None):
 
 		if not trace in seq:
 			seq.append(trace)
-
 	return seq
 
 

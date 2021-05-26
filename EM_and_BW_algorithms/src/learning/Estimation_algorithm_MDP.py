@@ -26,8 +26,17 @@ class Estimation_algorithm_MDP:
 	def hhat_g(self,s1,act,s2,obs):
 		return self.hhat.g(s1,act,s2,obs)
 	
-	def computeAlphas(self,sequence,sequence_actions,common,alpha_matrix):
+	def computeAlphas(self,sequence,sequence_actions,common,alpha_matrix,prev_len):
 		"""Here we compute all the values alpha(k,t) for a given sequence"""
+		diff = len(sequence) - prev_len
+		if diff > 0:
+			for s in range(len(self.h.states)):
+				for i in range(diff):
+					alpha_matrix[s].append(None)
+		if diff < 0:
+			for s in range(len(self.h.states)):
+				alpha_matrix[s] = alpha_matrix[s][:diff]
+
 		for k in range(common,len(sequence)):
 			action = sequence_actions[k]
 			for s in range(len(self.h.states)):
@@ -121,7 +130,7 @@ class Estimation_algorithm_MDP:
 			self.hhat = MDP(new_states,self.h.initial_state)
 			
 			counter += 1
-			if abs(prevloglikelihood - currentloglikelihood) < epsilon: #ici on compare h et celui avant(pas hhat)
+			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
 				break
 			else:
 				prevloglikelihood = currentloglikelihood
@@ -152,6 +161,7 @@ class Estimation_algorithm_MDP:
 			sequence_actions = [self.sequences_sorted[seq][i] for i in range(0,len(self.sequences_sorted[seq]),2)]
 			sequence_obs = [self.sequences_sorted[seq][i+1] for i in range(0,len(self.sequences_sorted[seq]),2)]
 			if seq == 0:
+				prev_len = len(sequence_obs)
 				common = 0
 				alpha_matrix = []
 
@@ -162,11 +172,14 @@ class Estimation_algorithm_MDP:
 						alpha_matrix.append([0.0])
 					alpha_matrix[-1] += [None for i in range(len(sequence_obs))]
 			else:
-				common = 0 
-				while self.sequences_sorted[seq-1][common] == self.sequences_sorted[seq][common]:
-					common += 1
+				common = 0
+				while common < min(len(self.sequences_sorted[seq-1]),len(self.sequences_sorted[seq])):
+					if self.sequences_sorted[seq-1][common] == self.sequences_sorted[seq][common]:
+						common += 1
+					else:
+						break
 			
-			alpha_matrix = self.computeAlphas(sequence_obs,sequence_actions,int(common/2),alpha_matrix)
+			alpha_matrix = self.computeAlphas(sequence_obs,sequence_actions,int(common/2),alpha_matrix,prev_len)
 			beta_matrix  = self.computeBetas(sequence_obs,sequence_actions)
 			
 			bigK = beta_matrix[self.h.initial_state][0]
@@ -181,6 +194,8 @@ class Estimation_algorithm_MDP:
 		
 			if loglikelihood != None:
 				loglikelihood += log(sum([alpha_matrix[s][-1] for s in range(len(self.h.states))]))
+
+			prev_len = len(sequence_obs)
 
 		if loglikelihood == None:
 			return (s2,obs,[num[i]/den[i] if den[i] != 0.0 else 0.0 for i in range(len(num))])
