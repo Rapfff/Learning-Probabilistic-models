@@ -88,7 +88,7 @@ class Estimation_algorithm_MDP:
 		counter = 0
 		prevloglikelihood = 10
 		while True:
-			print(datetime.datetime.now(),pp,counter, prevloglikelihood)
+			#print(datetime.datetime.now(),pp,counter, prevloglikelihood)
 			new_states = []
 			for i in range(len(self.h.states)):
 				next_probas = []
@@ -136,7 +136,7 @@ class Estimation_algorithm_MDP:
 				prevloglikelihood = currentloglikelihood
 				self.h = self.hhat
 
-		print()
+		#print()
 		self.h.save(output_file)
 		return self.h
 

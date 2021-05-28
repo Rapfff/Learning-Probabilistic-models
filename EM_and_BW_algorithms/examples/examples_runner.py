@@ -31,7 +31,7 @@ test_set = None
 def run_experiment(training_set,output_folder,kind_model,algorithm,
 				   test_set=None,model=None,alpha=None,nb_states=None,
 				   epsilon=None,lr=None,epsilon_greedy=0.9,
-				   nb_sequences=None,nb_iteration=None,nb_steps=None):
+				   nb_sequences=None,nb_iteration=None,nb_steps=None,pp=''):
 	saveSet(training_set,output_folder+"/training_set.txt")
 	if test_set != None:
 		saveSet(test_set,output_folder+"/test_set.txt")
@@ -92,7 +92,7 @@ def run_experiment(training_set,output_folder,kind_model,algorithm,
 			output_model = algo.learn(training_set,output_folder+'/output_model.txt',epsilon)
 		else:
 			algo = Active_Learning_MDP(initial_model,observations,actions)
-			output_model = algo.learn(training_set,lr,nb_sequences,nb_iteration,epsilon_greedy,output_folder,epsilon,nb_steps)
+			output_model = algo.learn(training_set,lr,nb_sequences,nb_iteration,epsilon_greedy,output_folder,epsilon,nb_steps,pp)
 
 	delta_time = time()-start_time
 	f.write("number of states in the output model: "+str(len(output_model.states))+'\n')
