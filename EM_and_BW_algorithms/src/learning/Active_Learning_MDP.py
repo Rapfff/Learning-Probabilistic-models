@@ -57,67 +57,51 @@ class ActiveLearningScheduler:
 	def add_observation(self,obs):
 		self.seq_obs.append(obs)
 """
+
 class ActiveLearningScheduler:
-	def __init__(self,matrix,m):
+	def __init__(self,m,matrix):
 		self.m = m
-		self.nb_states = len(self.m.states)
-		self.reset()
+		self.nb_states = len(m.states)
 		self.matrix = matrix
-		
+		self.reset()
+
 	def reset(self):
-		self.gamma = []
+		self.seq_obs = []
+		self.seq_act = []
+		self.alpha_matrix = []
+
 		for s in range(self.nb_states):
 			if s == self.m.initial_state:
-				self.gamma.append([1.0])
+				self.alpha_matrix.append([1.0])
 			else:
-				self.gamma.append([0.0])
-
+				self.alpha_matrix.append([0.0])
+	
 	def get_action(self):
-		"""return an action to execute by the agent"""
-		state_choosen = resolveRandom(self.gamma)
-		self.last_action = self.m.actions()[self.matrix[state_choosen].index(min(self.matrix[state_choosen]))]
-		self.updateMatrix()
-		return self.last_action
-
+		#return an action to execute by the agent
 		if len(self.seq_act) != 0:
 			for s in range(self.nb_states):
-				self.gamma[s].append(None)
+				self.alpha_matrix[s].append(None) 
 				
 			for s in range(self.nb_states):
 				summ = 0.0
 				for ss in range(self.nb_states):
 					p = self.m.g(ss,self.seq_act[-1],s,self.seq_obs[-1])
-					summ += self.gamma[ss][-2]*p
-				self.gamma[s][-1] = summ
+					summ += self.alpha_matrix[ss][-2]*p
+				self.alpha_matrix[s][-1] = summ
 		
-		t = [self.gamma[s][-1] for s in range(self.nb_states)]
+		t = [self.alpha_matrix[s][-1] for s in range(self.nb_states)]
 		tot = sum(t)
 		if tot <= 0.0:
 			t = [1/len(t) for i in t]
 		else:
 			t = [i/tot for i in t]
 		s_i = resolveRandom(t)
-		act = self.memoryless_scheduler.get_action(s_i)
+		act = self.m.actions()[resolveRandom(self.matrix[s_i])]
 		self.seq_act.append(act)
 		return act
 
-	def updateMatrix(self):
-		for s in range(self.nb_states):
-			self.matrix[s][self.last_action] += self.gamma[s]
-
 	def add_observation(self,obs):
-		new_gamma = []
-		for s in range(self.nb_states): #s
-			new_gamma.append(0.0)
-			for ss in range(self.nb_states): #s'
-				tot = 0.0
-				for sss in range(self.nb_states): #n
-					tot += self.m.g(ss,self.last_action,sss,obs)
-				if tot != 0.0:
-					new_gamma[-1] += self.m.g(ss,self.last_action,s,obs) * self.gamma[ss] / tot
-
-		self.gamma = new_gamma
-
+		self.seq_obs.append(obs) 
 
 class Active_Learning_MDP:
 	def __init__(self,h,alphabet,actions):
@@ -201,7 +185,8 @@ class Active_Learning_MDP:
 				self.algo.h.states[s].next_matrix[a] = old_h.states[s].next_matrix[a]
 
 	def addTraces(self,number_steps,nb_sequences,traces,epsilon_greedy):
-		scheduler_exploit = strategy(self.algo.h,traces)
+		memoryless_scheduler = strategy(self.algo.h,traces)
+		scheduler_exploit = ActiveLearningScheduler(memoryless_scheduler,self.algo.h)
 		scheduler_explore = scheduler_uniform(self.algo.h.actions())
 
 		traces = [[],[]]
@@ -223,7 +208,7 @@ class Active_Learning_MDP:
 		return traces
 
 def strategy(m,traces):
-	#giovanni
+	#ma solution
 	nb_states = len(m.states)
 
 	p = Pool(processes = cpu_count()-1)
@@ -233,19 +218,21 @@ def strategy(m,traces):
 	p.close()
 	temp = [res.get() for res in tasks]
 
-	matrix = []
+	scheduler = []
 
 	for s in range(nb_states):
-		matrix.append([])
+		ss = []
 		for a in range(len(m.actions())):
-			self.matrix[-1].append(0.0)
-			for res in temp:
-				self.matrix[-1][-1] += res[s][a]
+			ss.append(sum( [ temp[t][s][a] for t in range(len(temp)) ] ))
 
-	return ActiveLearningScheduler(matrix,m)
+		scheduler.append(ss)
+		#scheduler.append(m.actions()[ss.index(min(ss))])
+
+	return ActiveLearningScheduler(m,scheduler)
+	#return MemorylessScheduler(scheduler)
 
 def computeProbas(m,seq,time):
-	#giovanni
+	#ma solution
 	nb_states = len(m.states)
 	sequence_actions = [seq[i] for i in range(0,len(seq),2)]
 	sequence_obs = [seq[i+1] for i in range(0,len(seq),2)]
