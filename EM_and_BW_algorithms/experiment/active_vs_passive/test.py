@@ -42,10 +42,10 @@ saveSet(test_set,output_folder+"/test_set.txt")
 
 m = modelMDP_random(nb_sta,original.observations(),original.actions())
 m.save(output_folder+"/initial_model.txt")
-m0_ll = str(m.logLikelihood(test_set))
 
 algo = Estimation_algorithm_MDP(m,original.observations(),original.actions())
 m = algo.learn(training_set,output_file=output_folder+"/model_0.txt")
+m0_ll = str(m.logLikelihood(test_set))
 
 for lr in learning_rates:
 	for epsilon_greedy in epsilons_list:
