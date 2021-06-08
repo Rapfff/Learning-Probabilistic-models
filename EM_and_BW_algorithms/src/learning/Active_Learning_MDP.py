@@ -73,7 +73,7 @@ class Active_Learning_MDP:
 		if number_steps == None:
 			number_steps = int(len(traces[0][0])/2)
 		elif type(number_steps) == list:
-			if len(number_steps) != max_iteration or len(number_steps[0]) != nb_sequences:
+			if len(number_steps) != max_iteration:
 				return None
 
 		self.algo.h = loadMDP(output_folder+"/model_0.txt")
