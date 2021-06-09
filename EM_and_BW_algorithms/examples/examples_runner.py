@@ -35,8 +35,8 @@ def run_experiment(training_set,output_folder,kind_model,algorithm,
 	saveSet(training_set,output_folder+"/training_set.txt")
 	if test_set != None:
 		saveSet(test_set,output_folder+"/test_set.txt")
-	if model != None:
-		model.save(output_folder+'/model_to_learn.txt')
+#	if model != None:
+#		model.save(output_folder+'/model_to_learn.txt')
 
 	f = open(output_folder+"/results.txt",'w')
 	f.write("Model to learn: ")

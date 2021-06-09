@@ -18,13 +18,13 @@ def folderFromParameters(output_folder,epsilon_greedy,i):
 	return output_folder+"/epsilon"+str(epsilon_greedy)+"/exp"+str(i)
 
 
-tr_size = 50
+tr_size = 250
 tr_len = 0.5
 ts_size = 200
 ts_len  = 10
 nb_sta = 9
 nb_seq = 1
-nb_it = 450
+nb_it = 750
 output_folder = "/home/anna/Desktop/active_vs_passive_results/small_grid"
 
 min_size = 8
@@ -39,23 +39,26 @@ nb_exp = 20
 
 original = SmallGrid()
 
-training_set = generateSet(original,tr_size,tr_len,scheduler_uniform(original.actions()),distribution='geo',min_size=min_size)
-saveSet(training_set,output_folder+"/training_set.txt")
+#training_set = generateSet(original,tr_size,tr_len,scheduler_uniform(original.actions()),distribution='geo',min_size=min_size)
+#saveSet(training_set,output_folder+"/training_set.txt")
+training_set = loadSet(output_folder+"/training_set.txt")
 
-test_set = generateSet(original,ts_size,ts_len,scheduler_uniform(original.actions()))
-saveSet(test_set,output_folder+"/test_set.txt")
+#test_set = generateSet(original,ts_size,ts_len,scheduler_uniform(original.actions()))
+#saveSet(test_set,output_folder+"/test_set.txt")
+test_set = loadSet(output_folder+"/test_set.txt")
 
-m = modelMDP_random(nb_sta,original.observations(),original.actions())
-m.save(output_folder+"/initial_model.txt")
+#m = modelMDP_random(nb_sta,original.observations(),original.actions())
+#m.save(output_folder+"/initial_model.txt")
 
-algo = Estimation_algorithm_MDP(m,original.observations(),original.actions())
-m = algo.learn(training_set,output_file=output_folder+"/model_0.txt")
+#algo = Estimation_algorithm_MDP(m,original.observations(),original.actions())
+#m = algo.learn(training_set,output_file=output_folder+"/model_0.txt")
+m = loadMDP(output_folder+"/model_0.txt")
 m0_ll = str(m.logLikelihood(test_set))
 
 for epsilon_greedy in epsilons_list:
-	os.mkdir(output_folder+"/epsilon"+str(epsilon_greedy))
+	#os.mkdir(output_folder+"/epsilon"+str(epsilon_greedy))
 	for i in range(1,nb_exp+1):
-		os.mkdir(folderFromParameters(output_folder,epsilon_greedy,i))
+		#os.mkdir(folderFromParameters(output_folder,epsilon_greedy,i))
 		m.save(folderFromParameters(output_folder,epsilon_greedy,i)+"/model_0.txt")
 
 fout = open(output_folder+"/csv_results.csv",'w')

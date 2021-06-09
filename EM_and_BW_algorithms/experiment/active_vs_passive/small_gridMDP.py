@@ -1,9 +1,10 @@
 import os, sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
+parentdir1 = os.path.dirname(currentdir)
+parentdir2 = os.path.dirname(parentdir1)
+sys.path.append(parentdir2)
 from random import randint
-from tools import resolveRandom
+from src.tools import resolveRandom
 
 class SmallGrid:
 
@@ -11,6 +12,7 @@ class SmallGrid:
 		#set of labels = ['Concrete','Grass','Wall','Mud','Sand']
 		#set of actions= ['N','S','W','E']
 		self.reset()
+		self.name = "SmallGrid"
 		self.map =	[  [ 'S','M','G' ],
 					   [ 'M','G','C' ],
 					   [ 'G','S','M' ]
