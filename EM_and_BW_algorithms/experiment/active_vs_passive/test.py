@@ -32,7 +32,7 @@ nb_steps = []
 for i in range(nb_it):
 	nb_steps.append(min_size+geometric(tr_len))
 
-epsilons_list = [0.0,1.0]
+epsilons_list = [1.0]
 
 learning_rates = [0]
 nb_exp = 20
