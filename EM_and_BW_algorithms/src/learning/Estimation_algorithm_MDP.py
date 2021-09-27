@@ -138,6 +138,7 @@ class Estimation_algorithm_MDP:
 
 		#print()
 		self.h.save(output_file)
+		print("Duration:",time()-start_time)
 		return self.h
 
 	def ghatmultiple(self,s1,s2,obs):
