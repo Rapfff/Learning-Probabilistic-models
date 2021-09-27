@@ -60,7 +60,7 @@ def experiment(training_set, test_set, model_type, log_like_org, alphabet, nb_st
         # f.write(str(algorithm.h)+'\n') # TODO: meaby get more info about model then just the name
         # f.write("logLikelihood= "+str(log_like_hypo_learned)+"\n\n")
         f.write(str(log_like_hypo_learned)+',')
-        f.write(str(log_like_org)+'\n ')
+        f.write(str(log_like_org)+'\n')
 
     f.close()
     return
