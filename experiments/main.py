@@ -13,10 +13,14 @@ size_training_set, len_training_set, size_test_set, len_test_set = 100, 6, 50, 5
 
 original_models =[modelMCGT1(), modelMCGT2(), modelMCGT3(), modelMCGT4()]
 
+# Experiments with random models ?
+# original_models = [modelMCGT_random(5, ['a', 'b', 'c', 'd', 'e', 'f']), modelMCGT_random(5, ['a', 'b', 'c', 'd', 'e', 'f']), modelMCGT_random(5, ['a', 'b', 'c', 'd', 'e', 'f'])]
+
+
 # Experiment 1 
 #   Random model
 
-run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, random_model, 'Estimation_algorithm_MCGT', None, 'results')
+# run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, random_model, 'Estimation_algorithm_MCGT', None, 'results')
 
 # Expriment 2
 #   Random search
@@ -27,3 +31,8 @@ run_experiment(original_models, size_training_set, len_training_set, size_test_s
 #   Equal prop model
 
 # run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, eq_model, 'Estimation_algorithm_MCGT', None, 'results')
+
+
+# Experiments 4
+run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, smart_random_search, 'Estimation_algorithm_MCGT', None, 'results')
+
