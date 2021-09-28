@@ -1,3 +1,4 @@
+from experiments.hypo_search import random_model
 import os, sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
@@ -13,7 +14,17 @@ from src.tools import *
 model_types= {MCGT: 'MCGT', HMM: 'HMM', MDP: 'MDP'}
 
 
-def run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, hypo_generator, learning_algorithm_type, learning_algorithm_epsilon, output_folder):
+def run_experiment(original_models, 
+    size_training_set= 100, 
+    len_training_set=7, 
+    size_test_set=100, 
+    len_test_set= 7, 
+    nb_states= [4,5,6], 
+    hypo_generator= random_model, 
+    learning_algorithm_type= 'Estimation_algorithm_MCGT', 
+    learning_algorithm_epsilon= 0.01, 
+    output_folder= 'results'
+    ):
     f = open(output_folder+"/results.txt",'w')
     for original_model in original_models:
         alphabet= original_model.observations();
