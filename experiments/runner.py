@@ -23,9 +23,10 @@ def run_experiment(original_models,
     hypo_generator= random_model, 
     learning_algorithm_type= 'BW', 
     learning_algorithm_epsilon= 0.01, 
-    output_folder= 'results'
+    output_folder= 'results',
+    result_file= 'result'
     ):
-    f = open(output_folder+"/results.txt",'w')
+    f = open(output_folder+"/"+result_file+".txt",'w')
     for original_model in original_models:
         alphabet= original_model.observations();
 
@@ -41,7 +42,7 @@ def run_experiment(original_models,
         log_like_org= original_model.logLikelihood(test_set);
 
         # write to result file
-        f = open(output_folder+"/results.txt",'a')
+        f = open(output_folder+"/"+result_file+".txt",'a')
         f.write("Model to learn: ")
         f.write(original_model.name+'\n')
         f.write("Training_set: "+str(size_training_set)+" sequences of "+str(len_training_set)+" observations\n")
@@ -54,4 +55,4 @@ def run_experiment(original_models,
 
 
 
-        experiment(training_set, test_set, model_type, log_like_org, alphabet, nb_states, hypo_generator, learning_algorithm_type, learning_algorithm_epsilon, output_folder)
+        experiment(training_set, test_set, model_type, log_like_org, alphabet, nb_states, hypo_generator, learning_algorithm_type, learning_algorithm_epsilon, output_folder, result_file)

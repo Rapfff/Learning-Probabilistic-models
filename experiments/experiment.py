@@ -17,7 +17,8 @@ def experiment(
         hypo_generator = random_model, 
         learning_algorithm_type = 'BW', 
         learning_algorithm_epsilon = 0.01, 
-        output_folder = 'results'):
+        output_folder = 'results',
+        result_file= 'result'):
     '''
     Experiment runs experiment on the original model
         information about the original model we need is 
@@ -37,7 +38,7 @@ def experiment(
 
     retuns None;
     '''
-    f = open(output_folder+"/results.txt",'a')
+    f = open(output_folder+"/"+result_file+".txt",'a')
 
     for nb in nb_states:
         # Get Hypothisis model 
