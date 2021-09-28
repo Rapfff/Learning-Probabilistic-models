@@ -5,35 +5,35 @@ sys.path.append(parentdir)
 
 from examples.examples_models import *
 
-def random_model(nb_states, alphabet, model_type, training_set, log_like_org=0):
+def random_model(nb_states, alphabet, model_type, training_set):
     if model_type == 'MCGT':
         return modelMCGT_random(nb_states,alphabet)
 
-def random_search(nb_states, alphabet, model_type, training_set, log_like_org=0):
+def random_search(nb_states, alphabet, model_type, training_set):
     if model_type== 'MCGT':
         best_model = modelMCGT_random(nb_states,alphabet)
-        best_like = abs(log_like_org- best_model.logLikelihood(training_set))
+        best_like = best_model.logLikelihood(training_set)
         for i in range(100):
             temp_model = modelMCGT_random(nb_states,alphabet)
-            temp_like = abs(log_like_org- temp_model.logLikelihood(training_set))
+            temp_like = temp_model.logLikelihood(training_set)
             if temp_like<best_like:
                 best_model, best_like=temp_model, temp_like
         return best_model
 
-def smart_random_search(nb_states, alphabet, model_type, training_set, log_like_org=0):
+def smart_random_search(nb_states, alphabet, model_type, training_set):
     if model_type== 'MCGT':
         lambda_ = 0.5
         best_model = modelMCGT_random(nb_states,alphabet)
-        best_like = abs(log_like_org- best_model.logLikelihood(training_set))
+        best_like = best_model.logLikelihood(training_set)
         for i in range(100):
             temp_model = modelMCGT_random(nb_states,alphabet)
             temp_model = mearge_MCGT(lambda_, temp_model, best_model)
-            temp_like = abs(log_like_org- temp_model.logLikelihood(training_set))
+            temp_like = temp_model.logLikelihood(training_set)
             if temp_like<best_like:
                 best_model, best_like=temp_model, temp_like
         return best_model
 
-def eq_model(nb_states, alphabet, model_type, training_set, log_like_org=0):
+def equiprobable_model(nb_states, alphabet, model_type, training_set):
     if model_type == 'MCGT':
         return modelMCGT_equiprobable(nb_states, alphabet)
 

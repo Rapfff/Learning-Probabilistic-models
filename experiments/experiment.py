@@ -32,7 +32,7 @@ def experiment(training_set, test_set, model_type, log_like_org, alphabet, nb_st
 
     for nb in nb_states:
         # Get Hypothisis model 
-        hypo_model = hypo_generator(nb, alphabet, model_type, training_set, log_like_org)
+        hypo_model = hypo_generator(nb, alphabet, model_type, training_set)
         hypo_model.pprint()
         log_like_hypo = hypo_model.logLikelihood(test_set);
         # Save hypo 

@@ -30,7 +30,7 @@ original_models =[modelMCGT1(), modelMCGT2(), modelMCGT3(), modelMCGT4()]
 # Experiment 3
 #   Equal prop model
 
-# run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, eq_model, 'Estimation_algorithm_MCGT', None, 'results')
+# run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, equiprobable_model, 'Estimation_algorithm_MCGT', None, 'results')
 
 
 # Experiments 4
