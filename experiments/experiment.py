@@ -1,3 +1,4 @@
+from experiments.hypo_search import random_model
 import os, sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
@@ -8,7 +9,17 @@ from src.learning.Estimation_algorithm_MCGT import *
 
 # TODO: Add epsilon
 
-def experiment(training_set, test_set, model_type, log_like_org, alphabet, nb_states, hypo_generator, learning_algorithm_type, learning_algorithm_epsilon, output_folder):
+def experiment(
+        training_set, 
+        test_set, 
+        model_type, 
+        log_like_org, 
+        alphabet, 
+        nb_states = [4,5,6], 
+        hypo_generator = random_model, 
+        learning_algorithm_type = 'BW', 
+        learning_algorithm_epsilon = 0.01, 
+        output_folder = 'results'):
     '''
     Experiment runs experiment on the original model
         information about the original model we need is 
@@ -33,7 +44,7 @@ def experiment(training_set, test_set, model_type, log_like_org, alphabet, nb_st
     for nb in nb_states:
         # Get Hypothisis model 
         hypo_model = hypo_generator(nb, alphabet, model_type, training_set)
-        hypo_model.pprint()
+        # hypo_model.pprint()
         log_like_hypo = hypo_model.logLikelihood(test_set);
         # Save hypo 
 
@@ -53,7 +64,7 @@ def experiment(training_set, test_set, model_type, log_like_org, alphabet, nb_st
         else: #TODO
             raise TypeError('Invalid type of algorithm, or this algorithm has not been implemented in the experiment function :D <3')
 
-        algorithm.learn(training_set)
+        algorithm.learn(training_set, output_folder+'/output_model.txt', learning_algorithm_epsilon)
         log_like_hypo_learned = algorithm.h.logLikelihood(test_set);
         # Save learnd model
         # f.write("Learned hypothesis model: ")

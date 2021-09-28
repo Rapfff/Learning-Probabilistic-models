@@ -21,7 +21,7 @@ def run_experiment(original_models,
     len_test_set= 7, 
     nb_states= [4,5,6], 
     hypo_generator= random_model, 
-    learning_algorithm_type= 'Estimation_algorithm_MCGT', 
+    learning_algorithm_type= 'BW', 
     learning_algorithm_epsilon= 0.01, 
     output_folder= 'results'
     ):
