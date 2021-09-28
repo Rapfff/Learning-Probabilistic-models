@@ -8,31 +8,28 @@ from examples.examples_models import *
 from hypo_search import *
 
 nb_states=[2,2,3,3,4,4,5,5,6,6]
-size_training_set, len_training_set, size_test_set, len_test_set = 100, 6, 50, 5;
+size_training_set, len_training_set, size_test_set, len_test_set = 100, 7, 100, 7;
 
 
-original_models =[modelMCGT1(), modelMCGT2(), modelMCGT3(), modelMCGT4()]
-
-# Experiments with random models ?
-# original_models = [modelMCGT_random(5, ['a', 'b', 'c', 'd', 'e', 'f']), modelMCGT_random(5, ['a', 'b', 'c', 'd', 'e', 'f']), modelMCGT_random(5, ['a', 'b', 'c', 'd', 'e', 'f'])]
+original_models =[modelMCGT1(), modelMCGT2(), modelMCGT3(), modelMCGT4(), modelMCGT_random(5, ['a', 'b', 'c', 'd', 'e', 'f'])]
 
 
 # Experiment 1 
 #   Random model
 
-# run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, random_model, 'Estimation_algorithm_MCGT', None, 'results')
+run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, random_model)
 
 # Expriment 2
 #   Random search
 
-# run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, random_search, 'Estimation_algorithm_MCGT', None, 'results')
+# run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, random_search)
 
 # Experiment 3
 #   Equal prop model
 
-# run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, equiprobable_model, 'Estimation_algorithm_MCGT', None, 'results')
+# run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, equiprobable_model)
 
 
 # Experiments 4
-run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, smart_random_search, 'Estimation_algorithm_MCGT', None, 'results')
+# run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, smart_random_search)
 

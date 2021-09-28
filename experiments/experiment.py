@@ -7,8 +7,6 @@ sys.path.append('../EM_and_BW_algorithms')
 
 from src.learning.Estimation_algorithm_MCGT import *
 
-# TODO: Add epsilon
-
 def experiment(
         training_set, 
         test_set, 
@@ -54,12 +52,10 @@ def experiment(
         # f.write("logLikelihood= "+str(log_like_hypo)+"\n")
         f.write(str(log_like_hypo)+', ')
         # Learn the hypo model
-        if learning_algorithm_type == 'Estimation_algorithm_MCGT':
+        if learning_algorithm_type == 'BW':
             if model_type== 'MCGT':
                 # f.write('Algorithm: '+ 'Estimation algorithm MCGT\n')
                 algorithm=Estimation_algorithm_MCGT(hypo_model, alphabet)
-            else: # TODO: other algorithms
-                raise TypeError(learning_algorithm_type+' is for MCGT not '+ model_type)
 
         else: #TODO
             raise TypeError('Invalid type of algorithm, or this algorithm has not been implemented in the experiment function :D <3')
