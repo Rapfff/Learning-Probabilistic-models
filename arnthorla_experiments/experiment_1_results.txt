@@ -114,3 +114,39 @@ Observation alphabet:  abcde
 #states:  3 	original:  -8.047189562170502 	trained:  -7.197598695480595 	improvement:  0.8495908666899066
 
 #states:  3 	Mean impovement:  0.9994842149519437 	Stdev of improvement:  0.3022107559066416
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -6.808831943613276 	improvement:  1.2383576185572256
+#states:  3 	original:  -8.047189562170502 	trained:  -6.993097885231618 	improvement:  1.0540916769388833
+#states:  3 	original:  -8.047189562170502 	trained:  -7.084048122028316 	improvement:  0.9631414401421861
+
+#states:  3 	Mean impovement:  1.0851969118794316 	Stdev of improvement:  0.1402199627224125
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -6.644329849933188 	improvement:  1.4028597122373139
+#states:  3 	original:  -8.047189562170502 	trained:  -7.053603376589576 	improvement:  0.9935861855809254
+#states:  3 	original:  -8.047189562170502 	trained:  -8.035026605928417 	improvement:  0.012162956242084633
+
+#states:  3 	Mean impovement:  0.8028696180201079 	Stdev of improvement:  0.7146950214186107
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -7.282177835268939 	improvement:  0.7650117269015624
+#states:  3 	original:  -8.047189562170502 	trained:  -6.778330163877499 	improvement:  1.268859398293003
+#states:  3 	original:  -8.047189562170502 	trained:  -7.096138465937884 	improvement:  0.951051096232618
+
+#states:  3 	Mean impovement:  0.9949740738090611 	Stdev of improvement:  0.25477939469476296

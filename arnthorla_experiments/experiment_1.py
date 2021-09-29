@@ -3,10 +3,10 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-from examples.examples_models import *
-from src.learning.Estimation_algorithm_MCGT import *
-from src.models.MCGT import *
-from src.tools import *
+from EM_and_BW_algorithms.examples.examples_models import *
+from EM_and_BW_algorithms.src.learning.Estimation_algorithm_MCGT import *
+from EM_and_BW_algorithms.src.models.MCGT import *
+from EM_and_BW_algorithms.src.tools import *
 
 from statistics import fmean, stdev
 
