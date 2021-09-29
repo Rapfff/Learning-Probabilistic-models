@@ -94,7 +94,7 @@ class MCGT:
 		for i in range(len(self.states)):
 			print("\n----STATE s",i,"----",sep='')
 			for j in range(len(self.states[i].next_matrix[0])):
-				if self.states[i].next_matrix[0][j] > 0.0:
+				if self.states[i].next_matrix[0][j] > 0.000001:
 					print("s",i," - (",self.states[i].next_matrix[2][j],") -> s",self.states[i].next_matrix[1][j]," : ",self.states[i].next_matrix[0][j],sep='')
 		print()
 

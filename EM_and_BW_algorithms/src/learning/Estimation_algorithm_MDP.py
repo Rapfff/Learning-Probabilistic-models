@@ -159,7 +159,7 @@ class Estimation_algorithm_MDP:
 			for s in range(self.nb_states):
 				dic = {}
 				for a in self.actions:
-					dic[a] = [ [tau[s][a][i]/den[s][a] for i in range(len(list_sta))] , list_sta, list_obs ]
+					dic[a] = [ correct_proba([tau[s][a][i]/den[s][a] for i in range(len(list_sta))]) , list_sta, list_obs ]
 				new_states.append(MDP_state(dic))
 
 			self.hhat = MDP(new_states,self.h.initial_state)
