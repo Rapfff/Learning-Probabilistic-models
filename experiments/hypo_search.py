@@ -17,7 +17,7 @@ def random_search(nb_states, alphabet, model_type, training_set):
         for i in range(100):
             temp_model = modelMCGT_random(nb_states,alphabet)
             temp_like = temp_model.logLikelihood(training_set)
-            if temp_like<best_like:
+            if temp_like>best_like:
                 best_model, best_like=temp_model, temp_like
         return best_model
 
@@ -30,7 +30,7 @@ def smart_random_search(nb_states, alphabet, model_type, training_set):
             temp_model = modelMCGT_random(nb_states,alphabet)
             temp_model = mearge_MCGT(lambda_, temp_model, best_model)
             temp_like = temp_model.logLikelihood(training_set)
-            if temp_like<best_like:
+            if temp_like>best_like:
                 best_model, best_like=temp_model, temp_like
         return best_model
 
