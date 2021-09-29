@@ -22,9 +22,6 @@ class Estimation_algorithm_MCGT:
 	def h_g(self,s1,s2,obs):
 		return self.h.g(s1,s2,obs)
 
-	def hhat_g(self,s1,s2,obs):
-		return self.hhat.g(s1,act,s2,obs)
-
 	def computeAlphas(self,sequence):
 		"""Here we compute all the values alpha(k,t) for a given sequence"""
 		alpha_matrix = []
