@@ -20,6 +20,7 @@ def run_experiment(original_models,
     size_test_set=100, 
     len_test_set= 7, 
     nb_states= [4,5,6], 
+    iterations= 1,
     hypo_generator= random_model, 
     learning_algorithm_type= 'BW', 
     learning_algorithm_epsilon= 0.01, 
@@ -55,4 +56,4 @@ def run_experiment(original_models,
 
 
 
-        experiment(training_set, test_set, model_type, log_like_org, alphabet, nb_states, hypo_generator, learning_algorithm_type, learning_algorithm_epsilon, output_folder, result_file)
+        experiment(training_set, test_set, model_type, log_like_org, alphabet, nb_states, iterations, hypo_generator, learning_algorithm_type, learning_algorithm_epsilon, output_folder, result_file)

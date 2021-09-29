@@ -14,6 +14,7 @@ def experiment(
         log_like_org, 
         alphabet, 
         nb_states = [4,5,6], 
+        iterations = 1,
         hypo_generator = random_model, 
         learning_algorithm_type = 'BW', 
         learning_algorithm_epsilon = 0.01, 
@@ -41,34 +42,36 @@ def experiment(
     f = open(output_folder+"/"+result_file+".txt",'a')
 
     for nb in nb_states:
-        # Get Hypothisis model 
-        hypo_model = hypo_generator(nb, alphabet, model_type, training_set)
-        # hypo_model.pprint()
-        log_like_hypo = hypo_model.logLikelihood(test_set);
-        # Save hypo 
+        for i in range(iterations):
+            # Get Hypothisis model 
+            hypo_model = hypo_generator(nb, alphabet, model_type, training_set)
+            # hypo_model.pprint()
+            log_like_hypo = hypo_model.logLikelihood(test_set);
+            # Save hypo 
 
-        f.write(str(nb)+', ')
-        # f.write("Hypothesis model: ")
-        # f.write(str(hypo_model)+'\n') # TODO: meaby get more info about model then just the name
-        # f.write("logLikelihood= "+str(log_like_hypo)+"\n")
-        f.write(str(log_like_hypo)+', ')
-        # Learn the hypo model
-        if learning_algorithm_type == 'BW':
-            if model_type== 'MCGT':
-                # f.write('Algorithm: '+ 'Estimation algorithm MCGT\n')
-                algorithm=Estimation_algorithm_MCGT(hypo_model, alphabet)
+            f.write(str(nb)+', ')
+            # f.write("Hypothesis model: ")
+            # f.write(str(hypo_model)+'\n') # TODO: meaby get more info about model then just the name
+            # f.write("logLikelihood= "+str(log_like_hypo)+"\n")
+            f.write(str(log_like_hypo)+', ')
+            # Learn the hypo model
+            if learning_algorithm_type == 'BW':
+                if model_type== 'MCGT':
+                    # f.write('Algorithm: '+ 'Estimation algorithm MCGT\n')
+                    algorithm=Estimation_algorithm_MCGT(hypo_model, alphabet)
 
-        else: #TODO
-            raise TypeError('Invalid type of algorithm, or this algorithm has not been implemented in the experiment function :D <3')
+            else: #TODO
+                raise TypeError('Invalid type of algorithm, or this algorithm has not been implemented in the experiment function :D <3')
 
-        algorithm.learn(training_set, output_folder+'/output_model.txt', learning_algorithm_epsilon)
-        log_like_hypo_learned = algorithm.h.logLikelihood(test_set);
-        # Save learnd model
-        # f.write("Learned hypothesis model: ")
-        # f.write(str(algorithm.h)+'\n') # TODO: meaby get more info about model then just the name
-        # f.write("logLikelihood= "+str(log_like_hypo_learned)+"\n\n")
-        f.write(str(log_like_hypo_learned)+',')
-        f.write(str(log_like_org)+'\n')
+            # algorithm.learn(training_set, output_folder+'/output_model_'+str(nb_states)+'_'+str(i)+'.txt', learning_algorithm_epsilon)
+            algorithm.learn(training_set, output_folder+'/output_model.txt', learning_algorithm_epsilon)
+            log_like_hypo_learned = algorithm.h.logLikelihood(test_set);
+            # Save learnd model
+            # f.write("Learned hypothesis model: ")
+            # f.write(str(algorithm.h)+'\n') # TODO: meaby get more info about model then just the name
+            # f.write("logLikelihood= "+str(log_like_hypo_learned)+"\n\n")
+            f.write(str(log_like_hypo_learned)+', ')
+            f.write(str(abs(log_like_org-log_like_hypo_learned))+'\n')
 
     f.close()
     return
