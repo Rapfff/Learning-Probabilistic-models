@@ -62,6 +62,9 @@ class MCGT:
 			f.write(str(s))
 		f.close()
 
+	def g(self,s1,s2,obs):
+		return self.states[s1].g(s2,obs)
+
 	def observations(self):
 		res = []
 		for s in self.states:
