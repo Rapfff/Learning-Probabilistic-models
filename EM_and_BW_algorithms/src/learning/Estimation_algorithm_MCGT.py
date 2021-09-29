@@ -3,12 +3,10 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from models.MCGT import *
-from tools import correct_proba
-from time import time
-import datetime
 from multiprocessing import cpu_count, Pool
-from math import log
-
+from time import time
+from tools import correct_proba
+import datetime
 
 class Estimation_algorithm_MCGT:
 	def __init__(self,h,alphabet):
@@ -19,151 +17,137 @@ class Estimation_algorithm_MCGT:
 		self.h = h
 		self.hhat = h
 		self.alphabet = alphabet
+		self.nb_states = len(self.h.states)
 
-	def computeAlphas(self, sequence, common, alpha_matrix):
+	def h_g(self,s1,s2,obs):
+		return self.h.g(s1,s2,obs)
+
+	def computeAlphas(self,sequence):
 		"""Here we compute all the values alpha(k,t) for a given sequence"""
-		for k in range(common,len(sequence)):
-			for s in range(len(self.h.states)):
-				summ = 0.0
-				for ss in range(len(self.h.states)):
-					p = self.h.states[ss].g(s,sequence[k])
-					summ += alpha_matrix[ss][k]*p
-				alpha_matrix[s][k+1] = summ
+		alpha_matrix = []
+		for i in range(self.nb_states):
+			if i == self.h.initial_state:
+				alpha_matrix.append([1.0])
+			else:
+				alpha_matrix.append([0.0])
 
+		for k in range(len(sequence)):
+			for s in range(self.nb_states):
+				summ = 0.0
+				for ss in range(self.nb_states):
+					p = self.h_g(ss,s,sequence[k])
+					if p > 0.0:
+						summ += alpha_matrix[ss][k]*p
+				alpha_matrix[s].append(summ)
 		return alpha_matrix
 
-	def computeBetas(self, sequence):
+	def computeBetas(self,sequence):
 		"""Here we compute all the values beta(t,k) for a given sequence"""
 		beta_matrix = []
-
-		for s in range(len(self.h.states)):
+		for s in range(self.nb_states):
 			beta_matrix.append([1.0])
 		
 		for k in range(len(sequence)-1,-1,-1):
-			for s in range(len(self.h.states)):
-				summ = 0
-				for ss in range(len(self.h.states)):
-					p = self.h.states[s].g(ss,sequence[k])
-					if p > 0:
+			for s in range(self.nb_states):
+				summ = 0.0
+				for ss in range(self.nb_states):
+					p = self.h_g(s,ss,sequence[k])
+					if p > 0.0:
 						summ += beta_matrix[ss][1 if ss<s else 0]*p
 				beta_matrix[s].insert(0,summ)
 
 		return beta_matrix
 
-	def learn(self,sequences,output_file="output_model.txt",epsilon=0.01,pp=''):
-		"""
-		Given sequences of observations it adapts the parameters of h in order to maximize the probability to get 
-		these sequences of observations.
-		sequences = [[sequence1,sequence2,...],[number_of_seq1,number_of_seq2,...]]
-		"""
-		self.sequences = sequences[0]
-		self.sequences.sort()
-		self.times = [ sequences[1][sequences[0].index(self.sequences[seq])] for seq in range(len(self.sequences))]
-
-		start_time = time()
-
-		self.observed = []
-		for i in self.sequences:
-			for j in i:
-				if not j in self.observed:
-					self.observed.append(j)
+	def processWork(self,sequence,times):
+		alpha_matrix = self.computeAlphas(sequence)
+		beta_matrix = self.computeBetas(sequence)
 		
+		proba_seq = beta_matrix[self.h.initial_state][0]
+		if proba_seq != 0.0:
+			####################
+			den = []
+			for s in range(self.nb_states):
+				den.append(0.0)
+				for t in range(len(sequence)):
+					den[-1] += alpha_matrix[s][t]*beta_matrix[s][t]*times/proba_seq
+			####################
+			num = []
+			for s in range(self.nb_states):
+				num.append([0.0 for i in range(self.nb_states*len(self.observations))])
+				for t in range(len(sequence)):
+					observation = sequence[t]
+					for ss in range(self.nb_states):
+						p = 0.0
+						for i in range(len(self.h.states[s].next_matrix[0])):
+							if self.h.states[s].next_matrix[1][i] == ss and self.h.states[s].next_matrix[2][i] == observation:
+								p = self.h.states[s].next_matrix[0][i]
+								break
+						if p != 0.0:
+							num[-1][ss*len(self.observations)+self.observations.index(observation)] += alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
+			####################
+			return [den,num, proba_seq]
+		return False
+
+
+	def learn(self,traces,output_file="output_model.txt",epsilon=0.01,pp=''):
+		"""
+		Given a set of sequences of pairs action-observation,
+		it adapts the parameters of h in order to maximize the probability to get 
+		these sequences of observations.
+		traces = [[trace1,trace2,...],[number_of_trace1,number_of_trace2,...]]
+		trace = [obs1,obs2,...,obsx]
+		"""
+		
+		self.observations = []
+		for seq in traces[0]:
+			for i in list(set(seq)):
+				if not i in self.observations:
+					self.observations.append(i)
+
 		counter = 0
-		prevloglikelihood = 10 #it contains the loglikelihood of the previous h
+		prevloglikelihood = 10
 		while True:
-			counter += 1
-			print(datetime.datetime.now(),pp,counter, prevloglikelihood)
+			#print(datetime.datetime.now(),pp,counter, prevloglikelihood)
+			den = []
+			for s in range(self.nb_states):
+				den.append(0.0)
+			tau = []
+			for s in range(self.nb_states):
+				tau.append([0 for i in range(self.nb_states*len(self.observations))])
+			
+			p = Pool(processes = cpu_count() - 1)
+			tasks = []
+			
+			for seq in range(len(traces[0])):
+				tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq],]))
+			
+			temp = [res.get() for res in tasks if res != False]
+			currentloglikelihood = sum([log(i[2]) for i in temp])
+
+			for s in range(self.nb_states):
+				den[s] = sum([i[0][s] for i in temp])
+					
+				for x in range(self.nb_states*len(self.observations)):
+					tau[s][x] = sum([i[1][s][x] for i in temp])
+
+			list_sta = []
+			for i in range(self.nb_states):
+				for o in self.observations:
+					list_sta.append(i)
+			list_obs = self.observations*self.nb_states
 			new_states = []
-			for i in range(len(self.h.states)):
-				next_probas = []
-				next_states = []
-				next_obs    = []
-				
-				p = Pool(processes = cpu_count()-1)
-				tasks = []
-				for j in range(len(self.h.states)):
-					for k in self.observed:
-						tasks.append(p.apply_async(self.ghatmultiple, [i,j,k,]))
-				p.close()
-				temp = [res.get() for res in tasks]
-
-				next_probas = [ temp[t][2] for t in range(len(temp)) ]
-				next_states = [ temp[t][0] for t in range(len(temp)) ]
-				next_obs    = [ temp[t][1] for t in range(len(temp)) ]
-
-				for j in temp:
-					if len(j) == 4:
-						currentloglikelihood = j[3]
-				for j in range(len(self.h.states)):		
-					for k in [ letter for letter in self.alphabet if not letter in self.observed ]:
-						next_probas.append(0)
-						next_states.append(j)
-						next_obs.append(k)
-
-				next_probas = correct_proba(next_probas)
-				new_states.append(MCGT_state([ next_probas, next_states, next_obs]))
+			for s in range(self.nb_states):
+				l = [ correct_proba([tau[s][i]/den[s] for i in range(len(list_sta))]) , list_sta, list_obs ]
+				new_states.append(MCGT_state(l))
 
 			self.hhat = MCGT(new_states,self.h.initial_state)
 			
-			if abs(prevloglikelihood -currentloglikelihood) < epsilon:#or self.checkEnd() #or time() - start_time > 120
+			counter += 1
+			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
 				break
 			else:
 				prevloglikelihood = currentloglikelihood
 				self.h = self.hhat
-		
+
 		self.h.save(output_file)
 		return self.h
-
-	def ghatmultiple(self,s1,s2,obs):
-		num = 0.0
-		den = 0.0
-
-		if s1 == 0 and s2 == 0 and self.observed.index(obs) == 0:
-			loglikelihood = 0.0
-		else:
-			loglikelihood = None
-
-		for seq in range(len(self.sequences)):
-			sequence = self.sequences[seq]
-			times = self.times[seq]
-			if seq == 0:
-				common = 0
-				alpha_matrix = []
-
-				for s in range(len(self.h.states)):
-					if s == self.h.initial_state:
-						alpha_matrix.append([1.0])
-					else:
-						alpha_matrix.append([0.0])
-					alpha_matrix[-1] += [None for i in range(len(sequence))]
-			else:
-				common = 0 
-				while self.sequences[seq-1][common] == sequence[common]:
-					common += 1
-			alpha_matrix = self.computeAlphas(sequence,common,alpha_matrix)
-			beta_matrix  = self.computeBetas(sequence)			
-
-			bigK = beta_matrix[self.h.initial_state][0]
-
-			for k in range(len(sequence)):
-				gamma_s1_k = alpha_matrix[s1][k] * beta_matrix[s1][k] / bigK
-
-				den += gamma_s1_k * times
-
-				if sequence[k] == obs:
-					num += alpha_matrix[s1][k]*self.h.states[s1].g(s2,obs)*beta_matrix[s2][k+1]*times/bigK
-
-			if loglikelihood != None:
-				loglikelihood += log(sum([alpha_matrix[s][-1] for s in range(len(self.h.states))]))
-
-		if den == 0.0:
-			#in this case we don't expect to reach s1 (except maybe at the end)
-			#so we don't care of this value
-			res = 0.0
-		else:
-			res = num/den
-
-		if loglikelihood == None:
-			return (s2,obs,res)
-		else:
-			return (s2,obs,res, loglikelihood)
