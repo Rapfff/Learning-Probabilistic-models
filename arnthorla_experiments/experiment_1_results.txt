@@ -1,0 +1,152 @@
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3, 4]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -6.253465916294379 	improvement:  1.7937236458761223
+#states:  3 	original:  -8.047189562170502 	trained:  -7.278844744863163 	improvement:  0.7683448173073391
+#states:  3 	original:  -8.047189562170502 	trained:  -7.184265589916436 	improvement:  0.862923972254066
+#states:  4 	original:  -8.047189562170502 	trained:  -6.983202311687121 	improvement:  1.0639872504833807
+#states:  4 	original:  -8.047189562170502 	trained:  -7.023527686087665 	improvement:  1.0236618760828362
+#states:  4 	original:  -8.047189562170502 	trained:  -7.1841771902553875 	improvement:  0.8630123719151142
+
+#states:  3 	Mean impovement:  1.1416641451458425 	Stdev of improvement:  0.5666767142799107
+#states:  4 	Mean impovement:  0.9835538328271104 	Stdev of improvement:  0.10632129045602652
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3, 4]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -7.268083558311434 	improvement:  0.7791060038590674
+#states:  3 	original:  -8.047189562170502 	trained:  -6.981091716877094 	improvement:  1.0660978452934078
+#states:  3 	original:  -8.047189562170502 	trained:  -7.183296727923315 	improvement:  0.8638928342471868
+#states:  4 	original:  -8.047189562170502 	trained:  -7.506864996980615 	improvement:  0.5403245651898869
+#states:  4 	original:  -8.047189562170502 	trained:  -7.2527933553994925 	improvement:  0.7943962067710091
+#states:  4 	original:  -8.047189562170502 	trained:  -7.072264273967191 	improvement:  0.9749252882033108
+
+#states:  3 	Mean impovement:  0.9030322277998873 	Stdev of improvement:  0.14744489939710795
+#states:  4 	Mean impovement:  0.7698820200547356 	Stdev of improvement:  0.21833496312711334
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -7.183721159921393 	improvement:  0.8634684022491088
+#states:  3 	original:  -8.047189562170502 	trained:  -7.159186764822344 	improvement:  0.8880027973481575
+#states:  3 	original:  -8.047189562170502 	trained:  -6.821356509320978 	improvement:  1.2258330528495236
+
+#states:  3 	Mean impovement:  0.9924347508155966 	Stdev of improvement:  0.20250076464043093
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -7.248156440843076 	improvement:  0.799033121327426
+#states:  3 	original:  -8.047189562170502 	trained:  -6.6842867647647255 	improvement:  1.3629027974057761
+#states:  3 	original:  -8.047189562170502 	trained:  -7.105343995820289 	improvement:  0.9418455663502128
+
+#states:  3 	Mean impovement:  1.0345938283611382 	Stdev of improvement:  0.29315342907718367
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -7.369897268313477 	improvement:  0.6772922938570245
+#states:  3 	original:  -8.047189562170502 	trained:  -6.882598956492943 	improvement:  1.1645906056775583
+#states:  3 	original:  -8.047189562170502 	trained:  -7.250303431150096 	improvement:  0.7968861310204058
+
+#states:  3 	Mean impovement:  0.8795896768516629 	Stdev of improvement:  0.2539583008007076
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -7.1027114583186375 	improvement:  0.9444781038518641
+#states:  3 	original:  -8.047189562170502 	trained:  -6.670803373073483 	improvement:  1.376386189097019
+#states:  3 	original:  -8.047189562170502 	trained:  -6.738191758432826 	improvement:  1.3089978037376753
+
+#states:  3 	Mean impovement:  1.209954032228853 	Stdev of improvement:  0.23236479946638403
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -7.069365577307863 	improvement:  0.9778239848626384
+#states:  3 	original:  -8.047189562170502 	trained:  -6.835733841461265 	improvement:  1.2114557207092362
+#states:  3 	original:  -8.047189562170502 	trained:  -7.080809498123576 	improvement:  0.966380064046926
+
+#states:  3 	Mean impovement:  1.0518865898729335 	Stdev of improvement:  0.13830933254050098
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -7.196269225859541 	improvement:  0.8509203363109608
+#states:  3 	original:  -8.047189562170502 	trained:  -7.272031896828135 	improvement:  0.7751576653423671
+#states:  3 	original:  -8.047189562170502 	trained:  -6.9507375645779605 	improvement:  1.096451997592541
+
+#states:  3 	Mean impovement:  0.907509999748623 	Stdev of improvement:  0.16795625766851383
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -7.245669517679249 	improvement:  0.8015200444912525
+#states:  3 	original:  -8.047189562170502 	trained:  -6.699847828495829 	improvement:  1.3473417336746722
+#states:  3 	original:  -8.047189562170502 	trained:  -7.197598695480595 	improvement:  0.8495908666899066
+
+#states:  3 	Mean impovement:  0.9994842149519437 	Stdev of improvement:  0.3022107559066416
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -6.808831943613276 	improvement:  1.2383576185572256
+#states:  3 	original:  -8.047189562170502 	trained:  -6.993097885231618 	improvement:  1.0540916769388833
+#states:  3 	original:  -8.047189562170502 	trained:  -7.084048122028316 	improvement:  0.9631414401421861
+
+#states:  3 	Mean impovement:  1.0851969118794316 	Stdev of improvement:  0.1402199627224125
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -6.644329849933188 	improvement:  1.4028597122373139
+#states:  3 	original:  -8.047189562170502 	trained:  -7.053603376589576 	improvement:  0.9935861855809254
+#states:  3 	original:  -8.047189562170502 	trained:  -8.035026605928417 	improvement:  0.012162956242084633
+
+#states:  3 	Mean impovement:  0.8028696180201079 	Stdev of improvement:  0.7146950214186107
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -7.282177835268939 	improvement:  0.7650117269015624
+#states:  3 	original:  -8.047189562170502 	trained:  -6.778330163877499 	improvement:  1.268859398293003
+#states:  3 	original:  -8.047189562170502 	trained:  -7.096138465937884 	improvement:  0.951051096232618
+
+#states:  3 	Mean impovement:  0.9949740738090611 	Stdev of improvement:  0.25477939469476296

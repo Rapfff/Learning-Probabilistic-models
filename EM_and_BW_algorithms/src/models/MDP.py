@@ -314,6 +314,26 @@ class MDP:
 		f.write("M = MDP[S,iota,tau];")
 		f.close()
 
+	def saveToPrism(self,output_file):
+		f = open(output_file,'w',encoding="utf-8")
+		f.write("mdp\n")
+		f.write("\tmodule "+self.name+"\n")
+		f.write("\ts : [0.."+str(len(self.states)-1)+"] init "+str(self.initial_state)+";\n")
+		f.write("\tl : [0.."+str(len(self.observations()))+"] init "+str(len(self.observations()))+";\n")
+		f.write("\n")
+		for s in range(len(self.states)):
+			state = self.states[s]
+			for a in state.actions():
+				f.write("\t["+a+"] s="+str(s)+" -> ")
+				f.write(" + ".join([str(state.next_matrix[a][0][t])+" : (s'="+str(state.next_matrix[a][1][t])+") & (l'="+str(self.observations().index(state.next_matrix[a][2][t]))+")" for t in range(len(state.next_matrix[a][0]))]))
+				f.write(";\n")
+		f.write("\n")
+		f.write("endmodule\n")
+
+		for l in range(len(self.observations())):
+			f.write('label "'+self.observations()[l]+'" = l='+str(l)+';\n')
+		f.close()
+
 
 def KLDivergence(m1,m2,test_set):
 	pm1 = m1.probasSequences(test_set)
@@ -409,6 +429,10 @@ def loadMDP(file_path):
 def MDPFileToMathematica(file_path,output_file):
 	m = loadMDP(file_path)
 	m.saveToMathematica(output_file)
+
+def MDPFileToPrism(file_path,output_file):
+	m = loadMDP(file_path)
+	m.saveToPrism(output_file)
 
 def prismToMathematica(file_path,output_file):
 	m = loadPrismMDP(file_path)
