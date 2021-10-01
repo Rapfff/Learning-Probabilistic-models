@@ -19,7 +19,7 @@ def result_to_list(file_name):
             l_s= line.split(',')
             l.append((i, float(l_s[1]), float(l_s[2]), float(l_s[3])))
             i=i+1
-        name='MCGT'+str(j//4+1)+'-'+str(j%5+2)
+        name='MCGT'+str(j//5+1)+'-'+str(j%5+2)
         ret[name]= l
 
     return ret
