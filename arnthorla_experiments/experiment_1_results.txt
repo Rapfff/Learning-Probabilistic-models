@@ -150,3 +150,15 @@ Observation alphabet:  abcde
 #states:  3 	original:  -8.047189562170502 	trained:  -7.096138465937884 	improvement:  0.951051096232618
 
 #states:  3 	Mean impovement:  0.9949740738090611 	Stdev of improvement:  0.25477939469476296
+Size of observation alphabet:  5
+Number of training sequences:  10
+Length per training sequence:  5
+Number of states to be tested:  [3]
+Number of models that are tested in each experiment:  3
+Observation alphabet:  abcde
+
+#states:  3 	original:  -8.047189562170502 	trained:  -7.262169036704142 	improvement:  0.7850205254663596
+#states:  3 	original:  -8.047189562170502 	trained:  -7.198192339813323 	improvement:  0.8489972223571787
+#states:  3 	original:  -8.047189562170502 	trained:  -6.992110510168837 	improvement:  1.0550790520016644
+
+#states:  3 	Mean impovement:  0.8963655999417343 	Stdev of improvement:  0.14112308221850087
