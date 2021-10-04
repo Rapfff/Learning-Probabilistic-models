@@ -49,6 +49,7 @@ def run_experiment(original_models,
         f.write("Training_set: "+str(size_training_set)+" sequences of "+str(len_training_set)+" observations\n")
         f.write("Testing_set: "+str(size_test_set)+" sequences of "+str(len_test_set)+" observations\n")
         f.write("logLikelihood of original model: "+ str(log_like_org)+"\n")
+        f.write("Observation alphabet: "+ str(alphabet)+"\n")
         f.write("Learning algorithm "+ learning_algorithm_type+ ", epsilon: "+ str(learning_algorithm_epsilon)+'\n\n')
         # TODO: add search algorithm for hypo
 
