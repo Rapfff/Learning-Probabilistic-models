@@ -52,7 +52,7 @@ def mearge_MCGT(lambda_, model1, model2):
     for i in range(len(states1)):
         state1=states1[i].next_matrix
         state2=states2[i].next_matrix
-        proba_transition= [state1[1][i]*lambda_+(1-lambda_)*state2[1][i] for i in range(len(state1[1]))]
+        proba_transition= [state1[0][i]*lambda_+(1-lambda_)*state2[0][i] for i in range(len(state1[1]))]
         if (state1[1] != state2[1]) or (state1[2] != state2[2]):
             raise ValueError('merge_MCGT assumes that for every state the symbol array and state array are the same')
         new_states.append(MCGT_state([proba_transition, state1[1], state2[2]]))
