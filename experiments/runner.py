@@ -57,4 +57,4 @@ def run_experiment(original_models,
 
 
 
-        experiment(training_set, test_set, model_type, log_like_org, alphabet, nb_states, iterations, hypo_generator, learning_algorithm_type, learning_algorithm_epsilon, output_folder, result_file)
+        experiment(training_set, test_set, model_type, original_model.name, log_like_org, alphabet, nb_states, iterations, hypo_generator, learning_algorithm_type, learning_algorithm_epsilon, output_folder, result_file)
