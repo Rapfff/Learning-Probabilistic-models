@@ -151,3 +151,82 @@ class Estimation_algorithm_MCGT:
 
 		self.h.save(output_file)
 		return self.h
+
+
+####################################################################################################
+#       HERE BE CHANGES!                                                                           #
+####################################################################################################
+
+	def learn2(self,traces,output_file="output_model.txt",epsilon=0.01,pp='', min_probability=0.005):
+		"""
+		Given a set of sequences of pairs action-observation,
+		it adapts the parameters of h in order to maximize the probability to get 
+		these sequences of observations.
+		traces = [[trace1,trace2,...],[number_of_trace1,number_of_trace2,...]]
+		trace = [obs1,obs2,...,obsx]
+		"""
+		
+		#self.observations = []
+		self.observations = list(set(list(self.alphabet))) # include model alphabet too
+		for seq in traces[0]:
+			for i in list(set(seq)):
+				if not i in self.observations:
+					self.observations.append(i)
+
+		counter = 0
+		prevloglikelihood = 10
+		while True:
+			#print(datetime.datetime.now(),pp,counter, prevloglikelihood)
+			den = []
+			for s in range(self.nb_states):
+				den.append(0.0)
+			tau = []
+			for s in range(self.nb_states):
+				tau.append([0 for i in range(self.nb_states*len(self.observations))])
+			
+			p = Pool(processes = cpu_count() - 1)
+			tasks = []
+			
+			for seq in range(len(traces[0])):
+				tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq],]))
+			
+			temp = [res.get() for res in tasks if res != False]
+			currentloglikelihood = sum([log(i[2]) for i in temp])
+
+			for s in range(self.nb_states):
+				#den[s] = sum([i[0][s] for i in temp])
+				tmp = sum([i[0][s] for i in temp])
+				if tmp > 0.0:
+					den[s] = tmp
+				else: 
+					den[s] = min_probability
+					
+				for x in range(self.nb_states*len(self.observations)):
+					#tau[s][x] = sum([i[1][s][x] for i in temp])
+					tmp = sum([i[1][s][x] for i in temp])
+					if tmp > 0.0:
+						tau[s][x] = tmp
+					else:
+						tau[s][x] = min_probability
+
+			list_sta = []
+			for i in range(self.nb_states):
+				for o in self.observations:
+					list_sta.append(i)
+			list_obs = self.observations*self.nb_states
+			new_states = []
+			for s in range(self.nb_states):
+				l = [ correct_proba([tau[s][i]/den[s] for i in range(len(list_sta))], accuracy=10) , list_sta, list_obs ]
+				new_states.append(MCGT_state(l))
+
+			self.hhat = MCGT(new_states,self.h.initial_state)
+			
+			counter += 1
+			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
+				break
+			else:
+				prevloglikelihood = currentloglikelihood
+				self.h = self.hhat
+
+		self.h.save(output_file)
+		return self.h

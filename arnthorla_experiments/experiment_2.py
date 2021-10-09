@@ -10,14 +10,20 @@ from EM_and_BW_algorithms.src.tools import *
 
 from statistics import fmean, stdev
 
+def sumAlphas( alpha_matrix ):
+    sum = 0
+    for i in range(len(alpha_matrix)):
+        sum += alpha_matrix[i][-1]
+    return sum
+
 # UTILITY
 base_alphabet = "abcdefghijklmnopqrstuvwxyz"   # Base alphabet, will be sliced to needs.  
 
 # PARAMETERS OF EXPERIMENT
-num_states = 5
-alphabet = base_alphabet[:num_states]
-num_sequenes = 4
-len_sequence = int( math.sqrt(num_states) ) * len( alphabet )
+num_states = 15
+num_sequenes = 2
+len_sequence = 5 #int( math.sqrt(num_states) ) * len( alphabet )
+alphabet = base_alphabet[:len_sequence] #base_alphabet[:num_states]
 num_tests = 1
 learn_algo = Estimation_algorithm_MCGT
 model_generator = modelMCGT_random
@@ -26,6 +32,8 @@ model_generator = modelMCGT_random
 generating_model = model_generator(num_states, alphabet)
 hypo_model = model_generator(num_states, alphabet)
 training_set = generateSet( generating_model, num_sequenes, len_sequence )
+
+untrained_logLikelihood = hypo_model.logLikelihood( training_set )
 
 # LEARN WHOLE TRAININGSET 
 algo = learn_algo( hypo_model, hypo_model.observations() )
@@ -36,17 +44,25 @@ set_trained_logLiklihood = set_trained_model.logLikelihood( training_set )
 current_model = hypo_model
 for i in range(num_sequenes):
     seq_set = []
-    print( 1 )
     seq_set.append( [training_set[0][i]] )
-    print( 2 )
     seq_set.append([1])             # Needs to conform to format of training_set
-    print( 3 )
-    print( seq_set )
     algo = learn_algo( current_model, current_model.observations() )
-    print( 4 )
-    current_model = algo.learn( seq_set )
-    print( 5 )
+
+    alpha = algo.computeAlphas( seq_set[0][0] )
+    alpha_sum = sumAlphas( alpha )
+    #current_model.pprint()
+    #print( "i: ", i )
+    #print( "seq: ", seq_set[0][0] )
+    #print( "alpha: ", alpha )
+    #print( "alpha_sum: ", alpha_sum )
+    if alpha_sum <= 0:
+        current_model.pprint()
+        print( "seq: ", seq_set[0][0] )
+        print( "Sequence cant be learned: i = ", i )
+        break
+    current_model = algo.learn2( seq_set, epsilon=1 )
 seq_trained_logLikelihood = current_model.logLikelihood( training_set )
 
+print( "Untrained: ", untrained_logLikelihood )
 print( "Trained on Set: ", set_trained_logLiklihood )
 print( "Trained on Seq: ", seq_trained_logLikelihood )
