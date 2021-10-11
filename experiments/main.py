@@ -27,8 +27,11 @@ original_models =[modelMCGT1(), modelMCGT2(), modelMCGT3(), modelMCGT4()]
 nb_states=[2, 3, 4, 5, 6, 7, 8, 9]
 nb_iterations= 100;
 size_training_set, len_training_set, size_test_set, len_test_set = 1000, 5, 1000, 5;
-Experiment_folder = "results/experiments_2"
+split_training_set = 0.2;
+experiment_folder = "results/experiments_2"
     # Experiment 1 - Random Search with split training dataset
+run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, nb_iterations, random_search, split_training_set, result_file= "result_experiment1", output_folder=experiment_folder+"/experiment1")
     # Experiment 2 - Smart Random Search with split training dataset
+# run_experiment(original_models, size_training_set, len_training_set, size_test_set, len_test_set, nb_states, nb_iterations, smart_random_search, split_training_set, result_file= "result_experiment2", output_folder=experiment_folder+"/experiment2")
     # Experiment 3 - Smart Random Search with different value for λ
     # Experiment 4 - Smart Random Search with modified λ
