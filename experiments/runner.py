@@ -23,6 +23,7 @@ def run_experiment(original_models,
     iterations= 1,
     hypo_generator= random_model, 
     split_training_set = 0,
+    hypo_generator_args = dict(),
     learning_algorithm_type= 'BW', 
     learning_algorithm_epsilon= 0.01, 
     output_folder= 'results',
@@ -67,4 +68,4 @@ def run_experiment(original_models,
 
 
 
-        experiment(training_set, test_set, model_type, original_model.name, log_like_org, alphabet, nb_states, iterations, hypo_generator, training_set_hypo, learning_algorithm_type, learning_algorithm_epsilon, output_folder, result_file)
+        experiment(training_set, test_set, model_type, original_model.name, log_like_org, alphabet, nb_states, iterations, hypo_generator, training_set_hypo, hypo_generator_args, learning_algorithm_type, learning_algorithm_epsilon, output_folder, result_file)

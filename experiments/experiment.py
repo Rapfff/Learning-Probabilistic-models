@@ -18,6 +18,7 @@ def experiment(
         iterations = 1,
         hypo_generator = random_model, 
         training_set_hypo = False,
+        hypo_generator_args= dict(),
         learning_algorithm_type = 'BW', 
         learning_algorithm_epsilon = 0.01, 
         output_folder = 'results',
@@ -49,9 +50,9 @@ def experiment(
         for i in range(iterations):
             # Get Hypothisis model 
             if training_set_hypo:
-                hypo_model = hypo_generator(nb, alphabet, model_type, training_set_hypo)
+                hypo_model = hypo_generator(nb, alphabet, model_type, training_set_hypo, **hypo_generator_args)
             else:
-                hypo_model = hypo_generator(nb, alphabet, model_type, training_set)
+                hypo_model = hypo_generator(nb, alphabet, model_type, training_set, **hypo_generator_args)
             log_like_hypo = hypo_model.logLikelihood(test_set);
 
             # Learn the hypo model
