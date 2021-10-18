@@ -15,14 +15,14 @@ model_types= {MCGT: 'MCGT', HMM: 'HMM', MDP: 'MDP'}
 
 
 def run_experiment(original_models, 
-    size_training_set= 100, 
-    len_training_set=7, 
-    size_test_set=100, 
-    len_test_set= 7, 
+    datasets= dict(),
+    size_training_set= 1000, 
+    len_training_set=5, 
+    size_test_set=1000, 
+    len_test_set= 5, 
     nb_states= [4,5,6], 
     iterations= 1,
     hypo_generator= random_model, 
-    split_training_set = 0,
     hypo_generator_args = dict(),
     learning_algorithm_type= 'BW', 
     learning_algorithm_epsilon= 0.01, 
@@ -31,22 +31,20 @@ def run_experiment(original_models,
     ):
     os.makedirs(output_folder, exist_ok=True)
     f = open(output_folder+"/"+result_file+".txt",'w')
+    f.close()
     for original_model in original_models:
         alphabet= original_model.observations();
 
         # Get training and test set
-        training_set_hypo= False
-        if split_training_set > 0:
-            if split_training_set>1:
-                raise ValueError("split_training set should be between 0 and 1.")
-            training_set= list()
-            training_set = generateSet(original_model, int(round(size_training_set*(1-split_training_set), 0)), len_training_set)
-            training_set_hypo = generateSet(original_model, int(round(size_training_set*(split_training_set), 0)), len_training_set)
-        else:
+        if original_model.name not in datasets:
             training_set = generateSet(original_model, size_training_set, len_training_set)
-        # saveSet(training_set,output_folder+"/training_set.txt")
-        test_set = generateSet(original_model, size_test_set, len_test_set)
-        # saveSet(training_set,output_folder+"/test_set.txt")
+            test_set = generateSet(original_model, size_test_set, len_test_set)
+            print(False)
+        else:
+            print(True)
+            training_set= loadSet(datasets[original_model.name]['trainingset'])
+            test_set= loadSet(datasets[original_model.name]['testset'])
+        
 
         model_type=model_types.get(type(original_model));
 
@@ -68,4 +66,4 @@ def run_experiment(original_models,
 
 
 
-        experiment(training_set, test_set, model_type, original_model.name, log_like_org, alphabet, nb_states, iterations, hypo_generator, training_set_hypo, hypo_generator_args, learning_algorithm_type, learning_algorithm_epsilon, output_folder, result_file)
+        experiment(training_set, test_set, model_type, original_model.name, log_like_org, alphabet, nb_states, iterations, hypo_generator, hypo_generator_args, learning_algorithm_type, learning_algorithm_epsilon, output_folder, result_file)
