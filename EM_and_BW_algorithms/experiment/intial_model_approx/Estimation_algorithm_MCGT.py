@@ -1,11 +1,12 @@
 import os, sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
+parentdir = os.path.dirname(parentdir)
 sys.path.append(parentdir)
-from models.MCGT import *
+from src.models.MCGT import *
 from multiprocessing import cpu_count, Pool
 from time import time
-from tools import correct_proba
+from src.tools import correct_proba
 import datetime
 
 class Estimation_algorithm_MCGT:
@@ -89,7 +90,7 @@ class Estimation_algorithm_MCGT:
 		return False
 
 
-	def learn(self,traces,output_file="loglikelihoods.csv",test_set,epsilon=0.01,pp=''):
+	def learn(self,traces,output_file,test_set,epsilon=0.01,pp=''):
 		"""
 		Given a set of sequences of pairs action-observation,
 		it adapts the parameters of h in order to maximize the probability to get 
@@ -142,7 +143,7 @@ class Estimation_algorithm_MCGT:
 
 			self.hhat = MCGT(new_states,self.h.initial_state)
 			
-			fout.write(str(self.hhat.logLikelihood(test_set)))
+			fout.write(str(self.hhat.logLikelihood(test_set))+',')
 
 			counter += 1
 			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
