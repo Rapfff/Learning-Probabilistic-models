@@ -23,9 +23,9 @@ summary_headers = ["#States", "#Sequences", "Mean(Learned - Original)", "Std.Dev
 
 
 # PARAMETERS OF EXPERIMENT
-num_states = [2] #[2,3,4,5] #[2,3,4,5,6,7]
-num_sequences = [10]#[10,100] #[10, 100, 1000]
-num_tests = 2 #30 #100                                 # How many repeats of equivalent tests, for statistics
+num_states = [2,3,4,5,6,7]
+num_sequences = [10, 100, 1000, 10000]
+num_tests = 30 #100                             # How many repeats of equivalent tests, for statistics
 model_generator = modelMCGT_random              # Function that generates model
 name_of_model = "Random MCGT"
 learn_algo = Estimation_algorithm_MCGT          # Learning algorithm to be used
@@ -39,7 +39,7 @@ def fullResultsFolderName():
     current_stack_index = len(inspect.stack())-1    # index of current running script (not just this file)
     filename = inspect.stack()[current_stack_index].filename    # full filename (with path)
     filename = os.path.splitext( filename )[0]                  # remove file extension
-    filename = filename + RESULTS_FOLDER_SUFFIX            # add "_results" suffix
+    filename = filename + RESULTS_FOLDER_SUFFIX                 # add "_results" suffix
     return filename
 
 def createResultsFolderIfNotExists():

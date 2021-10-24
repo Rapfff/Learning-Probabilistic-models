@@ -93,5 +93,14 @@ from Experiment import *
 #print( tmp3 )
 #print( max( 7,len(max( tmp, key=len ))))
 
-exp1 = Ex_Generator_Model_Trained_On_Own_Output([13],2,[modelMCGT_random],Estimation_algorithm_MCGT,[2])
-exp1.run()
+#exp1 = Ex_Generator_Model_Trained_On_Own_Output([13],2,[modelMCGT_random],Estimation_algorithm_MCGT,[2])
+#exp1.run()
+
+base_alphabet = "abcdefghijklmnopqrstuvwxyz"                    # Base alphabet, will be sliced to needs.
+size = 3
+alphabet = base_alphabet[:size]
+m = modelMCGT_random( size, alphabet )
+m.pprint()
+print()
+print(m)
+
