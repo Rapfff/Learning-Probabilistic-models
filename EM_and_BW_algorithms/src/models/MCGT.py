@@ -119,7 +119,7 @@ class MCGT:
 		return alpha_matrix
 
 	def logLikelihood(self,sequences):
-		sequences_sorted = sequences[0]
+		sequences_sorted = sequences[0][:]
 		sequences_sorted.sort()
 		loglikelihood = 0.0
 
