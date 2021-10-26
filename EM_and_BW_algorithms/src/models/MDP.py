@@ -208,7 +208,7 @@ class MDP:
 
 	#-------------------------------------------
 	def logLikelihood(self,sequences):
-		sequences_sorted = sequences[0]
+		sequences_sorted = sequences[0][:]
 		sequences_sorted.sort()
 		loglikelihood = 0.0
 

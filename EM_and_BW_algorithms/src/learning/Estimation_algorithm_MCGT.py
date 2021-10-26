@@ -121,7 +121,7 @@ class Estimation_algorithm_MCGT:
 			for seq in range(len(traces[0])):
 				tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq],]))
 			
-			temp = [res.get() for res in tasks if res != False]
+			temp = [res.get() for res in tasks if res.get() != False]
 			currentloglikelihood = sum([log(i[2]) for i in temp])
 
 			for s in range(self.nb_states):
