@@ -55,12 +55,12 @@ def run_experiment(original_models,
         f = open(output_folder+"/"+result_file+".txt",'a')
         f.write("Model to learn: ")
         f.write(original_model.name+'\n')
-        f.write("Training_set: "+str(size_training_set)+" sequences of "+str(len_training_set)+" observations\n")
-        f.write("Testing_set: "+str(size_test_set)+" sequences of "+str(len_test_set)+" observations\n")
+        f.write("Training_set: "+str(sum(training_set[1]))+" sequences of "+str(len(training_set[0][1]))+" observations\n")
+        f.write("Testing_set: "+str(sum(test_set[1]))+" sequences of "+str(len(test_set[0][1]))+" observations\n")
         f.write("logLikelihood of original model: "+ str(log_like_org)+"\n")
         f.write("Observation alphabet: "+ str(alphabet)+"\n")
-        f.write("Learning algorithm "+ learning_algorithm_type+ ", epsilon: "+ str(learning_algorithm_epsilon)+'\n\n')
-        # TODO: add search algorithm for hypo
+        f.write("Learning algorithm "+ learning_algorithm_type+ ", epsilon: "+ str(learning_algorithm_epsilon)+'\n')
+        f.write("Hypothesis generator: "+ hypo_generator.__name__+"\n")
 
         f.close();
 
