@@ -103,6 +103,70 @@ def modelMCGT4():
 	g_s5 = MCGT_state([[1.0],[5],['e']])
 	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5],0,"MCGT4")
 
+def modelMCGT5():
+	g_s0 = MCGT_state([[0.5,0.5],[1,2],['$','$']])
+	g_s1 = MCGT_state([[1],[3],['a']])
+	g_s2 = MCGT_state([[0.2, 0.8], [1, 3],['a', 'b']])
+	g_s3 = MCGT_state([[0.2, 0.8],[2, 3],['c', 'd']])
+	return MCGT([g_s0,g_s1,g_s2,g_s3],0,"MCGT5")
+
+def modelMCGT6():
+	g_s0 = MCGT_state([[0.5, 0.5], [1, 2], ['a', 'b']])
+	g_s1 = MCGT_state([[0.5, 0.5], [3, 4], ['b', 'd']])
+	g_s2 = MCGT_state([[0.5, 0.5], [1, 5], ['a', 'b']])
+	g_s3 = MCGT_state([[0.8, 0.2], [3, 4], ['b', 'd']])
+	g_s4 = MCGT_state([[0.7, 0.3], [5, 2], ['c', 'b']])
+	g_s5 = MCGT_state([[0.7, 0.3], [1, 4], ['a', 'd']])
+	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5],0,"MCGT6")
+
+
+def modelMCGT7():
+	g_s0 = MCGT_state([[1/2, 1/6, 1/4, 1/12], [0, 0, 1, 1], ['a', 'b', 'a', 'b']])
+	g_s1 = MCGT_state([[1/6, 1/2, 1/12, 1/4], [0, 0, 1, 1], ['a', 'b', 'a', 'b']])
+	return MCGT([g_s0,g_s1],0,"MCGT7")
+
+def modelMCGT8():
+	g_s0 = MCGT_state([[0.5, 0.25, 0.25], [1, 2, 2], ['x', 'x', 'y']])
+	g_s1 = MCGT_state([[0.5, 0.5], [3, 3], ['a', 'b']])
+	g_s2 = MCGT_state([[1], [3], ['c']])
+	g_s3 = MCGT_state([[1/4,1/4,0.3, 0.2], [4,4,5,5], ['e', 'f', 'a', 'b']])
+	g_s4 = MCGT_state([[0.4, 0.3, 0.3], [1, 1, 6], ['c', 'd', 'c']])
+	g_s5 = MCGT_state([[0.5, 0.1, 0.4], [2, 2, 6], ['e', 'd', 'f']])
+	g_s6 = MCGT_state([[1], [6], ['g']])
+	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5, g_s6],0,"MCGT8")
+
+
+def modelMCGT9():
+	g_s0 = MCGT_state([[0.5, 0.5], [1, 2], ['$', '$']])
+	g_s1 = MCGT_state([[0.2, 0.7, 0.1], [4, 3, 3], ['c', 'a', 'b']])
+	g_s2 = MCGT_state([[0.5, 0.1, 0.4], [3, 5, 5], ['c', 'c', 'd']])
+	g_s3 = MCGT_state([[0.1, 0.1, 0.1, 0.1, 0.1, 0.4, 0.1], [4,4,4,4,4,5,5], ['a', 'b', 'c', 'd', 'e', 'b', 'c']])
+	g_s4 = MCGT_state([[1], [4], ['f']])
+	g_s5 = MCGT_state([[0.2, 0.8], [5, 5], ['e', 'f']])
+	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5],0,"MCGT9")
+
+def modelMCGT10():
+	g_s0 = MCGT_state([[0.4, 0.6], [1, 2], ['$', '$']])
+	g_rain = MCGT_state([[0.36, 0.18, 0.06, 0.24, 0.12, 0.04], [1,1,1,2,2,2], ['walk', 'shop', 'clean', 'walk', 'shop', 'clean']])
+	g_sun = MCGT_state([[0.03, 0.12, 0.15, 0.07, 0.28, 0.35], [1,1,1,2,2,2], ['walk', 'shop', 'clean', 'walk', 'shop', 'clean']])
+	return MCGT([g_s0,g_rain, g_sun],0,"MCGT10")
+
+def modelMCGT11():
+	g_s0 = MCGT_state([[1/6, 1/6, 1/6, 1/6, 1/6, 1/6], [4,4,4,4,1,1], ['1', '2', '3', '4', '5', '6']])
+	g_s1 = MCGT_state([[1/6, 1/6, 1/6, 1/6, 1/6, 1/6], [4,4,4,4,2,2], ['1', '2', '3', '4', '5', '6']])
+	g_s2 = MCGT_state([[1/6, 1/6, 1/6, 1/6, 1/6, 1/6], [4,4,4,4,3,3], ['1', '2', '3', '4', '5', '6']])
+	g_win = MCGT_state([[1], [3], ['win']])
+	g_lose = MCGT_state([[1], [4], ['lose']])
+	return MCGT([g_s0,g_s1, g_s2, g_win, g_lose],0,"MCGT11")
+
+def modelMCGT12():
+	g_s0 = MCGT_state([[4/6, 2/6], [4,1], ['1-4', '5-6']])
+	g_s1 = MCGT_state([[4/6, 2/6], [4,2], ['1-4', '5-6']])
+	g_s2 = MCGT_state([[4/6, 2/6], [4,3], ['1-4', '5-6']])
+	g_win = MCGT_state([[1], [3], ['win']])
+	g_lose = MCGT_state([[1], [4], ['lose']])
+	return MCGT([g_s0,g_s1, g_s2, g_win, g_lose],0,"MCGT12")
+
 def modelMCGT_game():
 	s_dice = MCGT_state([[1/3,1/3,1/3],[0,0,1],['1-2','3-4','5-6']])
 	s_cards= MCGT_state([[10/13,3/13],[1,2],["Number","Face"]])
