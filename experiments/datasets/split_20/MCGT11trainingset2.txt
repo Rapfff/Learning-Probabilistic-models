@@ -1,0 +1,72 @@
+('1', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+131
+('5', '5', '2', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+1
+('5', '5', '4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+6
+('5', '5', '6', 'win', 'win', 'win', 'win', 'win', 'win', 'win')
+2
+('6', '5', '1', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+1
+('6', '5', '4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+2
+('5', '6', '4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+2
+('6', '6', '5', 'win', 'win', 'win', 'win', 'win', 'win', 'win')
+3
+('5', '5', '5', 'win', 'win', 'win', 'win', 'win', 'win', 'win')
+11
+('6', '1', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+16
+('5', '5', '1', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+2
+('5', '6', '2', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+5
+('6', '2', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+26
+('6', '4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+33
+('6', '6', '3', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+5
+('5', '1', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+28
+('4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+132
+('6', '5', '6', 'win', 'win', 'win', 'win', 'win', 'win', 'win')
+4
+('6', '5', '3', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+4
+('6', '6', '4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+3
+('6', '5', '2', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+4
+('6', '6', '6', 'win', 'win', 'win', 'win', 'win', 'win', 'win')
+4
+('5', '5', '3', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+5
+('5', '6', '3', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+3
+('5', '2', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+31
+('5', '3', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+17
+('6', '5', '5', 'win', 'win', 'win', 'win', 'win', 'win', 'win')
+6
+('5', '6', '6', 'win', 'win', 'win', 'win', 'win', 'win', 'win')
+2
+('6', '6', '2', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+3
+('6', '3', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+26
+('5', '6', '1', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+4
+('6', '6', '1', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+3
+('5', '6', '5', 'win', 'win', 'win', 'win', 'win', 'win', 'win')
+2
+('3', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+127
+('5', '4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+22
+('2', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+124

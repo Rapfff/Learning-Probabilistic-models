@@ -1,0 +1,72 @@
+['2', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+155
+['3', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+159
+['6', '5', '2', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+4
+['6', '5', '6', 'win', 'win', 'win', 'win', 'win', 'win', 'win']
+4
+['1', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+156
+['5', '3', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+25
+['6', '3', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+33
+['6', '5', '3', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+4
+['4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+169
+['5', '6', '2', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+5
+['5', '5', '4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+8
+['6', '2', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+31
+['5', '1', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+38
+['5', '5', '3', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+5
+['6', '4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+35
+['6', '6', '1', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+8
+['5', '4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+30
+['5', '5', '5', 'win', 'win', 'win', 'win', 'win', 'win', 'win']
+12
+['5', '2', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+37
+['6', '5', '5', 'win', 'win', 'win', 'win', 'win', 'win', 'win']
+6
+['5', '6', '3', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+4
+['5', '6', '1', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+5
+['5', '6', '4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+3
+['5', '5', '6', 'win', 'win', 'win', 'win', 'win', 'win', 'win']
+4
+['6', '1', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+20
+['6', '5', '1', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+2
+['6', '6', '5', 'win', 'win', 'win', 'win', 'win', 'win', 'win']
+4
+['6', '6', '4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+5
+['5', '6', '5', 'win', 'win', 'win', 'win', 'win', 'win', 'win']
+3
+['6', '6', '6', 'win', 'win', 'win', 'win', 'win', 'win', 'win']
+5
+['6', '6', '2', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+4
+['6', '5', '4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+4
+['6', '6', '3', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+6
+['5', '6', '6', 'win', 'win', 'win', 'win', 'win', 'win', 'win']
+2
+['5', '5', '1', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+2
+['5', '5', '2', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+3

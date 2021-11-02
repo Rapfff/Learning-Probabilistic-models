@@ -1,0 +1,8 @@
+('5-6', '5-6', '1-4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+41
+('5-6', '5-6', '5-6', 'win', 'win', 'win', 'win', 'win', 'win', 'win')
+21
+('5-6', '1-4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+119
+('1-4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose')
+319

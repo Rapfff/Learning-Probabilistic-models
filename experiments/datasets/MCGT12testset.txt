@@ -1,0 +1,8 @@
+['1-4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+1623
+['5-6', '1-4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+1002
+['5-6', '5-6', '1-4', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose', 'lose']
+590
+['5-6', '5-6', '5-6', 'win', 'win', 'win', 'win', 'win', 'win', 'win']
+159

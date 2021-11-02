@@ -1,0 +1,398 @@
+('$', 'walk', 'clean', 'shop', 'shop', 'walk', 'walk', 'walk', 'walk', 'walk')
+1
+('$', 'walk', 'walk', 'walk', 'walk', 'shop', 'clean', 'shop', 'shop', 'clean')
+1
+('$', 'clean', 'shop', 'clean', 'walk', 'shop', 'walk', 'shop', 'clean', 'clean')
+1
+('$', 'shop', 'shop', 'clean', 'shop', 'clean', 'clean', 'shop', 'clean', 'shop')
+2
+('$', 'walk', 'clean', 'clean', 'shop', 'shop', 'shop', 'shop', 'shop', 'walk')
+1
+('$', 'walk', 'shop', 'shop', 'clean', 'walk', 'walk', 'walk', 'walk', 'clean')
+1
+('$', 'clean', 'clean', 'shop', 'clean', 'clean', 'walk', 'shop', 'shop', 'walk')
+1
+('$', 'walk', 'walk', 'clean', 'shop', 'clean', 'clean', 'shop', 'shop', 'clean')
+1
+('$', 'clean', 'shop', 'shop', 'shop', 'clean', 'clean', 'shop', 'clean', 'clean')
+1
+('$', 'shop', 'walk', 'clean', 'walk', 'walk', 'walk', 'shop', 'walk', 'walk')
+1
+('$', 'walk', 'clean', 'walk', 'walk', 'shop', 'shop', 'walk', 'walk', 'shop')
+1
+('$', 'shop', 'clean', 'clean', 'shop', 'walk', 'walk', 'shop', 'shop', 'walk')
+1
+('$', 'walk', 'shop', 'shop', 'shop', 'walk', 'shop', 'shop', 'shop', 'clean')
+1
+('$', 'shop', 'walk', 'clean', 'walk', 'walk', 'shop', 'clean', 'clean', 'shop')
+1
+('$', 'shop', 'shop', 'clean', 'walk', 'shop', 'clean', 'clean', 'clean', 'walk')
+1
+('$', 'clean', 'clean', 'walk', 'shop', 'clean', 'shop', 'clean', 'shop', 'shop')
+1
+('$', 'shop', 'shop', 'walk', 'walk', 'walk', 'walk', 'clean', 'clean', 'clean')
+1
+('$', 'clean', 'clean', 'walk', 'shop', 'clean', 'clean', 'walk', 'shop', 'clean')
+1
+('$', 'clean', 'shop', 'shop', 'walk', 'walk', 'walk', 'clean', 'clean', 'shop')
+1
+('$', 'walk', 'clean', 'clean', 'clean', 'shop', 'walk', 'walk', 'clean', 'walk')
+1
+('$', 'shop', 'shop', 'clean', 'shop', 'clean', 'walk', 'walk', 'walk', 'walk')
+1
+('$', 'clean', 'shop', 'walk', 'clean', 'clean', 'shop', 'shop', 'walk', 'clean')
+1
+('$', 'walk', 'clean', 'clean', 'shop', 'clean', 'walk', 'walk', 'walk', 'shop')
+1
+('$', 'shop', 'walk', 'shop', 'shop', 'walk', 'shop', 'walk', 'walk', 'walk')
+1
+('$', 'walk', 'clean', 'clean', 'clean', 'shop', 'walk', 'shop', 'walk', 'walk')
+1
+('$', 'walk', 'clean', 'shop', 'clean', 'shop', 'walk', 'clean', 'walk', 'clean')
+1
+('$', 'clean', 'clean', 'clean', 'walk', 'shop', 'walk', 'shop', 'walk', 'walk')
+1
+('$', 'shop', 'walk', 'shop', 'shop', 'shop', 'shop', 'walk', 'clean', 'clean')
+1
+('$', 'clean', 'walk', 'shop', 'clean', 'walk', 'walk', 'walk', 'clean', 'walk')
+1
+('$', 'walk', 'clean', 'clean', 'clean', 'walk', 'walk', 'clean', 'shop', 'clean')
+1
+('$', 'clean', 'clean', 'shop', 'shop', 'clean', 'clean', 'clean', 'shop', 'clean')
+1
+('$', 'clean', 'shop', 'clean', 'clean', 'shop', 'shop', 'clean', 'clean', 'walk')
+1
+('$', 'shop', 'shop', 'clean', 'shop', 'walk', 'shop', 'walk', 'clean', 'shop')
+1
+('$', 'walk', 'shop', 'walk', 'clean', 'walk', 'clean', 'clean', 'clean', 'walk')
+1
+('$', 'clean', 'walk', 'shop', 'shop', 'clean', 'walk', 'shop', 'shop', 'walk')
+1
+('$', 'clean', 'clean', 'shop', 'clean', 'clean', 'shop', 'shop', 'walk', 'walk')
+1
+('$', 'shop', 'clean', 'shop', 'walk', 'walk', 'walk', 'shop', 'walk', 'walk')
+1
+('$', 'shop', 'shop', 'clean', 'clean', 'clean', 'shop', 'clean', 'walk', 'walk')
+1
+('$', 'shop', 'clean', 'clean', 'shop', 'clean', 'clean', 'walk', 'clean', 'clean')
+1
+('$', 'walk', 'walk', 'walk', 'walk', 'shop', 'clean', 'walk', 'walk', 'shop')
+1
+('$', 'walk', 'walk', 'shop', 'clean', 'shop', 'shop', 'walk', 'shop', 'walk')
+1
+('$', 'walk', 'clean', 'clean', 'shop', 'clean', 'shop', 'walk', 'clean', 'shop')
+1
+('$', 'clean', 'shop', 'walk', 'shop', 'clean', 'walk', 'walk', 'clean', 'clean')
+1
+('$', 'walk', 'shop', 'clean', 'shop', 'walk', 'shop', 'shop', 'clean', 'shop')
+1
+('$', 'clean', 'walk', 'walk', 'shop', 'clean', 'clean', 'clean', 'shop', 'shop')
+1
+('$', 'walk', 'clean', 'clean', 'walk', 'walk', 'shop', 'walk', 'shop', 'clean')
+1
+('$', 'walk', 'clean', 'shop', 'shop', 'shop', 'walk', 'walk', 'shop', 'shop')
+1
+('$', 'shop', 'walk', 'shop', 'shop', 'clean', 'walk', 'shop', 'shop', 'walk')
+1
+('$', 'clean', 'clean', 'clean', 'clean', 'walk', 'clean', 'walk', 'shop', 'walk')
+1
+('$', 'clean', 'clean', 'walk', 'shop', 'shop', 'walk', 'clean', 'shop', 'clean')
+1
+('$', 'shop', 'walk', 'shop', 'walk', 'clean', 'clean', 'shop', 'clean', 'clean')
+1
+('$', 'shop', 'clean', 'clean', 'walk', 'clean', 'walk', 'shop', 'walk', 'shop')
+1
+('$', 'shop', 'clean', 'walk', 'walk', 'shop', 'walk', 'walk', 'shop', 'clean')
+1
+('$', 'clean', 'shop', 'clean', 'shop', 'walk', 'shop', 'shop', 'shop', 'shop')
+1
+('$', 'walk', 'clean', 'clean', 'walk', 'walk', 'walk', 'walk', 'shop', 'shop')
+1
+('$', 'shop', 'walk', 'shop', 'shop', 'shop', 'clean', 'clean', 'shop', 'clean')
+1
+('$', 'shop', 'clean', 'shop', 'walk', 'clean', 'clean', 'walk', 'shop', 'clean')
+1
+('$', 'clean', 'shop', 'walk', 'walk', 'shop', 'walk', 'shop', 'shop', 'shop')
+1
+('$', 'shop', 'clean', 'walk', 'shop', 'walk', 'clean', 'walk', 'shop', 'clean')
+1
+('$', 'clean', 'shop', 'shop', 'walk', 'walk', 'clean', 'shop', 'clean', 'walk')
+1
+('$', 'shop', 'shop', 'walk', 'walk', 'clean', 'walk', 'walk', 'walk', 'shop')
+1
+('$', 'walk', 'clean', 'clean', 'shop', 'clean', 'walk', 'shop', 'shop', 'clean')
+1
+('$', 'clean', 'walk', 'shop', 'clean', 'walk', 'walk', 'shop', 'walk', 'shop')
+1
+('$', 'shop', 'walk', 'shop', 'clean', 'clean', 'clean', 'shop', 'shop', 'shop')
+1
+('$', 'walk', 'walk', 'shop', 'shop', 'shop', 'clean', 'walk', 'shop', 'walk')
+1
+('$', 'walk', 'walk', 'clean', 'walk', 'walk', 'shop', 'shop', 'walk', 'clean')
+1
+('$', 'shop', 'shop', 'walk', 'walk', 'walk', 'shop', 'clean', 'shop', 'walk')
+1
+('$', 'walk', 'shop', 'clean', 'clean', 'clean', 'clean', 'clean', 'clean', 'clean')
+1
+('$', 'clean', 'walk', 'clean', 'shop', 'walk', 'walk', 'walk', 'clean', 'clean')
+1
+('$', 'walk', 'shop', 'shop', 'clean', 'clean', 'shop', 'walk', 'clean', 'clean')
+1
+('$', 'clean', 'clean', 'clean', 'walk', 'shop', 'walk', 'shop', 'walk', 'clean')
+1
+('$', 'shop', 'shop', 'walk', 'shop', 'shop', 'clean', 'walk', 'walk', 'shop')
+1
+('$', 'shop', 'walk', 'walk', 'walk', 'shop', 'walk', 'clean', 'walk', 'shop')
+1
+('$', 'clean', 'walk', 'walk', 'walk', 'walk', 'walk', 'walk', 'clean', 'walk')
+1
+('$', 'shop', 'shop', 'walk', 'shop', 'walk', 'walk', 'clean', 'walk', 'walk')
+1
+('$', 'clean', 'clean', 'walk', 'walk', 'shop', 'shop', 'clean', 'clean', 'shop')
+1
+('$', 'clean', 'walk', 'clean', 'walk', 'walk', 'clean', 'shop', 'shop', 'walk')
+1
+('$', 'walk', 'walk', 'shop', 'clean', 'shop', 'clean', 'shop', 'clean', 'clean')
+1
+('$', 'shop', 'clean', 'clean', 'shop', 'shop', 'clean', 'walk', 'walk', 'walk')
+1
+('$', 'shop', 'shop', 'clean', 'clean', 'clean', 'walk', 'clean', 'shop', 'shop')
+1
+('$', 'shop', 'clean', 'shop', 'shop', 'clean', 'walk', 'walk', 'walk', 'shop')
+1
+('$', 'walk', 'shop', 'shop', 'clean', 'shop', 'shop', 'shop', 'walk', 'shop')
+1
+('$', 'shop', 'walk', 'clean', 'shop', 'walk', 'walk', 'walk', 'walk', 'shop')
+1
+('$', 'walk', 'shop', 'walk', 'shop', 'walk', 'shop', 'shop', 'clean', 'walk')
+1
+('$', 'shop', 'clean', 'walk', 'shop', 'shop', 'clean', 'shop', 'shop', 'walk')
+1
+('$', 'clean', 'walk', 'clean', 'shop', 'shop', 'clean', 'walk', 'shop', 'walk')
+1
+('$', 'clean', 'clean', 'clean', 'clean', 'clean', 'walk', 'walk', 'walk', 'clean')
+1
+('$', 'shop', 'clean', 'shop', 'clean', 'walk', 'shop', 'shop', 'clean', 'walk')
+1
+('$', 'clean', 'shop', 'clean', 'shop', 'clean', 'walk', 'walk', 'walk', 'shop')
+1
+('$', 'clean', 'clean', 'clean', 'shop', 'clean', 'clean', 'shop', 'clean', 'clean')
+1
+('$', 'walk', 'clean', 'shop', 'clean', 'clean', 'shop', 'walk', 'shop', 'clean')
+1
+('$', 'walk', 'clean', 'clean', 'shop', 'clean', 'shop', 'clean', 'shop', 'shop')
+1
+('$', 'clean', 'clean', 'clean', 'clean', 'clean', 'shop', 'shop', 'walk', 'walk')
+1
+('$', 'walk', 'shop', 'clean', 'clean', 'clean', 'shop', 'shop', 'clean', 'shop')
+1
+('$', 'shop', 'clean', 'walk', 'shop', 'walk', 'clean', 'shop', 'clean', 'clean')
+1
+('$', 'shop', 'walk', 'shop', 'shop', 'walk', 'walk', 'walk', 'walk', 'shop')
+1
+('$', 'clean', 'shop', 'clean', 'shop', 'clean', 'clean', 'clean', 'shop', 'walk')
+1
+('$', 'clean', 'clean', 'clean', 'shop', 'walk', 'clean', 'clean', 'clean', 'shop')
+1
+('$', 'clean', 'shop', 'clean', 'clean', 'shop', 'shop', 'clean', 'walk', 'clean')
+1
+('$', 'shop', 'walk', 'clean', 'walk', 'walk', 'walk', 'clean', 'walk', 'clean')
+1
+('$', 'clean', 'walk', 'shop', 'clean', 'walk', 'clean', 'clean', 'shop', 'shop')
+1
+('$', 'clean', 'shop', 'clean', 'clean', 'clean', 'walk', 'walk', 'walk', 'walk')
+1
+('$', 'walk', 'shop', 'clean', 'shop', 'walk', 'clean', 'clean', 'walk', 'walk')
+1
+('$', 'walk', 'shop', 'shop', 'shop', 'shop', 'walk', 'shop', 'shop', 'shop')
+1
+('$', 'shop', 'shop', 'clean', 'walk', 'walk', 'clean', 'clean', 'shop', 'walk')
+1
+('$', 'shop', 'walk', 'clean', 'shop', 'shop', 'walk', 'clean', 'walk', 'shop')
+1
+('$', 'clean', 'shop', 'walk', 'clean', 'walk', 'walk', 'clean', 'walk', 'clean')
+1
+('$', 'shop', 'clean', 'clean', 'shop', 'clean', 'walk', 'shop', 'shop', 'clean')
+1
+('$', 'clean', 'clean', 'clean', 'walk', 'shop', 'clean', 'walk', 'walk', 'shop')
+1
+('$', 'clean', 'shop', 'shop', 'clean', 'walk', 'clean', 'shop', 'clean', 'clean')
+1
+('$', 'shop', 'clean', 'shop', 'walk', 'walk', 'walk', 'walk', 'clean', 'shop')
+1
+('$', 'shop', 'shop', 'walk', 'shop', 'walk', 'clean', 'clean', 'walk', 'clean')
+1
+('$', 'walk', 'shop', 'shop', 'shop', 'clean', 'clean', 'shop', 'walk', 'shop')
+1
+('$', 'clean', 'clean', 'shop', 'shop', 'walk', 'clean', 'shop', 'walk', 'walk')
+1
+('$', 'shop', 'clean', 'clean', 'clean', 'shop', 'clean', 'clean', 'clean', 'walk')
+1
+('$', 'shop', 'clean', 'walk', 'shop', 'shop', 'clean', 'shop', 'shop', 'clean')
+1
+('$', 'walk', 'shop', 'shop', 'walk', 'walk', 'shop', 'shop', 'clean', 'shop')
+1
+('$', 'clean', 'clean', 'shop', 'clean', 'walk', 'walk', 'clean', 'walk', 'walk')
+1
+('$', 'shop', 'walk', 'shop', 'walk', 'walk', 'clean', 'walk', 'walk', 'walk')
+1
+('$', 'walk', 'shop', 'walk', 'walk', 'clean', 'walk', 'clean', 'shop', 'walk')
+1
+('$', 'clean', 'clean', 'clean', 'walk', 'walk', 'walk', 'walk', 'walk', 'shop')
+1
+('$', 'clean', 'clean', 'shop', 'shop', 'walk', 'shop', 'shop', 'walk', 'clean')
+1
+('$', 'clean', 'clean', 'clean', 'clean', 'clean', 'clean', 'shop', 'walk', 'walk')
+1
+('$', 'clean', 'walk', 'walk', 'shop', 'clean', 'walk', 'clean', 'clean', 'clean')
+1
+('$', 'walk', 'walk', 'walk', 'clean', 'shop', 'clean', 'walk', 'walk', 'shop')
+1
+('$', 'walk', 'shop', 'clean', 'shop', 'shop', 'clean', 'shop', 'shop', 'walk')
+1
+('$', 'clean', 'shop', 'clean', 'shop', 'clean', 'clean', 'clean', 'shop', 'clean')
+1
+('$', 'shop', 'walk', 'clean', 'clean', 'walk', 'shop', 'walk', 'clean', 'shop')
+1
+('$', 'shop', 'shop', 'clean', 'clean', 'shop', 'clean', 'shop', 'shop', 'shop')
+1
+('$', 'clean', 'walk', 'shop', 'walk', 'clean', 'shop', 'clean', 'walk', 'shop')
+1
+('$', 'clean', 'shop', 'shop', 'clean', 'clean', 'shop', 'clean', 'clean', 'shop')
+1
+('$', 'shop', 'shop', 'clean', 'walk', 'walk', 'clean', 'clean', 'shop', 'clean')
+1
+('$', 'walk', 'walk', 'shop', 'walk', 'walk', 'shop', 'clean', 'walk', 'walk')
+1
+('$', 'walk', 'clean', 'shop', 'shop', 'clean', 'clean', 'clean', 'shop', 'shop')
+1
+('$', 'walk', 'walk', 'walk', 'walk', 'clean', 'clean', 'shop', 'shop', 'clean')
+1
+('$', 'clean', 'shop', 'clean', 'walk', 'walk', 'clean', 'walk', 'clean', 'clean')
+1
+('$', 'clean', 'walk', 'shop', 'walk', 'walk', 'shop', 'shop', 'walk', 'walk')
+1
+('$', 'clean', 'shop', 'clean', 'clean', 'clean', 'shop', 'shop', 'walk', 'shop')
+1
+('$', 'walk', 'clean', 'shop', 'walk', 'shop', 'clean', 'clean', 'walk', 'shop')
+1
+('$', 'shop', 'walk', 'clean', 'clean', 'clean', 'walk', 'walk', 'clean', 'walk')
+1
+('$', 'shop', 'walk', 'shop', 'clean', 'shop', 'clean', 'walk', 'shop', 'shop')
+1
+('$', 'shop', 'shop', 'clean', 'clean', 'walk', 'shop', 'clean', 'clean', 'clean')
+1
+('$', 'clean', 'clean', 'shop', 'walk', 'walk', 'walk', 'shop', 'walk', 'clean')
+1
+('$', 'clean', 'shop', 'clean', 'shop', 'clean', 'shop', 'walk', 'walk', 'shop')
+1
+('$', 'clean', 'walk', 'walk', 'walk', 'shop', 'walk', 'walk', 'clean', 'walk')
+1
+('$', 'clean', 'shop', 'shop', 'clean', 'shop', 'shop', 'shop', 'shop', 'shop')
+1
+('$', 'walk', 'shop', 'walk', 'shop', 'walk', 'shop', 'walk', 'walk', 'shop')
+1
+('$', 'walk', 'clean', 'clean', 'walk', 'shop', 'shop', 'walk', 'clean', 'walk')
+1
+('$', 'clean', 'walk', 'clean', 'clean', 'clean', 'walk', 'walk', 'clean', 'shop')
+1
+('$', 'walk', 'clean', 'shop', 'walk', 'shop', 'walk', 'shop', 'clean', 'shop')
+1
+('$', 'clean', 'clean', 'walk', 'shop', 'walk', 'shop', 'shop', 'walk', 'shop')
+1
+('$', 'clean', 'walk', 'walk', 'clean', 'shop', 'shop', 'shop', 'shop', 'shop')
+1
+('$', 'clean', 'shop', 'walk', 'clean', 'walk', 'walk', 'shop', 'walk', 'walk')
+1
+('$', 'shop', 'walk', 'shop', 'shop', 'walk', 'shop', 'clean', 'walk', 'walk')
+1
+('$', 'walk', 'clean', 'clean', 'walk', 'shop', 'shop', 'shop', 'walk', 'shop')
+1
+('$', 'shop', 'clean', 'walk', 'clean', 'clean', 'shop', 'shop', 'clean', 'walk')
+1
+('$', 'shop', 'shop', 'clean', 'walk', 'clean', 'clean', 'walk', 'clean', 'clean')
+1
+('$', 'clean', 'walk', 'walk', 'shop', 'shop', 'shop', 'clean', 'walk', 'clean')
+1
+('$', 'clean', 'clean', 'walk', 'shop', 'walk', 'clean', 'shop', 'walk', 'walk')
+1
+('$', 'clean', 'clean', 'walk', 'shop', 'shop', 'walk', 'clean', 'shop', 'shop')
+1
+('$', 'shop', 'clean', 'clean', 'shop', 'shop', 'walk', 'walk', 'walk', 'clean')
+1
+('$', 'shop', 'walk', 'shop', 'shop', 'clean', 'clean', 'shop', 'clean', 'walk')
+1
+('$', 'walk', 'walk', 'clean', 'walk', 'clean', 'shop', 'shop', 'clean', 'shop')
+1
+('$', 'shop', 'clean', 'clean', 'clean', 'walk', 'walk', 'shop', 'clean', 'shop')
+1
+('$', 'walk', 'walk', 'walk', 'clean', 'walk', 'walk', 'clean', 'shop', 'walk')
+1
+('$', 'shop', 'shop', 'clean', 'clean', 'clean', 'shop', 'walk', 'clean', 'clean')
+1
+('$', 'clean', 'shop', 'clean', 'clean', 'clean', 'shop', 'clean', 'shop', 'shop')
+1
+('$', 'walk', 'clean', 'walk', 'walk', 'walk', 'clean', 'clean', 'clean', 'clean')
+1
+('$', 'shop', 'shop', 'walk', 'clean', 'walk', 'clean', 'shop', 'clean', 'clean')
+1
+('$', 'clean', 'clean', 'walk', 'walk', 'shop', 'clean', 'shop', 'shop', 'shop')
+1
+('$', 'shop', 'clean', 'shop', 'shop', 'clean', 'shop', 'walk', 'shop', 'walk')
+1
+('$', 'walk', 'shop', 'walk', 'shop', 'walk', 'walk', 'walk', 'shop', 'walk')
+1
+('$', 'clean', 'shop', 'shop', 'walk', 'shop', 'walk', 'shop', 'clean', 'walk')
+1
+('$', 'walk', 'shop', 'shop', 'clean', 'clean', 'walk', 'clean', 'walk', 'clean')
+1
+('$', 'shop', 'walk', 'clean', 'clean', 'clean', 'shop', 'clean', 'walk', 'walk')
+1
+('$', 'shop', 'shop', 'shop', 'clean', 'shop', 'shop', 'shop', 'clean', 'walk')
+1
+('$', 'shop', 'clean', 'shop', 'shop', 'clean', 'shop', 'shop', 'walk', 'clean')
+1
+('$', 'shop', 'clean', 'shop', 'shop', 'clean', 'walk', 'clean', 'shop', 'walk')
+1
+('$', 'clean', 'clean', 'walk', 'shop', 'shop', 'clean', 'clean', 'shop', 'clean')
+1
+('$', 'walk', 'clean', 'clean', 'clean', 'walk', 'shop', 'clean', 'walk', 'walk')
+1
+('$', 'clean', 'shop', 'clean', 'clean', 'clean', 'clean', 'shop', 'walk', 'shop')
+1
+('$', 'walk', 'shop', 'shop', 'walk', 'shop', 'clean', 'shop', 'shop', 'shop')
+1
+('$', 'clean', 'shop', 'shop', 'shop', 'clean', 'clean', 'clean', 'clean', 'shop')
+1
+('$', 'walk', 'shop', 'walk', 'walk', 'shop', 'clean', 'walk', 'shop', 'clean')
+1
+('$', 'shop', 'shop', 'shop', 'walk', 'shop', 'clean', 'clean', 'clean', 'walk')
+1
+('$', 'walk', 'shop', 'shop', 'walk', 'clean', 'walk', 'shop', 'clean', 'clean')
+1
+('$', 'shop', 'clean', 'shop', 'clean', 'shop', 'walk', 'walk', 'walk', 'shop')
+1
+('$', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'clean', 'walk', 'clean')
+1
+('$', 'shop', 'shop', 'shop', 'clean', 'shop', 'clean', 'walk', 'shop', 'shop')
+1
+('$', 'walk', 'walk', 'clean', 'walk', 'shop', 'clean', 'shop', 'walk', 'walk')
+1
+('$', 'walk', 'shop', 'clean', 'shop', 'walk', 'walk', 'shop', 'walk', 'shop')
+1
+('$', 'shop', 'walk', 'walk', 'clean', 'shop', 'walk', 'walk', 'shop', 'clean')
+1
+('$', 'clean', 'clean', 'clean', 'shop', 'shop', 'clean', 'walk', 'shop', 'shop')
+1
+('$', 'shop', 'walk', 'walk', 'clean', 'clean', 'clean', 'clean', 'walk', 'shop')
+1
+('$', 'shop', 'shop', 'shop', 'shop', 'walk', 'walk', 'shop', 'walk', 'shop')
+1
+('$', 'shop', 'clean', 'clean', 'walk', 'shop', 'clean', 'clean', 'walk', 'clean')
+1
+('$', 'clean', 'clean', 'walk', 'shop', 'walk', 'clean', 'shop', 'walk', 'clean')
+1
+('$', 'clean', 'clean', 'shop', 'clean', 'clean', 'clean', 'shop', 'shop', 'clean')
+1
+('$', 'walk', 'walk', 'shop', 'clean', 'clean', 'clean', 'clean', 'clean', 'walk')
+1
