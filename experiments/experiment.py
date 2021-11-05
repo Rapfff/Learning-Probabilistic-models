@@ -14,7 +14,7 @@ def experiment(
         model_name,
         log_like_org, 
         alphabet, 
-        nb_states = [4,5,6], 
+        nb_states = {4,5,6}, 
         iterations = 1,
         hypo_generator = random_model,
         hypo_training_set= False, 
@@ -34,11 +34,14 @@ def experiment(
         To generate the hypothesis model we need
             nb_states and
             hypo_generator
+            Optional:
+                hypo_training_set (Use a separate set while generating the hypothesis model)
+                hypo_generator_args (Extra arguments for the hypothesis generator)
         Then we learn the hypothesis model with the learning algorithm
             learning_algorithm_type and
             learning_algorithm_epsilon
 
-    saves results to <output_folder> 
+    saves results to <output_folder>/<result_file>
 
     retuns None;
     '''
