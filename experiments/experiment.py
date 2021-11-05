@@ -16,7 +16,8 @@ def experiment(
         alphabet, 
         nb_states = [4,5,6], 
         iterations = 1,
-        hypo_generator = random_model, 
+        hypo_generator = random_model,
+        hypo_training_set= False, 
         hypo_generator_args= dict(),
         learning_algorithm_type = 'BW', 
         learning_algorithm_epsilon = 0.01, 
@@ -41,6 +42,8 @@ def experiment(
 
     retuns None;
     '''
+    if hypo_training_set== False:
+        hypo_training_set= training_set
     f = open(output_folder+"/"+result_file+".txt",'a')
     for nb in nb_states:
         # Keep track of best model so far
@@ -48,7 +51,7 @@ def experiment(
     
         for i in range(iterations):
             # Get Hypothisis model 
-            hypo_model = hypo_generator(nb, alphabet, model_type, training_set, **hypo_generator_args)
+            hypo_model = hypo_generator(nb, alphabet, model_type, hypo_training_set, **hypo_generator_args)
             log_like_hypo = hypo_model.logLikelihood(test_set);
 
             # Learn the hypo model
