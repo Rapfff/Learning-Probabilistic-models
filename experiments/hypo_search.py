@@ -5,6 +5,7 @@ sys.path.append(parentdir)
 sys.path.append('../EM_and_BW_algorithms')
 
 from examples.examples_models import *
+from random import sample
 
 def random_model(nb_states, alphabet, model_type, training_set):
     if model_type == 'MCGT':
@@ -56,6 +57,23 @@ def normal_model(nb_states, alphabet, model_type, training_set):
         proba = [d[o]/(a*nb_states) for o in alphabet] 
         for i in range(nb_states):
             states.append(MCGT_state([proba*nb_states,s,obs]))
+        return MCGT(states,0,"MCGT_normal_"+str(nb_states)+"states")
+
+def prime_model(nb_states, alphabet, model_type, training_set):
+    primes= {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41}
+    if model_type == 'MCGT':
+        s = []
+        for i in range(nb_states):
+            s += [i] * len(alphabet)
+        obs = alphabet*nb_states
+        states = []
+
+        for i in range(nb_states):
+            proba=list()
+            for _ in range(nb_states):
+                p_sample=sample(primes, len(alphabet))
+                proba+=[p/(sum(p_sample)*nb_states) for p in p_sample]
+            states.append(MCGT_state([proba,s,obs]))
         return MCGT(states,0,"MCGT_normal_"+str(nb_states)+"states")
 
 # Helper function
