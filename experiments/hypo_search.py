@@ -40,6 +40,24 @@ def equiprobable_model(nb_states, alphabet, model_type, training_set):
     if model_type == 'MCGT':
         return modelMCGT_equiprobable(nb_states, alphabet)
 
+def normal_model(nb_states, alphabet, model_type, training_set):
+    d= dict()
+    for i in range(len(training_set[0])):
+        for o in training_set[0][i]:
+            if o in d:  d[o]+=training_set[1][i]
+            else:       d[o] =training_set[1][i]
+    a= len(training_set[0][0])*sum(training_set[1])
+    if model_type == 'MCGT':
+        s = []
+        for i in range(nb_states):
+            s += [i] * len(alphabet)
+        obs = alphabet*nb_states
+        states = []
+        proba = [d[o]/(a*nb_states) for o in alphabet] 
+        for i in range(nb_states):
+            states.append(MCGT_state([proba*nb_states,s,obs]))
+        return MCGT(states,0,"MCGT_normal_"+str(nb_states)+"states")
+
 # Helper function
 def mearge_MCGT(lambda_, model1, model2):
     '''
