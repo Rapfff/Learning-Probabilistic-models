@@ -8,6 +8,8 @@ from time import time
 from tools import correct_proba
 import datetime
 
+NB_PROCESS = 11
+
 class Estimation_algorithm_MCGT:
 	def __init__(self,h,alphabet):
 		"""
@@ -115,7 +117,7 @@ class Estimation_algorithm_MCGT:
 			for s in range(self.nb_states):
 				tau.append([0 for i in range(self.nb_states*len(self.observations))])
 			
-			p = Pool(processes = cpu_count() - 1)
+			p = Pool(processes = NB_PROCESS)
 			tasks = []
 			
 			for seq in range(len(traces[0])):
