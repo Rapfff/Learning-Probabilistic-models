@@ -1,15 +1,14 @@
 import os, sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
+parentdir = os.path.dirname(parentdir)
 sys.path.append(parentdir)
-from models.MDP import *
-from tools import correct_proba
+from src.models.MDP import *
+from src.tools import correct_proba
 from random import randint
 from multiprocessing import cpu_count, Pool
 from time import time
 import datetime
-
-NB_PROCESS = 11
 
 class Estimation_algorithm_MDP:
 	def __init__(self,h,alphabet,actions):
@@ -106,7 +105,7 @@ class Estimation_algorithm_MDP:
 		return False
 
 
-	def learn(self,traces,output_file="output_model.txt",epsilon=0.01,pp=''):
+	def learn(self,traces,output_file,test_set,epsilon=0.01,nb_iterations=0,pp=''):
 		"""
 		Given a set of sequences of pairs action-observation,
 		it adapts the parameters of h in order to maximize the probability to get 
@@ -115,6 +114,7 @@ class Estimation_algorithm_MDP:
 		trace = [action,obs1,action2,obs2,...,actionx,obsx]
 		"""
 		
+		fout = open(output_file+".csv",'w')
 		self.observations = []
 		for seq in traces[0]:
 			for i in range(1,len(seq),2):
@@ -136,13 +136,13 @@ class Estimation_algorithm_MDP:
 				for a in self.actions:
 					tau[-1][a] = [0 for i in range(self.nb_states*len(self.observations))]
 			
-			p = Pool(processes = NB_PROCESS)
+			p = Pool(processes = cpu_count() - 1)
 			tasks = []
 			
 			for seq in range(len(traces[0])):
 				tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq],]))
 			
-			temp = [res.get() for res in tasks if res.get() != False]
+			temp = [res.get() for res in tasks if res != False]
 			currentloglikelihood = sum([log(i[2]) for i in temp])
 
 			for s in range(self.nb_states):
@@ -165,13 +165,16 @@ class Estimation_algorithm_MDP:
 				new_states.append(MDP_state(dic))
 
 			self.hhat = MDP(new_states,self.h.initial_state)
-			
+			fout.write(str(self.hhat.logLikelihood(test_set))+',')
 			counter += 1
 			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
+				break
+			elif nb_iterations > 0 and counter > nb_iterations:
 				break
 			else:
 				prevloglikelihood = currentloglikelihood
 				self.h = self.hhat
 
-		self.h.save(output_file)
-		return self.h
+		fout.close()
+		self.h.save(output_file+"_after.txt")
+		return self.h.logLikelihood(test_set)
