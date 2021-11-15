@@ -108,7 +108,15 @@ if __name__ == "__main__":
             hypo_generator=smart_random_search, 
             output_folder=experiment_folder+'/smart_random_search_split', 
             result_file='smart_random_split_10')
+    elif sys.argv[1]=='3': # smart random search w. dynamic lambda
+        run_experiment(
+            original_models=original_models2, 
+            datasets= datasets, 
+            nb_states=nb_states,iterations=nb_iterations, 
+            hypo_generator=smart_random_search, 
+            hypo_generator_args={'modify': True},
+            output_folder=experiment_folder+'/smart_random_search_dy', 
+            result_file='smart_random_dy')
+
     else:
-        print('Run: main.py <1: split with random search 2: split with smart random search>')
-
-
+        print('Run: main.py <1: split with random search 2: split with smart random search 3: smart random search w. dynamic lambda>')
