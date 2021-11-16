@@ -117,6 +117,36 @@ if __name__ == "__main__":
             hypo_generator_args={'modify': True},
             output_folder=experiment_folder+'/smart_random_search_dy', 
             result_file='smart_random_dy')
+    elif sys.argv[1]=='4': # smart random search w. different lambda values (noise)
+        run_experiment(
+            original_models={modelMCGT6()}, 
+            datasets= datasets, 
+            nb_states={9},iterations=nb_iterations, 
+            hypo_generator=smart_random_search, 
+            hypo_generator_args={'lambda_': 0.25},
+            output_folder=experiment_folder+'/smart_random_search_25', 
+            result_file='smart_random_search_25')
+        run_experiment(
+            original_models= {modelMCGT_game(), modelMCGT_REBER(), modelMCGT5(), modelMCGT7(), modelMCGT8(), modelMCGT9(), modelMCGT12()}, 
+            datasets= datasets, 
+            nb_states=nb_states,iterations=nb_iterations, 
+            hypo_generator=smart_random_search, 
+            hypo_generator_args={'lambda_': 0.25},
+            output_folder=experiment_folder+'/smart_random_search_25', 
+            result_file='smart_random_search_25')
+        
+        run_experiment(
+            original_models= original_models2, 
+            datasets= datasets, 
+            nb_states=nb_states,iterations=nb_iterations, 
+            hypo_generator=smart_random_search, 
+            hypo_generator_args={'lambda_': 0.9},
+            output_folder=experiment_folder+'/smart_random_search_90', 
+            result_file='smart_random_search_90')
+        
+        
+        
+
 
     else:
         print('Run: main.py <1: split with random search 2: split with smart random search 3: smart random search w. dynamic lambda>')

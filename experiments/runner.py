@@ -56,7 +56,7 @@ def run_experiment(
 
     # create the result file (in folder output_folder)
     os.makedirs(output_folder, exist_ok=True)
-    f = open(output_folder+"/"+result_file+".txt",'w')
+    f = open(output_folder+"/"+result_file+".txt",'a')
     f.close()
 
     # run experimet for each original model
