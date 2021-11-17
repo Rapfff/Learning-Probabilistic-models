@@ -76,8 +76,8 @@ class Active_Learning_MDP:
 			if len(number_steps) != max_iteration:
 				return None
 
-		self.algo.h = loadMDP(output_folder+"/model_0.txt")
-		#self.algo.learn(traces,output_folder+"/model_0.txt",epsilon,pp)
+		#self.algo.h = loadMDP(output_folder+"/model_0.txt")
+		self.algo.learn(traces,output_folder+"/model_0.txt",epsilon,pp)
 
 		c = 1
 		sample_active = []
@@ -178,8 +178,12 @@ def strategy(m,traces):
 		ss = []
 		for a in range(len(m.actions())):
 			ss.append(sum( [ temp[t][s][a] for t in range(len(temp)) ] ))
-
+		print(s,ss)
 		scheduler.append(m.actions()[ss.index(min(ss))])
+	
+	#################
+	m.pprint()
+	#################
 
 	return MemorylessScheduler(scheduler)
 

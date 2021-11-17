@@ -10,6 +10,8 @@ from multiprocessing import cpu_count, Pool
 from time import time
 import datetime
 
+NB_PROCESSES = 11
+
 class Estimation_algorithm_MDP:
 	def __init__(self,h,alphabet,actions):
 		"""
@@ -136,7 +138,7 @@ class Estimation_algorithm_MDP:
 				for a in self.actions:
 					tau[-1][a] = [0 for i in range(self.nb_states*len(self.observations))]
 			
-			p = Pool(processes = cpu_count() - 1)
+			p = Pool(processes = NB_PROCESSES)
 			tasks = []
 			
 			for seq in range(len(traces[0])):

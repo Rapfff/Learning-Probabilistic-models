@@ -27,13 +27,13 @@ def approx(values,knowledge_default,window):
 	except RuntimeError:
 		return False
 
-nb_models = 1000
+nb_models = 500
 nb_iterations = 35
 nb_to_keep = 10
-folder = "exp3/"
+folder = "exp1/"
 os.mkdir(folder[:-1])
 knowledge_default = nb_iterations
-window = 200
+window = 150
 """
 original = modelMCGT_REBER()
 training_set = generateSet(original,1000,8)
@@ -51,6 +51,8 @@ test_set = generateSet(original,200,8,sched)
 
 algo = Estimation_algorithm_MDP(modelMDP_random(4,original.observations(),original.actions()),original.observations(),original.actions())
 algo.learn(training_set,folder+"loglikelihoods",test_set)
+
+"""
 fin = open(folder+"loglikelihoods.csv",'r')
 l = [float(i) for i in fin.readline()[:-1].split(',')]
 fin.close()
@@ -61,8 +63,8 @@ import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots()
 t = min(len(l),len(estimated))
-ax.scatter(range(1,knowledge_default+1),l[:knowledge_default],alpha=0.5)
-ax.scatter(range(knowledge_default+1,t+1),l[knowledge_default:t],alpha=0.5)
+ax.scatter(range(1,knowledge_default+1),l[:knowledge_default],alpha=0.5,label="used for approximation")
+ax.scatter(range(knowledge_default+1,t+1),l[knowledge_default:t],alpha=0.5,label="not used for approximation")
 ax.plot(range(1,t+1),estimated[:t],'r',label="estimation")
 ax.set_xlabel("BW iterations")
 ax.set_ylabel("log-likelihood of the test set")
@@ -93,11 +95,11 @@ i = 0
 while i < len(v):
 	print(i)
 	t = approx(v[i],knowledge_default,window)
-	if not t:
+	if type(t) == bool:
 		v = v[:i]+v[i+1:]
 		i -= 1
 	else:
-		estimated.append(func(range(1,len(v[i])), *popt))
+		estimated.append(t)
 	i += 1
 
 v_estimated =   [estimated[i][-1] for i in range(len(estimated))]
@@ -132,4 +134,3 @@ print("Mean classic:",sum(v)/len(v))
 print("Best classic:",max(v))
 
 rmtree(folder[:-1])
-"""

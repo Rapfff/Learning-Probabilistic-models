@@ -103,6 +103,11 @@ def modelMCGT4():
 	g_s5 = MCGT_state([[1.0],[5],['e']])
 	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5],0,"MCGT4")
 
+def modelMCGT5(p1=0.4,p2=0.3,p3=0.2,p4=0.05):
+	g_s0 = MCGT_state([[p1,p2,p3,1-p1-p2-p3],[0,0,1,1],['a','b','a','b']])
+	g_s1 = MCGT_state([[p4,1-p4],[0,0],['a','b']])
+	return MCGT([g_s0,g_s1],0,"MCGT5")
+
 def modelMCGT_game():
 	s_dice = MCGT_state([[1/3,1/3,1/3],[0,0,1],['1-2','3-4','5-6']])
 	s_cards= MCGT_state([[10/13,3/13],[1,2],["Number","Face"]])
