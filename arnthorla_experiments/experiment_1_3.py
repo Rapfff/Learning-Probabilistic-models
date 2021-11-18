@@ -23,7 +23,7 @@ summary_headers = ["#States", "#Sequences", "Mean(Learned - Original)", "Std.Dev
 
 
 # PARAMETERS OF EXPERIMENT
-num_states = [2,3,4]
+num_states = [2,3] #[2,3,4]
 num_sequences = [10,100] #[10, 100, 1000, 10000]
 num_tests = 1 #30 #100                             # How many repeats of equivalent tests, for statistics
 model_generator = modelMCGT_random              # Function that generates model
@@ -177,7 +177,6 @@ for i in range( len(num_states) ): # Number of States
             ###########################################################################
             # logLiklihood of original model:
             #original_model_logLikelihood = original_model.logLikelihood( training_set )
-
             
             # First training:
             algo = learn_algo( original_model, original_model.observations() )

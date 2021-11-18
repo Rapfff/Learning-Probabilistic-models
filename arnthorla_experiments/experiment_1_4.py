@@ -168,7 +168,7 @@ for i in range( len(num_states) ): # Number of States
             original_model_logLikelihood = original_model.logLikelihood( training_set )
 
             algo = learn_algo( original_model, original_model.observations() )
-            learned_model = algo.learn( training_set )
+            learned_model = algo.learn3( training_set )
             res[i][j][k][2] = learned_model.logLikelihood( training_set ) - original_model_logLikelihood
 end_time = process_time_ns()
 logResults()
