@@ -52,6 +52,18 @@ def run_experiment(
             learning_algorithm_epsilon: the epsilon value for the learning algorithm
             output_folder: a path to the folder we want to store the results
             result_file: a file that we store our results in
+
+        Writest results of the following format to file output_folder/result_file
+            FORMAT for each model:
+                Model to learn: <Model name>
+                Training_set: <int> sequences of <int> observations
+                Testing_set: <int> sequences of <int> observations
+                logLikelihood of original model: <float>
+                Observation alphabet: <a list of strings>
+                Learning algorithm <name of algorithm>, epsilon: <float>
+                Hypothesis generator: <name of generator>
+                For each test
+                    <number of states>, <L(h, train)>, <L(h, test)>, <L(BW(h), test)>
     """
 
     # create the result file (in folder output_folder)

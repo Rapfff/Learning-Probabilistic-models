@@ -24,7 +24,8 @@ def experiment(
         output_folder = 'results',
         result_file= 'result'):
     '''
-    Experiment runs experiment on the original model
+    Experiment uses the given input to build a model that fits the  training_set and test_set.
+
         information about the original model we need is 
             model_type,
             training_set,
@@ -42,6 +43,9 @@ def experiment(
             learning_algorithm_epsilon
 
     saves results to <output_folder>/<result_file>
+    Of the followinng format for each test:
+        <number of states>, <L(h, train)>, <L(h, test)>, <L(BW(h), test)>
+    saves the best result model to <output_folder>/<result_file>"_best_learned_model"<model name>"_"<number of states>
 
     retuns None;
     '''
