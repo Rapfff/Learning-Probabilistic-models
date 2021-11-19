@@ -84,6 +84,9 @@ class ExperimentResult:
         
         get_mean_results_all()
             Returns a list with mean result for all cases
+
+        plot()
+            Plot barchart from experement results
     '''
     def __init__(self, output_folder = 'results', result_file= 'result', name= 'unknown experiment'):
         self.output_folder = output_folder
@@ -186,6 +189,33 @@ class ExperimentResult:
                 
         return l
 
+    def plot(self):
+        n_groups = len(self.results)
+        mean_results= list()
+        for i in range(2,10):
+            mean_results.append([self.get_mean_results(m,i)[0] for m in self.results.keys()])
+
+        plt.subplots()
+        index = arange(n_groups)
+        bar_width = 0.1
+        opacity = 0.8
+
+        i=0
+        for group in mean_results:
+            plt.bar(index+ bar_width*i, tuple(group), bar_width,alpha=opacity, label=i+2)
+            i+=1
+
+
+        plt.xlabel('Original models')
+        plt.ylabel('Mean results')
+        plt.title(self.name) 
+        plt.xticks(index + bar_width, self.results.keys())
+        plt.legend()
+
+        plt.tight_layout()
+        plt.show()
+
+
 def get_barchart_nb(experiments= list(), nb_start=2, nb_end=9, title="Compare experiments"):
     '''Plot barchart copering experements w. focus on nb states'''
 
@@ -215,7 +245,7 @@ def get_barchart_nb(experiments= list(), nb_start=2, nb_end=9, title="Compare ex
     plt.show()
 
 def get_barchart_model(experiments= list(), models= list(), title="Compare experiments"):
-    '''Plot barchart copering experements w. focus on nb states'''
+    '''Plot barchart copering experements w. focus on models'''
 
     n_groups = len(models)
     mean_results= list()
