@@ -4,7 +4,8 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 sys.path.append('../EM_and_BW_algorithms')
 
-from numpy import mean, std
+from numpy import mean, std, arange
+import matplotlib.pyplot as plt
 
 class ExperimentResult:
     '''
@@ -42,6 +43,7 @@ class ExperimentResult:
                     },
                     ... for all models
                 }
+        name:       String, name of experiment
     
     Methods:
 
@@ -83,10 +85,11 @@ class ExperimentResult:
         get_mean_results_all()
             Returns a list with mean result for all cases
     '''
-    def __init__(self, output_folder = 'results', result_file= 'result'):
+    def __init__(self, output_folder = 'results', result_file= 'result', name= 'unknown experiment'):
         self.output_folder = output_folder
         self.result_file=result_file
         self.results=dict()
+        self.name= name
         self.get_result()
 
     def get_result(self):
@@ -182,3 +185,67 @@ class ExperimentResult:
 
                 
         return l
+
+def get_barchart_nb(experiments= list(), nb_start=2, nb_end=9, title="Compare experiments"):
+    '''Plot barchart copering experements w. focus on nb states'''
+
+    n_groups = nb_end-nb_start+1
+    mean_results= list()
+    for ex in experiments:
+        mean_results.append([ex.get_mean_results_nb(i) for i in range(nb_start, nb_end+1)])
+
+    plt.subplots()
+    index = arange(n_groups)
+    bar_width = 0.2
+    opacity = 0.8
+
+    i=0
+    for group in mean_results:
+        plt.bar(index+ bar_width*i, tuple(group), bar_width,alpha=opacity, label=experiments[i].name)
+        i+=1
+
+
+    plt.xlabel('Number of states in Hypothesis model')
+    plt.ylabel('Mean results')
+    plt.title(title) 
+    plt.xticks(index + bar_width, range(nb_start,nb_end+1))
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+def get_barchart_model(experiments= list(), models= list(), title="Compare experiments"):
+    '''Plot barchart copering experements w. focus on nb states'''
+
+    n_groups = len(models)
+    mean_results= list()
+    for ex in experiments:
+        mean_results.append([ex.get_mean_results_model(m)[0] for m in models])
+
+    plt.subplots()
+    index = arange(n_groups)
+    bar_width, opacity = 0.15, 0.8
+
+    i=0
+    for group in mean_results:
+        plt.bar(index+ bar_width*i, tuple(group), bar_width,alpha=opacity, label=experiments[i].name)
+        i+=1
+
+
+    plt.xlabel('Original models')
+    plt.ylabel('Mean results')
+    plt.title(title) 
+    plt.xticks(index + bar_width, models)
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+if __name__ == '__main__':
+    ex10= ExperimentResult('experiments/results/experiments_2/experiment1', 'result_experiment1_10', '10:90')
+    ex20= ExperimentResult('experiments/results/experiments_2/experiment1', 'result_experiment1_20', '20:80')
+    ex50= ExperimentResult('experiments/results/experiments_2/experiment1', 'result_experiment1_50', '50:50')
+    exn= ExperimentResult('experiments/results/experiments_2/experiment1', 'result_experiment1__', '100:100')
+
+    # get_barchart_nb([ex10, ex20, ex50, exn], 2,9, 'Random Search split training set')
+    get_barchart_model([ex10, ex20, ex50, exn], ['MCGT1', 'MCGT2', 'MCGT3', 'MCGT4'], 'Random Search split training set')
