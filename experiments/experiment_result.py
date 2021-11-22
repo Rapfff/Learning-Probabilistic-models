@@ -85,6 +85,9 @@ class ExperimentResult:
         get_mean_results_all()
             Returns a list with mean result for all cases
 
+        add_results(new_results: dict)
+            Add new results
+
         plot()
             Plot barchart from experement results
     '''
@@ -188,6 +191,47 @@ class ExperimentResult:
 
                 
         return l
+    
+    def add_results(self, new_results = dict()):
+        """add new results
+            new results:= 
+            {
+                <model name 1>: 
+                {
+                    'size_training_set': <int>, 
+                    'len_training_set': <int>, 
+                    'size_test_set': <int>, 
+                    'len_test_set': <int>, 
+                    'log_like_org': <float>, 
+                    'data': 
+                    {
+                        <nb of states>: [(<L(h, trainset)>, <L(h, testset)>, <L(learn(h), testset)>) ... for all tests]
+                        ... for all number of states
+                    }
+                },
+                ...
+            }
+        """
+        for (m, v) in new_results.items():
+            if m in self.results.keys():
+                if new_results[m]['size_training_set']!=self.results[m]['size_training_set']:
+                    raise ValueError
+                if new_results[m]['len_training_set']!=self.results[m]['len_training_set']:
+                    raise ValueError
+                if new_results[m]['size_test_set']!=self.results[m]['size_test_set']:
+                    raise ValueError
+                if new_results[m]['len_test_set']!=self.results[m]['len_test_set']:
+                    raise ValueError
+                if new_results[m]['log_like_org']!=self.results[m]['log_like_org']:
+                    raise ValueError
+                for i in new_results[m]['data'].keys():
+                    if i in self.results[m]['data'].keys():
+                        self.results[m]['data'][i]+=new_results[m]['data'][i]
+                    else:  
+                        self.results[m]['data'][i]=new_results[m]['data'][i]
+            else:
+                self.results[m]=new_results[m]
+                
 
     def plot(self):
         n_groups = len(self.results)
