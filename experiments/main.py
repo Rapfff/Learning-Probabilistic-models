@@ -24,6 +24,9 @@ datasets= {'MCGT_games': {'trainingset': 'datasets/MCGT_gamestrainingset.txt', '
     'MCGT10': {'trainingset': 'datasets/MCGT10trainingset.txt', 'testset': 'datasets/MCGT10testset.txt'},
     'MCGT11': {'trainingset': 'datasets/MCGT11trainingset.txt', 'testset': 'datasets/MCGT11testset.txt'},
     'MCGT12': {'trainingset': 'datasets/MCGT12trainingset.txt', 'testset': 'datasets/MCGT12testset.txt'},
+    'MCGT13': {'trainingset': 'datasets/MCGT13trainingset.txt', 'testset': 'datasets/MCGT13testset.txt'},
+    'MCGT14': {'trainingset': 'datasets/MCGT14trainingset.txt', 'testset': 'datasets/MCGT14testset.txt'},
+    'MCGT15': {'trainingset': 'datasets/MCGT15trainingset.txt', 'testset': 'datasets/MCGT15testset.txt'},
     }
 datasets_split10= {
     'MCGT_games': {'trainingset1': 'datasets/split_10/MCGT_gamestrainingset1.txt', 'trainingset2': 'datasets/split_10/MCGT_gamestrainingset2.txt'}, 
@@ -119,24 +122,41 @@ if __name__ == "__main__":
             result_file='smart_random_dy')
     elif sys.argv[1]=='4': # smart random search w. different lambda values (noise)
         run_experiment(
-            original_models={modelMCGT6()}, 
+            original_models= {modelMCGT13(), modelMCGT14(), modelMCGT15()}, 
             datasets= datasets, 
-            nb_states={9},iterations=nb_iterations, 
+            nb_states=nb_states,iterations=nb_iterations, 
             hypo_generator=smart_random_search, 
-            hypo_generator_args={'lambda_': 0.25},
-            output_folder=experiment_folder+'/smart_random_search_25', 
-            result_file='smart_random_search_25')
+            hypo_generator_args={'lambda_': 0.125},
+            output_folder=experiment_folder+'/smart_random_search_125', 
+            result_file='smart_random_search_125')
         run_experiment(
-            original_models= {modelMCGT_game(), modelMCGT_REBER(), modelMCGT5(), modelMCGT7(), modelMCGT8(), modelMCGT9(), modelMCGT12()}, 
+            original_models= {modelMCGT13(), modelMCGT14(), modelMCGT15()}, 
             datasets= datasets, 
             nb_states=nb_states,iterations=nb_iterations, 
             hypo_generator=smart_random_search, 
             hypo_generator_args={'lambda_': 0.25},
             output_folder=experiment_folder+'/smart_random_search_25', 
             result_file='smart_random_search_25')
+        run_experiment(
+            original_models= {modelMCGT13(), modelMCGT14(), modelMCGT15()}, 
+            datasets= datasets, 
+            nb_states=nb_states,iterations=nb_iterations, 
+            hypo_generator=smart_random_search, 
+            hypo_generator_args={'lambda_': 0.5},
+            output_folder=experiment_folder+'/smart_random_search_50', 
+            result_file='smart_random_search_50')
         
         run_experiment(
-            original_models= original_models2, 
+            original_models= {modelMCGT13(), modelMCGT14(), modelMCGT15()}, 
+            datasets= datasets, 
+            nb_states=nb_states,iterations=nb_iterations, 
+            hypo_generator=smart_random_search, 
+            hypo_generator_args={'lambda_': 0.7},
+            output_folder=experiment_folder+'/smart_random_search_70', 
+            result_file='smart_random_search_70')
+        
+        run_experiment(
+            original_models= {modelMCGT13(), modelMCGT14(), modelMCGT15()}, 
             datasets= datasets, 
             nb_states=nb_states,iterations=nb_iterations, 
             hypo_generator=smart_random_search, 
