@@ -173,6 +173,12 @@ def modelCTMC_random(nb_states, alphabet):
 		states.append(CTMC_state([randomProbabilities(len(obs)),s,obs],random()))
 	return CTMC(states,0,"MCGT_random_"+str(nb_states)+"states")
 
+def modelCTMC1():
+	g_s0 = CTMC_state([[0.4,0.1,0.5],[1,1,2],['A','B','A']],1/5)
+	g_s1 = CTMC_state([[0.4,0.1,0.3,0.2],[1,0,2,2],['A','B','B','A']],1/3)
+	g_s2 = CTMC_state([[0.25,0.25,0.5],[0,1,2],['A','A','B']],1/10)
+	return CTMC([g_s0,g_s1,g_s2],0,"CTMC_REBER")
+
 def modelCTMC_REBER():
 	g_s0 = CTMC_state([[1.0],[1],['B']],1/1)
 	g_s1 = CTMC_state([[0.5,0.5],[2,3],['T','P']],1/1)

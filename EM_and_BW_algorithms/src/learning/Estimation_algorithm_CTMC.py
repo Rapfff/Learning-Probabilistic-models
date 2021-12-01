@@ -77,15 +77,16 @@ class Estimation_algorithm_CTMC:
 				rate_parameters.append(0.0)
 				for t in range(len(sequence)//2):
 					den[-1] += alpha_matrix[s][t]*beta_matrix[s][t]*times/proba_seq
-					rate_parameters[-1] += alpha_matrix[s][t]*self.h_v(s,sequence[t*2])*beta_matrix[s][t]*times/proba_seq
+					rate_parameters[-1] += alpha_matrix[s][t]*sequence[t*2]*beta_matrix[s][t]*times/proba_seq
 			####################
 			num = []
 			for s in range(self.nb_states):
 				num.append([0.0 for i in range(self.nb_states*len(self.observations))])
 				for t in range(len(sequence)//2):
 					observation = sequence[t*2+1]
+					rate        = sequence[t*2]
 					for ss in range(self.nb_states):
-						p = self.h_g(s,ss,observation)
+						p = self.h_g(s,ss,observation)*self.h_v(s,rate)
 						#for i in range(len(self.h.states[s].next_matrix[0])):
 						#	if self.h.states[s].next_matrix[1][i] == ss and self.h.states[s].next_matrix[2][i] == observation:
 						#		p = self.h.states[s].next_matrix[0][i]
@@ -153,10 +154,7 @@ class Estimation_algorithm_CTMC:
 				new_states.append(CTMC_state(l1,exp_lambda))
 
 			self.hhat = CTMC(new_states,self.h.initial_state)
-			self.hhat.pprint()
-			for i in temp:
-				print(i[2])
-			input()
+
 			counter += 1
 			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
 				break

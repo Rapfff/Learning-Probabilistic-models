@@ -1,10 +1,6 @@
-output_CTMC
+unknown CTMC
 0
-1.1325562897959887
-<super: <class 'CTMC_state'>, <CTMC_state object>>0.21861087714670352
-<super: <class 'CTMC_state'>, <CTMC_state object>>0.7712604652680968
-<super: <class 'CTMC_state'>, <CTMC_state object>>0.22545443357321365
-<super: <class 'CTMC_state'>, <CTMC_state object>>0.3657162680522589
-<super: <class 'CTMC_state'>, <CTMC_state object>>0.8883353693915392
-<super: <class 'CTMC_state'>, <CTMC_state object>>0.1570769302319413
+0.23852239519904794
+<super: <class 'CTMC_state'>, <CTMC_state object>>0.07864768677684951
+<super: <class 'CTMC_state'>, <CTMC_state object>>0.3903779690510866
 <super: <class 'CTMC_state'>, <CTMC_state object>>
