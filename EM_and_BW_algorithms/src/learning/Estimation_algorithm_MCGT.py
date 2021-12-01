@@ -87,7 +87,7 @@ class Estimation_algorithm_MCGT:
 						if p != 0.0:
 							num[-1][ss*len(self.observations)+self.observations.index(observation)] += alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
 			####################
-			return [den,num, proba_seq]
+			return [den,num, proba_seq*times]
 		return False
 
 

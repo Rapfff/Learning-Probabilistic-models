@@ -4,9 +4,10 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from src.models.HMM import *
 from src.models.MCGT import *
-from src.models.MCGS import *
+from src.models.CTMC import *
 from src.models.MDP import *
 from src.tools import randomProbabilities
+from random import random
 
 # ---- HMM ----------------------------
 
@@ -158,22 +159,29 @@ def modelMCGT_random(nb_states,alphabet):
 def modelMCGT1_equiprobable():
 	return modelMCGT_equiprobable(5,['x','y','a','b','c','d'])
 
+# ---- CTMC----------------------------
 
-# ---- MCGS ---------------------------
+def modelCTMC_random(nb_states, alphabet):
+	#lambda between 0 and 1
+	s = []
+	for i in range(nb_states):
+		s += [i] * len(alphabet)
+	obs = alphabet*nb_states
+	
+	states = []
+	for i in range(nb_states):
+		states.append(CTMC_state([randomProbabilities(len(obs)),s,obs],random()))
+	return CTMC(states,0,"MCGT_random_"+str(nb_states)+"states")
 
-def modelMCGS1():
-	m_s0  = MCGS_state('',[[0.5,0.5],[5,6]])
-	m_s0x = MCGS_state('x',[[0.3,0.4,0.3],[1,2,3]])
-	m_s0y = MCGS_state('y',[[0.3,0.4,0.3],[1,2,3]])
-	m_s1  = MCGS_state('',[[1.0],[7]])
-	m_s1a = MCGS_state('a',[[1.0],[4]])
-	m_s2  = MCGS_state('',[[1.0],[8]])
-	m_s2b = MCGS_state('b',[[1.0],[4]])
-	m_s3  = MCGS_state('',[[1.0],[9]])
-	m_s3c = MCGS_state('c',[[1.0],[4]])
-	m_s4  = MCGS_state('',[[1.0],[10]])
-	m_s4d = MCGS_state('d',[[1.0],[4]])
-	return MCGS([m_s0,m_s1,m_s2,m_s3,m_s4,m_s0x,m_s0y,m_s1a,m_s2b,m_s3c,m_s4d],[[1.0],[0]])
+def modelCTMC_REBER():
+	g_s0 = CTMC_state([[1.0],[1],['B']],1/1)
+	g_s1 = CTMC_state([[0.5,0.5],[2,3],['T','P']],1/1)
+	g_s2 = CTMC_state([[0.6,0.4],[2,4],['S','X']],1/2)
+	g_s3 = CTMC_state([[0.7,0.3],[3,5],['T','V']],1/4)
+	g_s4 = CTMC_state([[0.5,0.5],[3,6],['X','S']],1/10)
+	g_s5 = CTMC_state([[0.5,0.5],[4,6],['P','V']],1/8)
+	g_s6 = CTMC_state([[1.0],[6],['E']],1/50)
+	return CTMC([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5,g_s6],0,"CTMC_REBER")
 
 
 # ---- MDP ----------------------------
