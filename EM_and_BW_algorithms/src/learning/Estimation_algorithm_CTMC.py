@@ -93,7 +93,7 @@ class Estimation_algorithm_CTMC:
 						if p != 0.0:
 							num[-1][ss*len(self.observations)+self.observations.index(observation)] += alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
 			####################
-			return [den,num, proba_seq*times, rate_parameters]
+			return [den,num, proba_seq,times, rate_parameters]
 		return False
 
 
@@ -132,11 +132,11 @@ class Estimation_algorithm_CTMC:
 				tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq],]))
 			
 			temp = [res.get() for res in tasks if res.get() != False]
-			currentloglikelihood = sum([log(i[2]) for i in temp])
+			currentloglikelihood = sum([log(i[2])*i[3] for i in temp])
 
 			for s in range(self.nb_states):
 				den[s] = sum([i[0][s] for i in temp])
-				rate_parameters[s] = sum([i[3][s] for i in temp])
+				rate_parameters[s] = sum([i[4][s] for i in temp])
 				for x in range(self.nb_states*len(self.observations)):
 					tau[s][x] = sum([i[1][s][x] for i in temp])
 

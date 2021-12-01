@@ -102,7 +102,7 @@ class Estimation_algorithm_MDP:
 						if p != 0.0:
 							num[-1][action][ss*len(self.observations)+self.observations.index(observation)] += alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
 			####################
-			return [den,num, proba_seq*times]
+			return [den,num, proba_seq,times]
 		return False
 
 
@@ -143,7 +143,7 @@ class Estimation_algorithm_MDP:
 				tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq],]))
 			
 			temp = [res.get() for res in tasks if res.get() != False]
-			currentloglikelihood = sum([log(i[2]) for i in temp])
+			currentloglikelihood = sum([log(i[2])*i[3] for i in temp])
 
 			for s in range(self.nb_states):
 				for a in self.actions:
