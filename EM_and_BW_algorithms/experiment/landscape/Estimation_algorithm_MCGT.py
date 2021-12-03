@@ -12,14 +12,16 @@ import datetime
 NB_PROCESS = 11
 
 def to_index(m):
+	if type(m) == list:
+		return '|'.join([str(i) for i in m])
 	p1 = str(m.g(0,0,'a'))
 	p2 = str(m.g(0,0,'b'))
 	p3 = str(m.g(0,1,'a'))
 	p4 = str(m.g(1,0,'a'))
-	return p1+p2+p3+p4
+	return p1+'|'+p2+'|'+p3+'|'+p4
 
 def to_probas(i):
-	return i.split("0.")[1:]
+	return [float(j) for j in i.split("|")]
 
 class Estimation_algorithm_MCGT:
 	def __init__(self,h,alphabet):
