@@ -5,7 +5,8 @@ sys.path.append(parentdir)
 sys.path.append('../EM_and_BW_algorithms')
 
 from examples.examples_models import *
-from random import sample
+from src.tools import randomProbabilities
+from random import randrange, sample, randint
 
 def random_model(nb_states, alphabet, model_type, training_set):
     if model_type == 'MCGT':
@@ -58,6 +59,44 @@ def normal_model(nb_states, alphabet, model_type, training_set):
         for i in range(nb_states):
             states.append(MCGT_state([proba*nb_states,s,obs]))
         return MCGT(states,0,"MCGT_normal_"+str(nb_states)+"states")
+
+def dom_model(nb_states, alphabet, model_type, training_set):
+    if model_type == 'MCGT':
+        s = []
+        for i in range(len(alphabet)):
+            s += [i] * len(alphabet)
+        obs = alphabet*len(alphabet)
+        states = []
+        for i in range(len(alphabet)):
+            proba = [1/(2*(len(alphabet)**2-len(alphabet))) for o in alphabet]
+            proba[i]=1/(2*len(alphabet)) 
+            states.append(MCGT_state([proba*len(alphabet),s,obs]))
+        return MCGT(states,0,"MCGT_dom_"+str(len(alphabet))+"states")
+
+def random_model_deleted_edges(nb_states, alphabet, model_type, training_set):
+    nb_edes= nb_states-2 # Number of edges to not exist
+    del_edges= [[randint(0, nb_states-1) for _ in range(nb_edes)]for i in range(2)]
+    if model_type == 'MCGT':
+        s = []
+        for i in range(nb_states):
+            s += [i] * len(alphabet)
+        obs = alphabet*nb_states
+
+        states = []
+        for i in range(nb_states):
+            del_s=list()
+            for k in range((nb_edes)):
+                if del_edges[0][k]==i:
+                    del_s.append(del_edges[1][k])
+            del_s.sort()
+            obs_=obs
+            s_=s
+            for j in del_s:
+                obs_=obs_[0:j*len(alphabet)]+obs_[(j+1)*len(alphabet):]
+                s_=s_[0:j*len(alphabet)]+s_[(j+1)*len(alphabet):]
+                
+            states.append(MCGT_state([randomProbabilities(len(obs)-len(alphabet)*len(del_s)), s_, obs_]))
+        return MCGT(states,0,"MCGT_random_"+str(nb_states)+"states")
 
 def prime_model(nb_states, alphabet, model_type, training_set):
     primes= {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41}
