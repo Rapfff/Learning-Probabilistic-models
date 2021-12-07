@@ -1,9 +1,19 @@
-from edfreader import EDFreader
+import os, sys
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+parentdir = os.path.dirname(parentdir)
+sys.path.append(parentdir)
+
 import numpy as np
 import matplotlib.pyplot as plt
 from statistics import mean
 from scipy.signal import hilbert
 from math import exp
+from experiment.nox.edfreader import EDFreader
+from src.learning.Estimation_algorithm_MCGT import Estimation_algorithm_MCGT
+from examples.examples_models import modelMCGT_random
+from src.tools import saveSet, loadSet
+
 
 EDF_FILE   = "eh_20210211.edf"
 EVENT_FILE = "Event_Grid.csv"
@@ -16,6 +26,9 @@ SIGNAL_ID = 44
 SIGNAL_NAME = "F3_M2"
 
 WINDOW_SIZE_SEC = 1
+EVALUATING_WINDOW_SIZE_SEC = 15
+
+NB_STATES = 6
 
 def clean(s):
     i = 1
@@ -122,11 +135,18 @@ def read_files():
 
 def write_training_sets(hil,stages,x_stages):
 	for s in stages:
-		f = open(str(s)+"_trainingset.txt",'w')
 		for j in x_stages[s]:
-			for i in j:
-				f.write(str(hil[i])+',')
-		f.close()
+			seq = []
+			t   = []
+			for i in range(0,len(j),EVALUATING_WINDOW_SIZE_SEC):
+				ss = j[i:min(len(j),i+EVALUATING_WINDOW_SIZE_SEC)]
+				ss = [hil[k] for k in ss]
+				if ss in seq:
+					t[seq.index(ss)] += 1
+				else:
+					seq.append(ss)
+					t.append(1)
+		saveSet([seq,t],str(s)+"_training.txt")
 
 def discretize(hil):
 	m1 = min(hil)
@@ -146,6 +166,16 @@ hil, stages, x_stages = read_files()
 hil = discretize(hil)
 write_training_sets(hil,stages,x_stages)
 
+model_stages = []
+rm = modelMCGT_random(NB_STATES,stages)
+for s in stages:
+	model_stages.append(rm)
+	algo = Estimation_algorithm_MCGT(model_stages[-1],stages)
+	algo.learn(loadSet(str(s)+"_training.txt"))
+	model_stages[-1] = algo.learn(loadSet(str(s)+"_training.txt"),output_file=str(s)+"_model.txt",pp=str(s))	
+
+
+
 
 
 
@@ -155,7 +185,6 @@ write_training_sets(hil,stages,x_stages)
 #séparer le training set pour chaque stage
 #train un model par stage sur son training set
 #pour sequence de 30 secondes (30 hilbert values), calculer la proba que chaque model génere cette  sequence
-
 
 """
 fig, ax = plt.subplots()
