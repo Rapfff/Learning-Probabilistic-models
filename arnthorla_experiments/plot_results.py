@@ -35,7 +35,7 @@ import matplotlib.pyplot as plt
 
 # Parse results from result file.
 results = []
-with open( "experiment_1_2_results/result_2021_10_28_0_52_42.txt" ) as file:
+with open( "experiment_1_4_results/result_2021_11_26_18_55_28.txt" ) as file:
     for line in file:
         line = line.split( "|" )
         tmp = []
@@ -56,10 +56,11 @@ while i < len(results):
         seq.append( int(results[i][1]) )
         diff.append( float(results[i][2]) )
         i += 1
-    plt.yscale("log")
+    plt.xscale("log")
+    #plt.yscale("log")
     plt.plot( seq, diff, label="#states " + str(states) )
 plt.xlabel( "#Sequences" )
-plt.ylabel( "LogLikelihood" )
+plt.ylabel( "log-Likelihood" )
 plt.legend()
 plt.savefig("test.png")
 
