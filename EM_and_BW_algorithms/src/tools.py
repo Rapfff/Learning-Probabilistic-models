@@ -1,6 +1,15 @@
 from random import random, randint
 from functools import reduce
 from numpy.random import geometric
+from math import exp, pi
+
+
+def normpdf(x, params):
+	mean, sd = params
+	var = float(sd)**2
+	denom = (2*pi*var)**.5
+	num = exp(-(float(x)-float(mean))**2/(2*var))
+	return num/denom
 
 def loadSet(file_path):
 	res_set = [[],[]]
