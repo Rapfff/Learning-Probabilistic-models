@@ -6,8 +6,9 @@ from src.models.HMM import *
 from src.models.MCGT import *
 from src.models.CTMC import *
 from src.models.MDP import *
+from src.models.coMC import *
 from src.tools import randomProbabilities
-from random import random
+from random import random, uniform
 
 # ---- HMM ----------------------------
 
@@ -171,7 +172,7 @@ def modelCTMC_random(nb_states, alphabet):
 	states = []
 	for i in range(nb_states):
 		states.append(CTMC_state([randomProbabilities(len(obs)),s,obs],random()))
-	return CTMC(states,0,"MCGT_random_"+str(nb_states)+"states")
+	return CTMC(states,0,"CTMC_random_"+str(nb_states)+"states")
 
 def modelCTMC1():
 	g_s0 = CTMC_state([[0.4,0.1,0.5],[1,1,2],['A','B','A']],1/5)
@@ -188,6 +189,24 @@ def modelCTMC_REBER():
 	g_s5 = CTMC_state([[0.5,0.5],[4,6],['P','V']],1/8)
 	g_s6 = CTMC_state([[1.0],[6],['E']],1/50)
 	return CTMC([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5,g_s6],0,"CTMC_REBER")
+
+# ---- coMC ---------------------------
+def modelCOMC_random(nb_states):
+	#mu between -2 and 2
+	#sd between -2 and 2
+	s = [i for i in range(nb_states)]
+	states = []
+	for i in range(nb_states):
+		d = {}
+		for j in range(nb_states):
+			d[j] = [round(uniform(-2.0,2.0),3),round(uniform(-2.0,2.0),3)]
+		states.append(coMC_state([randomProbabilities(nb_states),s],d))
+	return coMC(states,0,"coMC_random_"+str(nb_states)+"states")
+
+def modelCOMC1():
+	s0 = coMC_state([[0.2,0.8],[0,1]],{0:[0.0,1.0],1:[1.0,1.0]})
+	s1 = coMC_state([[1.0],[0]],{0:[0.0,1.5]})
+	return coMC([s0,s1],0,"coMC1")
 
 
 # ---- MDP ----------------------------
