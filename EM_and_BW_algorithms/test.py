@@ -4,7 +4,7 @@ from tools import generateSet
 
 original = modelCOMC1()
 
-training_set = generateSet(original,100,10)
+training_set = generateSet(original,1,4)
 
 
 m = modelCOMC_random(2)
