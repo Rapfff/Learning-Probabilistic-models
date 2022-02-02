@@ -84,14 +84,10 @@ class Estimation_algorithm_coMC:
 
 				for t in range(len(sequence)):
 					for ss in range(self.nb_states):
-						p = 0.0
-						for i in range(len(self.h.states[s].next_matrix[0])):
-							if self.h.states[s].next_matrix[1][i] == ss:
-								p = self.h.states[s].next_matrix[0][i]
-								break
+						p = self.h_g(s,ss,sequence[t])
 						if p != 0.0:
 							num[-1][ss]    += alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
-							p = self.h_g(s,ss,sequence[t])*alpha_matrix[s][t]*beta_matrix[ss][t+1]*times/proba_seq
+							p *= alpha_matrix[s][t]*beta_matrix[ss][t+1]*times/proba_seq
 							den2[-1][ss]   += p
 							num_mu[-1][ss] += p*sequence[t]
 							num_d[-1][ss]  += p*(sequence[t]-self.h.states[s].obs_matrix[ss][0])**2
@@ -108,10 +104,11 @@ class Estimation_algorithm_coMC:
 		traces = [[trace1,trace2,...],[number_of_trace1,number_of_trace2,...]]
 		trace = [obs1,obs2,...,obsx]
 		"""
+		self.h.pprint()
 		counter = 0
 		prevloglikelihood = 10
 		while True:
-			#print(datetime.datetime.now(),pp,counter, prevloglikelihood)
+			print(datetime.datetime.now(),pp,counter, prevloglikelihood)
 			den    = []
 			a      = []
 			den2   = []
@@ -142,17 +139,19 @@ class Estimation_algorithm_coMC:
 					num_mu[s][ss] = sum([i[5][s][ss] for i in temp])
 					num_d[s][ss]  = sum([i[6][s][ss] for i in temp])
 
-
 			list_sta = [i for i in range(self.nb_states)]
 			new_states = []
 			for s in range(self.nb_states):
 				l = [ correct_proba([a[s][i]/den[s] for i in range(len(list_sta))]) , list_sta]
 				d = {}
 				for ss in range(self.nb_states):
-					d[ss] = [num_mu[s][ss]/den2[s][ss], num_d[s][ss]/(2*den2[s][ss])]
+					if l[0][ss] > 0.00001:
+						d[ss] = [num_mu[s][ss]/den2[s][ss], num_d[s][ss]/(2*den2[s][ss])]
 				new_states.append(coMC_state(l,d))
 
 			self.hhat = coMC(new_states,self.h.initial_state)
+			#self.hhat.pprint()
+			#print()
 			
 			counter += 1
 			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
