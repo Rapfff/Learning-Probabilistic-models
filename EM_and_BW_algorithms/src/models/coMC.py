@@ -32,8 +32,8 @@ class coMC_state:
 		for i in range(len(self.next_matrix[0])):
 			if self.next_matrix[1][i] == state:
 				p1 = self.next_matrix[0][i]
-				p2 = normpdf(obs,self.obs_matrix[state])
-				return p1*p2
+				if p1 > 0.0:
+					return p1*normpdf(obs,self.obs_matrix[state])
 		return 0.0
 
 	def __str__(self):
