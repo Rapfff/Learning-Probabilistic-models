@@ -3,113 +3,104 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from tools import resolveRandom
+from models.Model import Model, Model_state
 
-class HMM_state:
+class HMM_state(Model_state):
 
 	def __init__(self,output_matrix, next_matrix):
 		"""
 		output_matrix = [[proba_symbol1,proba_symbol2,...],[symbol1,symbol2,...]]
 		next_matrix = [[proba_state1,proba_state2,...],[state1,state2,...]]
 		"""
-		#if sum(output_matrix[0]) < 1.0:
-		#	print("Sum of the probabilies of the output_matrix should be 1.0")
-		#	print(output_matrix)
-		#	return False
+		super().__init__(next_matrix)
+		if round(sum(output_matrix[0]),2) != 1.0 and sum(output_matrix[0]) != 0:
+			print("Sum of the probabilies of the output_matrix should be 1 or 0 here it's ",sum(output_matrix[0]))
+			#return False
 		self.output_matrix = output_matrix
-		#if sum(next_matrix[0]) < 1.0:
-		#	print("Sum of the probabilies of the next_matrix should be 1.0")
-		#	print(next_matrix)
-		#	return False
-		self.next_matrix = next_matrix
 
 	def a(self,state):
 		if state in self.next_matrix[1]:
 			return self.next_matrix[0][self.next_matrix[1].index(state)]
 		else:
-			return 0
+			return 0.0
 
 	def b(self,sigma):
 		if sigma in self.output_matrix[1]:
 			return self.output_matrix[0][self.output_matrix[1].index(sigma)]
 		else:
-			return 0
-
-	def generate(self):
-		return self.output_matrix[1][resolveRandom(self.output_matrix[0])]
-
-	def next(self):
-		return self.next_matrix[1][resolveRandom(self.next_matrix[0])]
-
-
-class HMM:
-
-	def __init__(self,states,initial_state,name="unknow HMM"):
-		self.initial_state = initial_state
-		self.states = states
-		self.name = name
-
-	def __str__(self):
-		return self.name
-
-	def observations(self):
-		res = []
-		for s in self.states:
-			res += s.output_matrix[1]
-		return list(set(res))
-
-	def pi(self,s):
-		if s == self.initial_state:
-			return 1.0
-		else:
 			return 0.0
 
-	def run(self,number_steps):
-		output = ""
-		current = self.initial_state
+	def next_obs(self):
+		return self.output_matrix[1][resolveRandom(self.output_matrix[0])]
 
-		while len(output) < number_steps:
-			output += self.states[current].generate()
-			current = self.states[current].next()
+	def next_state(self):
+		return self.next_matrix[1][resolveRandom(self.next_matrix[0])]
 
-		return output
+	def next(self):
+		return [self.next_state(),self.next_obs()]
+	
+	def tau(self,state,obs):
+		return self.a(state)*self.b(obs)
 
-	def pprint(self):
-		for i in range(len(self.states)):
-			print("----STATE s",i,"----",sep='')
-			for j in range(len(self.states)):
-				print(" -> s",j," : ",self.states[i].a(j),sep='')
-			print("************")
-			for j in self.states[i].output_matrix[1]:
-				print(" => ",j," : ",self.states[i].b(j),sep='')
+	def observations(self):
+		return list(set(self.output_matrix[1]))
+		
 
-	def allStatesPathIterative(self, start, obs_seq):
-		"""return all the states path from start that can generate obs_seq"""
-		res = []
-		for i in range(len(self.states)):
-			if self.states[i].b(obs_seq[0]) > 0 and self.states[start].a(i) > 0:
-				if len(obs_seq) == 1:
-					res.append([start,i])
-				else:
-					t = self.allStatesPathIterative(i,obs_seq[1:])
-					for j in t:
-						res.append([start]+j)
-		return res
+	def pprint(self,i):#TODO
+		print("----STATE s",i,"----",sep='')
+		for j in range(len(self.next_matrix[0])):
+			if self.next_matrix[0][j] > 0.000001:
+				print("s",i," -> s",self.next_matrix[1][j]," : ",self.next_matrix[0][j],sep='')
+		print("************")
+		for j in range(len(self.output_matrix[0])):
+			if self.output_matrix[0][j] > 0.000001:
+				print("s",i," => ",self.output_matrix[1][j]," : ",self.output_matrix[0][j],sep='')
 
-	def allStatesPath(self,obs_seq):
-		"""return all the states path that can generate obs_seq"""
-		res = []
-		if self.states[self.initial_state].b(obs_seq[0]) > 0.0:
-			t = self.allStatesPathIterative(self.initial_state,obs_seq[1:])
-			for j in t:
-				res.append(j)
-		return res
 
-	def prob(self,states_path, obs_seq):
-		"""return the probability to get this states_path generating this observations sequence"""
-		if states_path[0] != self.initial_state:
-			return 0
-		res = self.states[states_path[0]].b(obs_seq[0])
-		for i in range(1,len(states_path)):
-			res *= self.states[states_path[i-1]].a(states_path[i])*self.states[states_path[i]].b(obs_seq[i])
-		return res
-		#but sum_k alpha(seq[:k],states_path[k])*beta(seq[k:],states_path[k]) =? proba(states_path,seq)
+	def __str__(self):
+		if len(self.next_matrix[0]) == 0: #end state
+			return "-\n"
+		else:
+			res = ""
+			for proba in self.next_matrix[0]:
+				res += str(proba)+' '
+			res += '\n'
+			for state in self.next_matrix[1]:
+				res += str(state)+' '
+			res += '\n'
+
+			for proba in self.output_matrix[0]:
+				res += str(proba)+' '
+			res += '\n'
+			for obs in self.output_matrix[1]:
+				res += str(obs)+' '
+			res += '\n'
+			return res
+
+class HMM(Model):
+	def __init__(self,states,initial_state,name="unknown HMM"):
+		super().__init__(states,initial_state,name)
+
+
+def loadHMM(file_path):
+	f = open(file_path,'r')
+	name = f.readline()[:-1]
+	initial_state = int(f.readline()[:-1])
+	states = []
+	
+	l = f.readline()
+	while l and l != '\n':
+		if l == '-\n':
+			states.append(MCGT_state([[],[],[]]))
+		else:
+			ps = [ float(i) for i in l[:-2].split(' ')]
+			l  = f.readline()[:-2].split(' ')
+			s  = [ int(i) for i in l ]
+			l  = f.readline()[:-2].split(' ')
+			po = [ float(i) for i in l]
+			o  = f.readline()[:-2].split(' ')
+			states.append(HMM_state([ps,s],[po,o]))
+
+		l = f.readline()
+
+	return HMM(states,initial_state,name)

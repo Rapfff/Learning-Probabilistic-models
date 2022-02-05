@@ -1,6 +1,11 @@
-from examples.examples_models import modelMCGT_REBER
+from examples.examples_models import modelMCGT_REBER, modelHMM4
 from src.tools import generateSet
+from src.models.MCGT import loadMCGT
+from src.models.HMM import loadHMM
+from os import remove
+
 m = modelMCGT_REBER()
+
 m.pprint()
 print(m.observations())
 print(m.tau(0,1,'B'))
@@ -11,3 +16,29 @@ s = generateSet(m,10,5)
 print(s)
 
 print(m.logLikelihood(s))
+
+m.save("test_save.txt")
+
+m2 = loadMCGT("test_save.txt")
+m2.pprint()
+
+
+m = modelHMM4()
+
+m.pprint()
+print(m.observations())
+print(m.tau(0,2,'y'))
+print(m.tau(0,1,'y'))
+print(m.tau(0,1,'V'))
+
+s = generateSet(m,10,5)
+print(s)
+
+print(m.logLikelihood(s))
+
+m.save("test_save.txt")
+
+m2 = loadHMM("test_save.txt")
+m2.pprint()
+
+remove("test_save.txt")
