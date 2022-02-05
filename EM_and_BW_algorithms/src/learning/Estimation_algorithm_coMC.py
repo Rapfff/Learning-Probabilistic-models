@@ -145,13 +145,13 @@ class Estimation_algorithm_coMC:
 				l = [ correct_proba([a[s][i]/den[s] for i in range(len(list_sta))]) , list_sta]
 				d = {}
 				for ss in range(self.nb_states):
-					if l[0][ss] > 0.00001:
+					if l[0][ss] > 0.0:
 						d[ss] = [num_mu[s][ss]/den2[s][ss], num_d[s][ss]/(2*den2[s][ss])]
 				new_states.append(coMC_state(l,d))
 
 			self.hhat = coMC(new_states,self.h.initial_state)
-			#self.hhat.pprint()
-			#print()
+			self.hhat.pprint()
+			print()
 			
 			counter += 1
 			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
