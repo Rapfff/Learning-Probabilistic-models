@@ -191,21 +191,21 @@ def modelCTMC_REBER():
 	return CTMC([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5,g_s6],0,"CTMC_REBER")
 
 # ---- coMC ---------------------------
-def modelCOMC_random(nb_states):
+def modelCOMC_random(nb_states,min_mu=-2.0,max_mu=2.0,min_std=0.5,max_std=2.0):
 	#mu between -2 and 2
-	#sd between -2 and 2
+	#sd between 0 and 2
 	s = [i for i in range(nb_states)]
 	states = []
 	for i in range(nb_states):
 		d = {}
 		for j in range(nb_states):
-			d[j] = [round(uniform(-2.0,2.0),3),round(uniform(-2.0,2.0),3)]
+			d[j] = [round(uniform(min_mu,max_mu),3),round(uniform(min_std,max_std),3)]
 		states.append(coMC_state([randomProbabilities(nb_states),s],d))
 	return coMC(states,0,"coMC_random_"+str(nb_states)+"states")
 
 def modelCOMC1():
 	s0 = coMC_state([[0.2,0.8],[0,1]],{0:[0.0,1.0],1:[1.0,1.0]})
-	s1 = coMC_state([[1.0],[0]],{0:[0.0,1.5]})
+	s1 = coMC_state([[1.0],[0]],{0:[0.5,1.5]})
 	return coMC([s0,s1],0,"coMC1")
 
 
