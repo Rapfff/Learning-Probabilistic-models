@@ -8,6 +8,7 @@ from math import exp, pi
 def normpdf(x, params, variation=0.01):
 	return norm.cdf(x+variation,params[0],params[1]) - norm.cdf(x-variation,params[0],params[1])
 
+
 def loadSet(file_path):
 	res_set = [[],[]]
 	f = open(file_path,'r')
