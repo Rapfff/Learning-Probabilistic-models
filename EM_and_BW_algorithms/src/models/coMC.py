@@ -6,19 +6,16 @@ from tools import resolveRandom, normpdf
 from math import  log
 from ast import literal_eval
 from numpy.random import normal
-from models.MCGT import MCGT
+from models.Model import Model, Model_state
 
-class coMC_state:
+class coMC_state(Model_state):
 
 	def __init__(self,next_matrix,obs_matrix):
 		"""
 		next_matrix = [[proba_transition1,proba_transition2,...],[transition1_state,transition2_state,...]]
 		obs_matrix  = {next_state1: parameters1, next_state2: parameters2...}
 		"""
-		if round(sum(next_matrix[0]),2) < 1.0 and sum(next_matrix[0]) != 0:
-			print("Sum of the probabilies of the next_matrix should be 1 or 0 here it's ",sum(next_matrix[0]))
-			#return False
-		self.next_matrix = next_matrix
+		super().__init__(next_matrix)
 		self.obs_matrix  = obs_matrix
 
 	def next(self):
@@ -28,13 +25,24 @@ class coMC_state:
 		next_obs   = normal(mu,sigma,1)[0]
 		return [next_state,next_obs]
 
-	def g(self,state,obs):
+	def tau(self,state,obs):
 		for i in range(len(self.next_matrix[0])):
 			if self.next_matrix[1][i] == state:
 				p1 = self.next_matrix[0][i]
 				if p1 > 0.0:
 					return p1*normpdf(obs,self.obs_matrix[state])
 		return 0.0
+
+	#def observations(self) doesn't make sense
+
+	def pprint(self,i):
+		print("\n----STATE s",i,"----",sep='')
+		for j in range(len(self.next_matrix[0])):
+			if self.next_matrix[0][j] > 0.000001:
+				print("s",i," - (mean: ",sep="",end="")
+				print(self.obs_matrix[self.next_matrix[1][j]][0],sep='',end='')
+				print(', std: ',self.obs_matrix[self.next_matrix[1][j]][1],sep='',end='')
+				print(") -> s",self.next_matrix[1][j]," : ",self.next_matrix[0][j],sep='')
 
 	def __str__(self):
 		if len(self.next_matrix[0]) == 0: #end state
@@ -52,22 +60,10 @@ class coMC_state:
 			return res
 
 
-class coMC(MCGT):
+class coMC(Model):
 	def __init__(self,states,initial_state,name="unknown coMC"):
 		super().__init__(states,initial_state,name)
 
-	def pprint(self):
-		print(self.name)
-		print(self.initial_state)
-		for i in range(len(self.states)):
-			print("\n----STATE s",i,"----",sep='')
-			for j in range(len(self.states[i].next_matrix[0])):
-				if self.states[i].next_matrix[0][j] > 0.000001:
-					print("s",i," - (mean: ",sep="",end="")
-					print(self.states[i].obs_matrix[self.states[i].next_matrix[1][j]][0],sep='',end='')
-					print(', std: ',self.states[i].obs_matrix[self.states[i].next_matrix[1][j]][1],sep='',end='')
-					print(") -> s",self.states[i].next_matrix[1][j]," : ",self.states[i].next_matrix[0][j],sep='')
-		print()
 
 def loadcoMC(file_path):
 	f = open(file_path,'r')
