@@ -7,6 +7,7 @@ from src.models.MCGT import *
 from src.models.CTMC import *
 from src.models.MDP import *
 from src.models.coMC import *
+from src.models.coHMM import *
 from src.tools import randomProbabilities
 from random import random, uniform
 
@@ -70,6 +71,22 @@ def modelHMM_random(number_states, alphabet):
 	for s in range(number_states):
 		states.append(HMM_state([randomProbabilities(len(alphabet)),alphabet],[randomProbabilities(number_states),list(range(number_states))]))
 	return HMM(states,0)
+
+# ---- coHMM ---------------------------
+def modelCOHMM_random(nb_states,min_mu=-2.0,max_mu=2.0,min_std=0.5,max_std=2.0):
+	#mu between -2 and 2
+	#sd between 0 and 2
+	s = [i for i in range(nb_states)]
+	states = []
+	for i in range(nb_states):
+		d = [round(uniform(min_mu,max_mu),3),round(uniform(min_std,max_std),3)]
+		states.append(coHMM_state([randomProbabilities(nb_states),s],d))
+	return coHMM(states,0,"coHMM_random_"+str(nb_states)+"states")
+
+def modelCOHMM1():
+	s0 = coHMM_state([[0.2,0.8],[0,1]],[0.0,1.0])
+	s1 = coHMM_state([[1.0],[0]],[0.5,1.5])
+	return coHMM([s0,s1],0,"coHMM1")
 
 # ---- MCGT ---------------------------
 
