@@ -14,7 +14,7 @@ class BW_HMM(BW):
 		"""
 		h is a HMM
 		"""
-		super().__init__()
+		super().__init__(initial_model)
 
 	def processWork(self,sequence,times):
 		alpha_matrix = self.computeAlphas(sequence)
@@ -43,7 +43,7 @@ class BW_HMM(BW):
 			return [den,num_a,num_b,proba_seq,times]
 		return False
 
-	def generateHhat(self):
+	def generateHhat(self,traces):
 		den = []
 		for s in range(self.nb_states):
 			den.append(0.0)
@@ -78,5 +78,5 @@ class BW_HMM(BW):
 			lb = [ correct_proba([b[s][i]/den[s] for i in range(len(self.observations))]) , self.observations]
 			new_states.append(HMM_state(lb,la))
 
-		return HMM(new_states,self.h.initial_state)
+		return [HMM(new_states,self.h.initial_state),currentloglikelihood]
 

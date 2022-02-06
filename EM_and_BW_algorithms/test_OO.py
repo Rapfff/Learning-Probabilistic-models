@@ -1,11 +1,13 @@
-from examples.examples_models import modelMCGT_REBER, modelHMM4, modelCOMC1, modelCOHMM1
+from examples.examples_models import modelMCGT_REBER, modelMCGT_random, modelHMM_random, modelHMM4, modelCOMC1, modelCOHMM1
 from src.tools import generateSet
 from src.models.MCGT import loadMCGT
 from src.models.HMM import loadHMM
 from src.models.coMC import loadcoMC
 from src.models.coHMM import loadcoHMM
+from src.learning.BW_HMM import BW_HMM
+from src.learning.BW_MCGT import BW_MCGT
 from os import remove
-"""
+
 m = modelMCGT_REBER()
 
 m.pprint()
@@ -19,10 +21,11 @@ print(s)
 
 print(m.logLikelihood(s))
 
-m.save("test_save.txt")
+m2 = modelMCGT_random(7,m.observations())
+algo = BW_MCGT(m2)
+m3 = algo.learn(s)
+m3.pprint()
 
-m2 = loadMCGT("test_save.txt")
-m2.pprint()
 ###########################################################
 
 m = modelHMM4()
@@ -38,10 +41,13 @@ print(s)
 
 print(m.logLikelihood(s))
 
-m.save("test_save.txt")
+m2 = modelMCGT_random(5,m.observations())
+algo = BW_MCGT(m2)
+m3 = algo.learn(s)
+m3.pprint()
 
-m2 = loadHMM("test_save.txt")
-m2.pprint()
+remove("output_model.txt")
+"""
 ###########################################################
 
 m = modelCOMC1()
@@ -61,7 +67,7 @@ m.save("test_save.txt")
 m2 = loadcoMC("test_save.txt")
 m2.pprint()
 ###########################################################
-"""
+
 m = modelCOHMM1()
 
 m.pprint()
@@ -80,5 +86,5 @@ m2 = loadcoHMM("test_save.txt")
 m2.pprint()
 
 remove("test_save.txt")
-
+"""
 

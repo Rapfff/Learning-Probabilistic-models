@@ -14,7 +14,7 @@ class BW_MCGT(BW):
 		"""
 		h is a MCGT
 		"""
-		super().__init__()
+		super().__init__(initial_model)
 
 	def processWork(self,sequence,times):
 		alpha_matrix = self.computeAlphas(sequence)
@@ -46,7 +46,7 @@ class BW_MCGT(BW):
 			return [den,num, proba_seq,times]
 		return False
 
-	def generateHhat(self):
+	def generateHhat(self,traces):
 		den = []
 		for s in range(self.nb_states):
 			den.append(0.0)
@@ -79,4 +79,4 @@ class BW_MCGT(BW):
 			l = [ correct_proba([tau[s][i]/den[s] for i in range(len(list_sta))]) , list_sta, list_obs ]
 			new_states.append(MCGT_state(l))
 
-		return MCGT(new_states,self.h.initial_state)
+		return [MCGT(new_states,self.h.initial_state),currentloglikelihood]
