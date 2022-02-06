@@ -70,6 +70,12 @@ class coHMM(Model):
 	def __init__(self,states,initial_state,name="unknown HMM"):
 		super().__init__(states,initial_state,name)
 
+	def a(self,s1,s2):
+		return self.states[s1].a(s2)
+
+	def b(self,s,o):
+		return self.states[s].b(o)
+
 
 def loadcoHMM(file_path):
 	f = open(file_path,'r')
