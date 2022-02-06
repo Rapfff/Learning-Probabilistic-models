@@ -4,6 +4,7 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from multiprocessing import cpu_count, Pool
 NB_PROCESS = cpu_count()-1
+from datetime import datetime
 
 class BW:
 	def __init__(self,initial_model):
@@ -80,7 +81,7 @@ class BW:
 		counter = 0
 		prevloglikelihood = 10
 		while True:
-			#print(datetime.datetime.now(),pp,counter, prevloglikelihood)
+			#print(datetime.now(),pp,counter, prevloglikelihood)
 			self.hhat, currentloglikelihood = self.generateHhat(traces)
 			
 			counter += 1

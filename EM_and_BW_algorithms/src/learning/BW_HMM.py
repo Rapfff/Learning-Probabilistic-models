@@ -8,6 +8,7 @@ from multiprocessing import cpu_count, Pool
 from time import time
 from tools import correct_proba
 import datetime
+from math import log
 
 class BW_HMM(BW):
 	def __init__(self,initial_model):
@@ -33,12 +34,12 @@ class BW_HMM(BW):
 			num_b = []
 			for s in range(self.nb_states):
 				num_a.append([0.0 for i in range(self.nb_states)])
-				num_b.append([0.0 for i in range(self.observations)])
+				num_b.append([0.0 for i in range(len(self.observations))])
 				for t in range(len(sequence)):
 					observation = sequence[t]
 					for ss in range(self.nb_states):
-						num_a[ss] += alpha_matrix[s][t]*self.h.a(s,ss)*self.h.b(s,observation)*beta_matrix[ss][t+1]
-						num_b[self.observations.index(observation)] += alpha_matrix[s][t]*beta_matrix[s][t]
+						num_a[-1][ss] += alpha_matrix[s][t]*self.h.a(s,ss)*self.h.b(s,observation)*beta_matrix[ss][t+1]*times/proba_seq
+						num_b[-1][self.observations.index(observation)] += alpha_matrix[s][t]*beta_matrix[s][t]*times/proba_seq
 			####################
 			return [den,num_a,num_b,proba_seq,times]
 		return False
@@ -51,8 +52,8 @@ class BW_HMM(BW):
 		for s in range(self.nb_states):
 			a.append([0 for i in range(self.nb_states)])
 		b = []
-		for s in range(len(self.observations)):
-			b.append([0 for i in range(self.observations)])
+		for s in range(self.nb_states):
+			b.append([0 for i in range(len(self.observations))])
 		
 		p = Pool(processes = NB_PROCESS)
 		tasks = []

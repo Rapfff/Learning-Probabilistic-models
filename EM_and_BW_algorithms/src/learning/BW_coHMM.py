@@ -2,15 +2,15 @@ import os, sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
-from models.HMM import *
+from models.coHMM import *
 from learning.BW import *
 from multiprocessing import cpu_count, Pool
 from time import time
 from tools import correct_proba
 import datetime
-from math import sqrt
+from math import sqrt, log
 
-class BW_HMM(BW):
+class BW_coHMM(BW):
 	def __init__(self,initial_model):
 		"""
 		h is a HMM
@@ -41,9 +41,9 @@ class BW_HMM(BW):
 					observation = sequence[t]
 					for ss in range(self.nb_states):
 						gamma = alpha_matrix[s][t]*beta_matrix[s][t]
-						num_a[ss]  += alpha_matrix[s][t]*self.h.a(s,ss)*self.h.b(s,observation)*beta_matrix[ss][t+1]
-						num_mu[-1] += gamma*observation
-						num_va[-1] += gamma*(observation-self.h.states[s].output_parameters[0])**2
+						num_a[-1][ss]  += alpha_matrix[s][t]*self.h.a(s,ss)*self.h.b(s,observation)*beta_matrix[ss][t+1]*times/proba_seq
+						num_mu[-1] += gamma*observation*times/proba_seq
+						num_va[-1] += gamma*(observation-self.h.states[s].output_parameters[0])**2*times/proba_seq
 			####################
 			return [den,num_a,num_mu,num_va,proba_seq,times]
 		return False
@@ -80,7 +80,7 @@ class BW_HMM(BW):
 		for s in range(self.nb_states):
 			la = [ correct_proba([a[s][i]/den[s] for i in range(self.nb_states)]) , list(range(self.nb_states))]
 			lb = [mu[s]/den[s],sqrt(std[s]/den[s])]
-			new_states.append(HMM_state(la,lb))
+			new_states.append(coHMM_state(la,lb))
 
-		return [HMM(new_states,self.h.initial_state),currentloglikelihood]
+		return [coHMM(new_states,self.h.initial_state),currentloglikelihood]
 
