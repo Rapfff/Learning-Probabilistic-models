@@ -2,7 +2,7 @@ import os, sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
-from learning.Estimation_algorithm_MDP import Estimation_algorithm_MDP
+from learning.BW_MDP import BW_MDP
 from models.MDP import MemorylessScheduler, loadMDP
 from tools import resolveRandom, mergeSets
 from multiprocessing import cpu_count, Pool
@@ -59,7 +59,7 @@ class Active_Learning_MDP:
 		h is a MDP
 		alphabet is a list of the possible observations (list of strings)
 		"""
-		self.algo  = Estimation_algorithm_MDP(h,alphabet,actions)
+		self.algo  = BW_MDP(h,alphabet,actions)
 		self.nb_states = len(h.states)
 
 	def learn(self,lr,nb_sequences,max_iteration,objective,epsilon_greedy=0.1,output_folder="active_learning_models",epsilon=0.01,pp=''):
