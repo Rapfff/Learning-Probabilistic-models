@@ -6,16 +6,15 @@ sys.path.append(parentdir)
 
 import numpy as np
 import matplotlib.pyplot as plt
-from statistics import mean
+from statistics import mean, stdev
 from scipy.signal import hilbert
 from math import exp
 from experiment.nox.edfreader import EDFreader
-from src.learning.Estimation_algorithm_MCGT import Estimation_algorithm_MCGT
 from examples.examples_models import modelMCGT_random
 from src.tools import saveSet, loadSet
 
 
-EDF_FILE   = "eh_20210211.edf"
+EDF_FILE   = "C:/Users/rafr7/Desktop/nox/eh_20210211.edf"
 EVENT_FILE = "Event_Grid.csv"
 SIZE_ALPHABET = 10
 #SIGNALS
@@ -127,7 +126,9 @@ def read_files():
 		if not s in stages:
 			stages.append(s)
 			x_stages[s] = []
-		x_stages[s].append([c+i for i in range(-1,d,1)])
+		#x_stages[s].append([c+i for i in range(-1,d,1)])
+		for i in range(-1,d,1):
+			x_stages[s].append(c+i)
 		l = events.readline()
 		c += d
 	events.close()
@@ -148,22 +149,52 @@ def write_training_sets(hil,stages,x_stages):
 					t.append(1)
 		saveSet([seq,t],str(s)+"_training.txt")
 
-def discretize(hil):
-	m1 = min(hil)
-	m2 = max(hil)-m1
-	hil = [100*(i-m1)/m2 for i in hil]
-	hil_sorted = hil[:]
-	hil_sorted.sort()
-
-	for i in range(len(hil)):
-		for j in range(1,SIZE_ALPHABET+1):
-			if hil[i] <= hil_sorted[int((j*len(hil_sorted)/SIZE_ALPHABET)-1)]:
-				hil[i] = j
-				break
-	return hil
-
 hil, stages, x_stages = read_files()
-hil = discretize(hil)
+mu  = mean(hil)
+std = stdev(hil)
+
+hil = [(i-mu)/std for i in hil] #normalizing
+mu   = {}
+var  = {}
+trans= {}
+for s in stages:
+	mu[s]    = 0.0
+	var[s]   = 0.0
+	trans[s] = [0.0 for i in range(len(stages))]
+
+for s in stages:
+	if 0 in x_stages[s]:
+		break
+
+for step in range(len(hil)-1):
+	mu[s] += hil[step]
+	for ss in stages:
+		if step+1 in x_stages[ss]:
+			break
+	trans[s][stages.index(ss)] += 1
+	s = ss
+mu[s] += hil[-1]
+for s in stages:
+	mu[s] /= len(x_stages[s])
+	trans[s] = [j/len(x_stages[s]) for j in trans[s]]
+
+for step in range(len(hil)-1):
+	for s in stages:
+		if step+1 in x_stages[s]:
+			break
+	var[s] += (hil[step]-mu[s])**2
+for s in stages:
+	var[s] /= len(x_stages[s])
+	print("\nSTAGE",s,"*****************")
+	print("Mean    :",round(mu[s],5))
+	print("Variance:",round(var[s],5))
+	for ss in stages:
+		print(s,"=>",ss,":",round(100*trans[s][stages.index(ss)],5),"%")
+	
+
+	
+	
+"""
 write_training_sets(hil,stages,x_stages)
 
 model_stages = []
@@ -174,8 +205,7 @@ for s in stages:
 	algo.learn(loadSet(str(s)+"_training.txt"))
 	model_stages[-1] = algo.learn(loadSet(str(s)+"_training.txt"),output_file=str(s)+"_model.txt",pp=str(s))	
 
-
-
+"""
 
 
 
@@ -185,6 +215,11 @@ for s in stages:
 #séparer le training set pour chaque stage
 #train un model par stage sur son training set
 #pour sequence de 30 secondes (30 hilbert values), calculer la proba que chaque model génere cette  sequence
+
+
+
+
+
 
 """
 fig, ax = plt.subplots()
