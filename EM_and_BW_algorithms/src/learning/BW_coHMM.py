@@ -5,9 +5,7 @@ sys.path.append(parentdir)
 from models.coHMM import *
 from learning.BW import *
 from multiprocessing import cpu_count, Pool
-from time import time
 from tools import correct_proba
-import datetime
 from math import sqrt, log
 
 class BW_coHMM(BW):
@@ -41,7 +39,7 @@ class BW_coHMM(BW):
 					observation = sequence[t]
 					for ss in range(self.nb_states):
 						gamma = alpha_matrix[s][t]*beta_matrix[s][t]
-						num_a[-1][ss]  += alpha_matrix[s][t]*self.h.a(s,ss)*self.h.b(s,observation)*beta_matrix[ss][t+1]*times/proba_seq
+						num_a[-1][ss]  += alpha_matrix[s][t]*self.h.tau(s,ss,observation)*beta_matrix[ss][t+1]*times/proba_seq
 						num_mu[-1] += gamma*observation*times/proba_seq
 						num_va[-1] += gamma*(observation-self.h.states[s].output_parameters[0])**2*times/proba_seq
 			####################

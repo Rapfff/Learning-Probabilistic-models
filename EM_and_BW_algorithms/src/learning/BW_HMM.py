@@ -5,9 +5,7 @@ sys.path.append(parentdir)
 from models.HMM import *
 from learning.BW import *
 from multiprocessing import cpu_count, Pool
-from time import time
 from tools import correct_proba
-import datetime
 from math import log
 
 class BW_HMM(BW):

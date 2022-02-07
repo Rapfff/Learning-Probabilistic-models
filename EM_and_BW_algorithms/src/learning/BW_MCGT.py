@@ -5,9 +5,7 @@ sys.path.append(parentdir)
 from models.MCGT import *
 from learning.BW import *
 from multiprocessing import cpu_count, Pool
-from time import time
 from tools import correct_proba
-import datetime
 
 class BW_MCGT(BW):
 	def __init__(self,initial_model):

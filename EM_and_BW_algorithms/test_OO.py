@@ -1,6 +1,7 @@
 from examples.examples_models import modelMCGT_REBER, modelMCGT_random
-from examples.examples_models import modelHMM_random, modelHMM4, modelCOMC1
+from examples.examples_models import modelHMM_random, modelHMM4
 from examples.examples_models import modelCOHMM1, modelCOHMM_random
+from examples.examples_models import modelCOMC1, modelCOMC_random
 
 from src.tools import generateSet
 from src.models.MCGT import loadMCGT
@@ -10,6 +11,7 @@ from src.models.coHMM import loadcoHMM
 from src.learning.BW_HMM import BW_HMM
 from src.learning.BW_MCGT import BW_MCGT
 from src.learning.BW_coHMM import BW_coHMM
+from src.learning.BW_coMC import BW_coMC
 from os import remove
 """
 m = modelMCGT_REBER()
@@ -51,7 +53,7 @@ m3 = algo.learn(s)
 m3.pprint()
 
 remove("output_model.txt")
-
+"""
 ###########################################################
 
 m = modelCOMC1()
@@ -68,10 +70,14 @@ print(m.logLikelihood(s))
 
 m.save("test_save.txt")
 
-m2 = loadcoMC("test_save.txt")
-m2.pprint()
+
+m2 = modelCOMC_random(2,min_mu=0.0,max_mu=1.0,min_std=0.5,max_std=2.0)
+algo = BW_coMC(m2)
+m3 = algo.learn(s)
+m3.pprint()
+remove("output_model.txt")
 ###########################################################
-"""
+
 
 m = modelCOHMM1()
 

@@ -71,12 +71,6 @@ class BW:
 		traces = [[trace1,trace2,...],[number_of_trace1,number_of_trace2,...]]
 		trace = [obs1,obs2,...,obsx]
 		"""
-		
-		self.observations = []
-		for seq in traces[0]:
-			for i in list(set(seq)):
-				if not i in self.observations:
-					self.observations.append(i)
 
 		counter = 0
 		prevloglikelihood = 10
