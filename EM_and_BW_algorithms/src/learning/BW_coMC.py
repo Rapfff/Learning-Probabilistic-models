@@ -45,11 +45,12 @@ class BW_coMC(BW):
 
 	def generateHhat(self,traces):
 		den = []
+		num_a = []
+		mu = []
+		std = []
 		for s in range(self.nb_states):
 			den.append(0.0)
-		a = []
-		for s in range(self.nb_states):
-			a.append(  [0.0 for i in range(self.nb_states)])
+			num_a.append(  [0.0 for i in range(self.nb_states)])
 			mu.append( [ 0.0 for i in range(self.nb_states)])
 			std.append([ 0.0 for i in range(self.nb_states)])
 			
@@ -66,16 +67,16 @@ class BW_coMC(BW):
 			den[s] = sum([i[0][s] for i in temp])
 				
 			for x in range(self.nb_states):
-				a[s][x]   = sum([i[1][s][x] for i in temp])
+				num_a[s][x]   = sum([i[1][s][x] for i in temp])
 				mu[s][x]  = sum([i[2][s][x] for i in temp])
 				std[s][x] = sum([i[3][s][x] for i in temp])
 
 		new_states = []
 		for s in range(self.nb_states):
-			la = [ correct_proba([a[s][i]/den[s] for i in range(self.nb_states)]) , list(range(self.nb_states))]
+			la = [ correct_proba([num_a[s][i]/den[s] for i in range(self.nb_states)]) , list(range(self.nb_states))]
 			d = {}
 			for ss in range(self.nb_states):
-				d[ss] = [mu[s][ss]/den[s][ss],sqrt(std[s]/den[s])]
+				d[ss] = [mu[s][ss]/num_a[s][ss],sqrt(std[s][ss]/num_a[s][ss])]
 			new_states.append(coMC_state(la,d))
 
 		return [coMC(new_states,self.h.initial_state),currentloglikelihood]

@@ -36,12 +36,12 @@ class coMC_state(Model_state):
 	#def observations(self) doesn't make sense
 
 	def pprint(self,i):
-		print("\n----STATE s",i,"----",sep='')
+		print("----STATE s",i,"----",sep='')
 		for j in range(len(self.next_matrix[0])):
 			if self.next_matrix[0][j] > 0.000001:
 				print("s",i," - (mean: ",sep="",end="")
-				print(self.obs_matrix[self.next_matrix[1][j]][0],sep='',end='')
-				print(', std: ',self.obs_matrix[self.next_matrix[1][j]][1],sep='',end='')
+				print(round(self.obs_matrix[self.next_matrix[1][j]][0],4),sep='',end='')
+				print(', std: ',round(self.obs_matrix[self.next_matrix[1][j]][1],4),sep='',end='')
 				print(") -> s",self.next_matrix[1][j]," : ",self.next_matrix[0][j],sep='')
 
 	def __str__(self):

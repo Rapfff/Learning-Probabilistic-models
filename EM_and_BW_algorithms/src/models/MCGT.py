@@ -28,7 +28,7 @@ class MCGT_state(Model_state):
 		return list(set(self.next_matrix[2]))
 
 	def pprint(self,i):
-		print("\n----STATE s",i,"----",sep='')
+		print("----STATE s",i,"----",sep='')
 		for j in range(len(self.next_matrix[0])):
 			if self.next_matrix[0][j] > 0.000001:
 				print("s",i," - (",self.next_matrix[2][j],") -> s",self.next_matrix[1][j]," : ",self.next_matrix[0][j],sep='')

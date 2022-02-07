@@ -48,8 +48,8 @@ class coHMM_state(Model_state):
 			if self.next_matrix[0][j] > 0.000001:
 				print("s",i," -> s",self.next_matrix[1][j]," : ",self.next_matrix[0][j],sep='')
 		print("************")
-		print("mean:",self.output_parameters[0])
-		print("std :",self.output_parameters[1])
+		print("mean:",round(self.output_parameters[0],4))
+		print("std :",round(self.output_parameters[1],4))
 
 	def __str__(self):
 		if len(self.next_matrix[0]) == 0: #end state

@@ -80,8 +80,8 @@ class Model:
 		return output
 
 	def pprint(self):
-		print(self.name)
-		print(self.initial_state)
+		print("Name:",self.name)
+		print("Initial state: s",self.initial_state,sep='')
 		for i in range(len(self.states)):
 			self.states[i].pprint(i)
 		print()

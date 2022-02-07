@@ -79,11 +79,12 @@ class BW:
 			self.hhat, currentloglikelihood = self.generateHhat(traces)
 			
 			counter += 1
+			self.h = self.hhat
 			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
 				break
 			else:
 				prevloglikelihood = currentloglikelihood
-				self.h = self.hhat
+				
 
 		self.h.save(output_file)
 		return self.h

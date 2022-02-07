@@ -59,14 +59,8 @@ remove("output_model.txt")
 m = modelCOMC1()
 
 m.pprint()
-print(m.tau(0,1,1.0))
-print(m.tau(0,0,1.0))
-print(m.tau(0,2,0.0))
 
 s = generateSet(m,10,5)
-print(s)
-
-print(m.logLikelihood(s))
 
 m.save("test_save.txt")
 
@@ -75,6 +69,7 @@ m2 = modelCOMC_random(2,min_mu=0.0,max_mu=1.0,min_std=0.5,max_std=2.0)
 algo = BW_coMC(m2)
 m3 = algo.learn(s)
 m3.pprint()
+print(m2.logLikelihood(s),m3.logLikelihood(s))
 remove("output_model.txt")
 ###########################################################
 
@@ -82,17 +77,12 @@ remove("output_model.txt")
 m = modelCOHMM1()
 
 m.pprint()
-print(m.tau(0,1,1.0))
-print(m.tau(0,0,1.0))
-print(m.tau(0,2,0.0))
 
 s = generateSet(m,10,5)
-print(s)
-
-print(m.logLikelihood(s))
 
 m2 = modelCOHMM_random(2,min_mu=0.0,max_mu=1.0,min_std=0.0,max_std=2.0)
 algo = BW_coHMM(m2)
 m3 = algo.learn(s)
 m3.pprint()
+print(m2.logLikelihood(s),m3.logLikelihood(s))
 remove("output_model.txt")
