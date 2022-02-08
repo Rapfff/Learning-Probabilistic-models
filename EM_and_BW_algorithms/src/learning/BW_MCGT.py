@@ -29,7 +29,7 @@ class BW_MCGT(BW):
 			####################
 			num = []
 			for s in range(self.nb_states):
-				num.append([0.0 for i in range(self.nb_states*len(self.observations))])
+				num.append([0.0 for i in range(self.nb_states*len(self.h.observations()))])
 				for t in range(len(sequence)):
 					observation = sequence[t]
 					for ss in range(self.nb_states):
@@ -39,7 +39,7 @@ class BW_MCGT(BW):
 								p = self.h.states[s].next_matrix[0][i]
 								break
 						if p != 0.0:
-							num[-1][ss*len(self.observations)+self.observations.index(observation)] += alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
+							num[-1][ss*len(self.h.observations())+self.h.observations().index(observation)] += alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
 			####################
 			num_init = [alpha_matrix[s][0] for s in range(self.nb_states)]
 			return [den,num, proba_seq,times,num_init]
@@ -51,7 +51,7 @@ class BW_MCGT(BW):
 			den.append(0.0)
 		tau = []
 		for s in range(self.nb_states):
-			tau.append([0 for i in range(self.nb_states*len(self.observations))])
+			tau.append([0 for i in range(self.nb_states*len(self.h.observations()))])
 		
 		p = Pool(processes = NB_PROCESS)
 		tasks = []
@@ -71,14 +71,14 @@ class BW_MCGT(BW):
 		for s in range(self.nb_states):
 			den[s] = sum([i[0][s] for i in temp])
 				
-			for x in range(self.nb_states*len(self.observations)):
+			for x in range(self.nb_states*len(self.h.observations())):
 				tau[s][x] = sum([i[1][s][x] for i in temp])
 
 		list_sta = []
 		for i in range(self.nb_states):
-			for o in self.observations:
+			for o in self.h.observations():
 				list_sta.append(i)
-		list_obs = self.observations*self.nb_states
+		list_obs = self.h.observations()*self.nb_states
 		new_states = []
 		for s in range(self.nb_states):
 			l = [ correct_proba([tau[s][i]/den[s] for i in range(len(list_sta))]) , list_sta, list_obs ]
