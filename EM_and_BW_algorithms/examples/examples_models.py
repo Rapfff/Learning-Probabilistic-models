@@ -66,11 +66,16 @@ def modelHMM4():
 	h_s4 = HMM_state([[1.0],['y']],[[1.0],[3]])
 	return HMM([h_s0,h_s1,h_s2,h_s3,h_s4],0,"HMM4")
 
-def modelHMM_random(number_states, alphabet):
+def modelHMM_random(number_states, alphabet, random_initial_model=False):
 	states = []
 	for s in range(number_states):
 		states.append(HMM_state([randomProbabilities(len(alphabet)),alphabet],[randomProbabilities(number_states),list(range(number_states))]))
-	return HMM(states,0)
+
+	if random_initial_model:
+		init = randomProbabilities(nb_states)
+	else:
+		init = 0
+	return HMM(states,init)
 
 # ---- coHMM ---------------------------
 def modelCOHMM_random(nb_states,min_mu=-2.0,max_mu=2.0,min_std=0.5,max_std=2.0):
@@ -81,7 +86,11 @@ def modelCOHMM_random(nb_states,min_mu=-2.0,max_mu=2.0,min_std=0.5,max_std=2.0):
 	for i in range(nb_states):
 		d = [round(uniform(min_mu,max_mu),3),round(uniform(min_std,max_std),3)]
 		states.append(coHMM_state([randomProbabilities(nb_states),s],d))
-	return coHMM(states,0,"coHMM_random_"+str(nb_states)+"states")
+	if random_initial_model:
+		init = randomProbabilities(nb_states)
+	else:
+		init = 0
+	return coHMM(states,init,"coHMM_random_"+str(nb_states)+"states")
 
 def modelCOHMM1():
 	s0 = coHMM_state([[0.2,0.8],[0,1]],[0.0,1.0])
@@ -163,7 +172,7 @@ def modelMCGT_equiprobable(nb_states,alphabet):
 		states.append(MCGT_state([[1/len(obs)]*len(obs),s,obs]))
 	return MCGT(states,0,"MCGT_equiprobable_"+str(nb_states)+"states")
 
-def modelMCGT_random(nb_states,alphabet):
+def modelMCGT_random(nb_states,alphabet,random_initial_model=False):
 	s = []
 	for i in range(nb_states):
 		s += [i] * len(alphabet)
@@ -172,7 +181,12 @@ def modelMCGT_random(nb_states,alphabet):
 	states = []
 	for i in range(nb_states):
 		states.append(MCGT_state([randomProbabilities(len(obs)),s,obs]))
-	return MCGT(states,0,"MCGT_random_"+str(nb_states)+"states")
+	
+	if random_initial_model:
+		init = randomProbabilities(nb_states)
+	else:
+		init = 0
+	return MCGT(states,init,"MCGT_random_"+str(nb_states)+"states")
 
 def modelMCGT1_equiprobable():
 	return modelMCGT_equiprobable(5,['x','y','a','b','c','d'])
@@ -218,7 +232,11 @@ def modelCOMC_random(nb_states,min_mu=-2.0,max_mu=2.0,min_std=0.5,max_std=2.0):
 		for j in range(nb_states):
 			d[j] = [round(uniform(min_mu,max_mu),3),round(uniform(min_std,max_std),3)]
 		states.append(coMC_state([randomProbabilities(nb_states),s],d))
-	return coMC(states,0,"coMC_random_"+str(nb_states)+"states")
+	if random_initial_model:
+		init = randomProbabilities(nb_states)
+	else:
+		init = 0
+	return coMC(states,init,"coMC_random_"+str(nb_states)+"states")
 
 def modelCOMC1():
 	s0 = coMC_state([[0.2,0.8],[0,1]],{0:[0.0,1.0],1:[1.0,1.0]})
