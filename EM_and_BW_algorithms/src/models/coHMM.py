@@ -80,7 +80,7 @@ class coHMM(Model):
 def loadcoHMM(file_path):
 	f = open(file_path,'r')
 	name = f.readline()[:-1]
-	initial_state = int(f.readline()[:-1])
+	initial_state = literal_eval(f.readline()[:-1])
 	states = []
 	
 	l = f.readline()

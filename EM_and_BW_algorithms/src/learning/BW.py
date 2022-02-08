@@ -23,10 +23,8 @@ class BW:
 		"""Here we compute all the values alpha(k,t) for a given sequence"""
 		alpha_matrix = []
 		for i in range(self.nb_states):
-			if i == self.h.initial_state:
-				alpha_matrix.append([1.0])
-			else:
-				alpha_matrix.append([0.0])
+			alpha_matrix.append([self.initial_state[s]])
+			alpha_matrix[-1] += [None for i in range(len_seq)]
 
 		for k in range(len(sequence)):
 			for s in range(self.nb_states):

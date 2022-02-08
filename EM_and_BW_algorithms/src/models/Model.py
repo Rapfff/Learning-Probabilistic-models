@@ -1,4 +1,5 @@
 from math import  log
+from tools import resolveRandom
 
 class Model_state:
 
@@ -36,7 +37,12 @@ class Model_state:
 class Model:
 
 	def __init__(self,states,initial_state,name):
-		self.initial_state = initial_state
+		# initial_state can be a list of probability or an int
+		if type(initial_state) == int:
+			self.initial_state = [0.0 for i in range(len(states))]
+			self.initial_state[initial_state] = 1.0
+		else:
+			self.initial_state = initial_state
 		self.states = states
 		self.name = name
 
@@ -63,14 +69,11 @@ class Model:
 		return list(set(res))
 
 	def pi(self,s):
-		if s == self.initial_state:
-			return 1.0
-		else:
-			return 0.0
-			
+		return self.initial_state[s]
+
 	def run(self,number_steps):
 		output = []
-		current = self.initial_state
+		current = resolveRandom(self.initial_state)
 
 		while len(output) < number_steps:
 			[next_state, symbol] = self.states[current].next()
@@ -81,7 +84,14 @@ class Model:
 
 	def pprint(self):
 		print("Name:",self.name)
-		print("Initial state: s",self.initial_state,sep='')
+		if 1.0 in self.initial_state:
+			print("Initial state: s",self.initial_state,sep='')
+		else:
+			print("Initial state: ",end='')
+			for i in range(len(self.states)):
+				if self.initial_state[i] != 0.0:
+					print('s'+str(i)+':',round(self.initial_state[i],3),end=', ')
+			print()
 		for i in range(len(self.states)):
 			self.states[i].pprint(i)
 		print()
@@ -99,10 +109,7 @@ class Model:
 	def initAlphaMatrix(self,len_seq):
 		alpha_matrix = []
 		for s in range(len(self.states)):
-			if s == self.initial_state:
-				alpha_matrix.append([1.0])
-			else:
-				alpha_matrix.append([0.0])
+			alpha_matrix.append([self.initial_state[s]])
 			alpha_matrix[-1] += [None for i in range(len_seq)]
 		return alpha_matrix
 

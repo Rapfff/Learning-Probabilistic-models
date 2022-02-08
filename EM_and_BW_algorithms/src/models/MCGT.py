@@ -4,6 +4,7 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from tools import resolveRandom
 from models.Model import Model, Model_state
+from ast import literal_eval
 from math import  log
 
 class MCGT_state(Model_state):
@@ -71,7 +72,7 @@ def HMMtoMCGT(h):
 def loadMCGT(file_path):
 	f = open(file_path,'r')
 	name = f.readline()[:-1]
-	initial_state = int(f.readline()[:-1])
+	initial_state = literal_eval(f.readline()[:-1])
 	states = []
 	
 	l = f.readline()

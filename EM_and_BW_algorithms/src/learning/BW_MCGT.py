@@ -18,7 +18,7 @@ class BW_MCGT(BW):
 		alpha_matrix = self.computeAlphas(sequence)
 		beta_matrix = self.computeBetas(sequence)
 		
-		proba_seq = beta_matrix[self.h.initial_state][0]
+		proba_seq = sum([alpha_matrix[s][-1] for s in range(self.nb_states)])
 		if proba_seq != 0.0:
 			####################
 			den = []
@@ -41,7 +41,8 @@ class BW_MCGT(BW):
 						if p != 0.0:
 							num[-1][ss*len(self.observations)+self.observations.index(observation)] += alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
 			####################
-			return [den,num, proba_seq,times]
+			num_init = [alpha_matrix[s][0] for s in range(self.nb_states)]
+			return [den,num, proba_seq,times,num_init]
 		return False
 
 	def generateHhat(self,traces):
@@ -60,6 +61,12 @@ class BW_MCGT(BW):
 		
 		temp = [res.get() for res in tasks if res.get() != False]
 		currentloglikelihood = sum([log(i[2])*i[3] for i in temp])
+		sum_of_probas = sum([i[2]*i[3] for i in temp])
+		
+		num_init = [0.0 for s in range(self.nb_states)]
+		for i in temp:
+			for s in range(self.nb_states):
+				num_init[s] += i[4][s]
 
 		for s in range(self.nb_states):
 			den[s] = sum([i[0][s] for i in temp])
@@ -77,4 +84,6 @@ class BW_MCGT(BW):
 			l = [ correct_proba([tau[s][i]/den[s] for i in range(len(list_sta))]) , list_sta, list_obs ]
 			new_states.append(MCGT_state(l))
 
-		return [MCGT(new_states,self.h.initial_state),currentloglikelihood]
+		initial_state = [num_init[s]/sum_of_probas for s in range(self.nb_states)]
+
+		return [MCGT(new_states,initial_state),currentloglikelihood]
