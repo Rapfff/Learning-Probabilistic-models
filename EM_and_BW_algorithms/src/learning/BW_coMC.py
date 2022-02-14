@@ -40,7 +40,7 @@ class BW_coMC(BW):
 						num_mu[-1][ss] += xi*observation
 						num_va[-1][ss] += xi*(observation-self.h.states[s].obs_matrix[ss][0])**2
 			####################
-			num_init = [alpha_matrix[s][0] for s in range(self.nb_states)]
+			num_init = [alpha_matrix[s][0]*beta_matrix[s][0] for s in range(self.nb_states)]
 			return [den_a,num_a,num_mu,num_va,proba_seq,times,num_init]
 		return False
 
@@ -63,6 +63,7 @@ class BW_coMC(BW):
 		
 		temp = [res.get() for res in tasks if res.get() != False]
 		currentloglikelihood = sum([log(i[4])*i[5] for i in temp])
+		sum_proba= sum([i[4]*i[5] for i in temp ])
 
 		num_init = [0.0 for s in range(self.nb_states)]
 		for i in temp:
@@ -85,7 +86,7 @@ class BW_coMC(BW):
 				d[ss] = [mu[s][ss]/num_a[s][ss],sqrt(std[s][ss]/num_a[s][ss])]
 			new_states.append(coMC_state(la,d))
 
-		initial_state = [num_init[s]/sum(traces[1]) for s in range(self.nb_states)]
+		initial_state = [num_init[s]/sum_proba for s in range(self.nb_states)]
 
-		return [coMC(new_states,self.h.initial_state),currentloglikelihood]
+		return [coMC(new_states,initial_state),currentloglikelihood]
 

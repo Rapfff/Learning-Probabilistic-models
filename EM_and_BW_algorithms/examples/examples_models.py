@@ -78,7 +78,7 @@ def modelHMM_random(number_states, alphabet, random_initial_model=False):
 	return HMM(states,init)
 
 # ---- coHMM ---------------------------
-def modelCOHMM_random(nb_states,min_mu=-2.0,max_mu=2.0,min_std=0.5,max_std=2.0):
+def modelCOHMM_random(nb_states,random_initial_model=False,min_mu=0.0,max_mu=2.0,min_std=0.5,max_std=2.0):
 	#mu between -2 and 2
 	#sd between 0 and 2
 	s = [i for i in range(nb_states)]
@@ -222,7 +222,7 @@ def modelCTMC_REBER():
 	return CTMC([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5,g_s6],0,"CTMC_REBER")
 
 # ---- coMC ---------------------------
-def modelCOMC_random(nb_states,min_mu=-2.0,max_mu=2.0,min_std=0.5,max_std=2.0):
+def modelCOMC_random(nb_states,random_initial_model=False,min_mu=0.0,max_mu=2.0,min_std=0.5,max_std=2.0):
 	#mu between -2 and 2
 	#sd between 0 and 2
 	s = [i for i in range(nb_states)]

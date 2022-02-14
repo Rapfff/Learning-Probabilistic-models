@@ -37,9 +37,9 @@ class BW_HMM(BW):
 					observation = sequence[t]
 					for ss in range(self.nb_states):
 						num_a[-1][ss] += alpha_matrix[s][t]*self.h.a(s,ss)*self.h.b(s,observation)*beta_matrix[ss][t+1]*times/proba_seq
-						num_b[-1][self.h.observations().index(observation)] += alpha_matrix[s][t]*beta_matrix[s][t]*times/proba_seq
+					num_b[-1][self.h.observations().index(observation)] += alpha_matrix[s][t]*beta_matrix[s][t]*times/proba_seq
 			####################
-			num_init = [alpha_matrix[s][0] for s in range(self.nb_states)]
+			num_init = [alpha_matrix[s][0]*beta_matrix[s][0] for s in range(self.nb_states)]
 			return [den,num_a,num_b,proba_seq,times,num_init]
 		return False
 
@@ -62,7 +62,8 @@ class BW_HMM(BW):
 		
 		temp = [res.get() for res in tasks if res.get() != False]
 		currentloglikelihood = sum([log(i[3])*i[4] for i in temp])
-		
+		sum_proba= sum([i[3]*i[4] for i in temp ])
+
 		num_init = [0.0 for s in range(self.nb_states)]
 		for i in temp:
 			for s in range(self.nb_states):
@@ -81,8 +82,9 @@ class BW_HMM(BW):
 		for s in range(self.nb_states):
 			la = [ correct_proba([a[s][i]/den[s] for i in range(self.nb_states)]) , list(range(self.nb_states))]
 			lb = [ correct_proba([b[s][i]/den[s] for i in range(len(self.h.observations()))]) , self.h.observations()]
+
 			new_states.append(HMM_state(lb,la))
 
-		initial_state = [num_init[s]/sum(traces[1]) for s in range(self.nb_states)]
+		initial_state = [num_init[s]/sum_proba for s in range(self.nb_states)]
 		
 		return [HMM(new_states,initial_state),currentloglikelihood]
