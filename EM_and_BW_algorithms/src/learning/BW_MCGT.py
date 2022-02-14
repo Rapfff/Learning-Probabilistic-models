@@ -41,7 +41,7 @@ class BW_MCGT(BW):
 						if p != 0.0:
 							num[-1][ss*len(self.h.observations())+self.h.observations().index(observation)] += alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
 			####################
-			num_init = [alpha_matrix[s][0]/proba_seq for s in range(self.nb_states)]
+			num_init = [alpha_matrix[s][0] for s in range(self.nb_states)]
 			return [den,num, proba_seq,times,num_init]
 		return False
 
