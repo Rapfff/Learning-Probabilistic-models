@@ -41,7 +41,7 @@ class BW_MCGT(BW):
 						if p != 0.0:
 							num[-1][ss*len(self.h.observations())+self.h.observations().index(observation)] += alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
 			####################
-			num_init = [alpha_matrix[s][0] for s in range(self.nb_states)]
+			num_init = [alpha_matrix[s][0]/proba_seq for s in range(self.nb_states)]
 			return [den,num, proba_seq,times,num_init]
 		return False
 
@@ -66,7 +66,7 @@ class BW_MCGT(BW):
 		num_init = [0.0 for s in range(self.nb_states)]
 		for i in temp:
 			for s in range(self.nb_states):
-				num_init[s] += i[4][s]
+				num_init[s] += i[4][s]*i[3]
 
 		for s in range(self.nb_states):
 			den[s] = sum([i[0][s] for i in temp])
@@ -84,6 +84,6 @@ class BW_MCGT(BW):
 			l = [ correct_proba([tau[s][i]/den[s] for i in range(len(list_sta))]) , list_sta, list_obs ]
 			new_states.append(MCGT_state(l))
 
-		initial_state = [num_init[s]/sum_of_probas for s in range(self.nb_states)]
+		initial_state = [num_init[s]/sum(traces[1]) for s in range(self.nb_states)]
 
 		return [MCGT(new_states,initial_state),currentloglikelihood]
