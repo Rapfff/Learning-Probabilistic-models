@@ -44,7 +44,7 @@ def resolveRandom(m):
 			break
 	return i
 
-def correct_proba(ll,accuracy = 5,times=1):
+def correct_proba(ll,accuracy = 6,times=1):
 	diff = sum(ll)-1.0
 	res =  [round(i-diff/len(ll),accuracy) for i in ll]
 	f = False
@@ -56,7 +56,7 @@ def correct_proba(ll,accuracy = 5,times=1):
 			res[i] = 0.0
 			f = True
 	if f:
-		if times == 900:
+		if times >= 600:
 			return res
 		else:
 			return correct_proba(res,times + 1)

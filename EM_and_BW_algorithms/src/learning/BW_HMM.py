@@ -19,7 +19,7 @@ class BW_HMM(BW):
 		alpha_matrix = self.computeAlphas(sequence)
 		beta_matrix = self.computeBetas(sequence)
 		
-		proba_seq = beta_matrix[self.h.initial_state][0]
+		proba_seq = sum([alpha_matrix[s][-1] for s in range(self.nb_states)])
 		if proba_seq != 0.0:
 			####################
 			den = []
@@ -32,14 +32,15 @@ class BW_HMM(BW):
 			num_b = []
 			for s in range(self.nb_states):
 				num_a.append([0.0 for i in range(self.nb_states)])
-				num_b.append([0.0 for i in range(len(self.observations))])
+				num_b.append([0.0 for i in range(len(self.h.observations()))])
 				for t in range(len(sequence)):
 					observation = sequence[t]
 					for ss in range(self.nb_states):
 						num_a[-1][ss] += alpha_matrix[s][t]*self.h.a(s,ss)*self.h.b(s,observation)*beta_matrix[ss][t+1]*times/proba_seq
-						num_b[-1][self.observations.index(observation)] += alpha_matrix[s][t]*beta_matrix[s][t]*times/proba_seq
+						num_b[-1][self.h.observations().index(observation)] += alpha_matrix[s][t]*beta_matrix[s][t]*times/proba_seq
 			####################
-			return [den,num_a,num_b,proba_seq,times]
+			num_init = [alpha_matrix[s][0] for s in range(self.nb_states)]
+			return [den,num_a,num_b,proba_seq,times,num_init]
 		return False
 
 	def generateHhat(self,traces):
@@ -51,7 +52,7 @@ class BW_HMM(BW):
 			a.append([0 for i in range(self.nb_states)])
 		b = []
 		for s in range(self.nb_states):
-			b.append([0 for i in range(len(self.observations))])
+			b.append([0 for i in range(len(self.h.observations()))])
 		
 		p = Pool(processes = NB_PROCESS)
 		tasks = []
@@ -61,6 +62,11 @@ class BW_HMM(BW):
 		
 		temp = [res.get() for res in tasks if res.get() != False]
 		currentloglikelihood = sum([log(i[3])*i[4] for i in temp])
+		
+		num_init = [0.0 for s in range(self.nb_states)]
+		for i in temp:
+			for s in range(self.nb_states):
+				num_init[s] += i[5][s]*i[4]
 
 		for s in range(self.nb_states):
 			den[s] = sum([i[0][s] for i in temp])
@@ -68,14 +74,15 @@ class BW_HMM(BW):
 			for x in range(self.nb_states):
 				a[s][x] = sum([i[1][s][x] for i in temp])
 
-			for x in range(len(self.observations)):
+			for x in range(len(self.h.observations())):
 				b[s][x] = sum([i[2][s][x] for i in temp])
 
 		new_states = []
 		for s in range(self.nb_states):
 			la = [ correct_proba([a[s][i]/den[s] for i in range(self.nb_states)]) , list(range(self.nb_states))]
-			lb = [ correct_proba([b[s][i]/den[s] for i in range(len(self.observations))]) , self.observations]
+			lb = [ correct_proba([b[s][i]/den[s] for i in range(len(self.h.observations()))]) , self.h.observations()]
 			new_states.append(HMM_state(lb,la))
 
-		return [HMM(new_states,self.h.initial_state),currentloglikelihood]
-
+		initial_state = [num_init[s]/sum(traces[1]) for s in range(self.nb_states)]
+		
+		return [HMM(new_states,initial_state),currentloglikelihood]

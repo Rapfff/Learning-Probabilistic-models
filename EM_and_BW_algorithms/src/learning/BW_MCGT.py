@@ -61,7 +61,6 @@ class BW_MCGT(BW):
 		
 		temp = [res.get() for res in tasks if res.get() != False]
 		currentloglikelihood = sum([log(i[2])*i[3] for i in temp])
-		sum_of_probas = sum([i[2]*i[3] for i in temp])
 		
 		num_init = [0.0 for s in range(self.nb_states)]
 		for i in temp:

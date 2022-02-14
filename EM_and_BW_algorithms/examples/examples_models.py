@@ -72,7 +72,7 @@ def modelHMM_random(number_states, alphabet, random_initial_model=False):
 		states.append(HMM_state([randomProbabilities(len(alphabet)),alphabet],[randomProbabilities(number_states),list(range(number_states))]))
 
 	if random_initial_model:
-		init = randomProbabilities(nb_states)
+		init = randomProbabilities(number_states)
 	else:
 		init = 0
 	return HMM(states,init)
