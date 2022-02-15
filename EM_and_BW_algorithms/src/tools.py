@@ -154,3 +154,11 @@ def getActionsObservationsFromSequences(sequences):
 				observations.append(x)
 
 	return [actions,observations]
+
+def setFromList(l):
+	res = [[],[]]
+	for s in l:
+		if s not in res[0]:
+			res[0].append(s)
+		res[1][res[0].index(s)] += 1
+	return res

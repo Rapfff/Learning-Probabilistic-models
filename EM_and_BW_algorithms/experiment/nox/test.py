@@ -10,8 +10,10 @@ from statistics import mean, stdev
 from scipy.signal import hilbert
 from math import exp
 from experiment.nox.edfreader import EDFreader
-from examples.examples_models import modelMCGT_random
-from src.tools import saveSet, loadSet
+from examples.examples_models import modelMCGT_random, modelCOMC_random
+from src.tools import saveSet, loadSet, setFromList
+from src.learning.BW_coMC import BW_coMC
+from random import shuffle
 
 
 EDF_FILE   = "C:/Users/rafr7/Desktop/nox/eh_20210211.edf"
@@ -25,7 +27,7 @@ SIGNAL_ID = 44
 SIGNAL_NAME = "F3_M2"
 
 WINDOW_SIZE_SEC = 1
-EVALUATING_WINDOW_SIZE_SEC = 15
+EVALUATING_WINDOW_SIZE_SEC = 30
 
 NB_STATES = 6
 
@@ -50,6 +52,10 @@ def clean(s):
 
     return s
 
+def normalize(seq):
+	mu  = mean(seq)
+	std = stdev(seq)
+	return [(i-mu)/std for i in seq]
 
 def peak_to_peak_amplitude_and_freq(s):
 	m = sum(s)/len(s)
@@ -134,7 +140,87 @@ def read_files():
 	events.close()
 	return [hil,stages,x_stages]
 
-def write_training_sets(hil,stages,x_stages):
+def naive_analysis():
+	hil, stages, x_stages = read_files()
+	hil = normalize(hil)
+
+	hil = [(i-mu)/std for i in hil] #normalizing
+	mu   = {}
+	var  = {}
+	trans= {}
+	for s in stages:
+		mu[s]    = 0.0
+		var[s]   = 0.0
+		trans[s] = [0.0 for i in range(len(stages))]
+
+	for s in stages:
+		if 0 in x_stages[s]:
+			break
+
+	for step in range(len(hil)-1):
+		mu[s] += hil[step]
+		for ss in stages:
+			if step+1 in x_stages[ss]:
+				break
+		trans[s][stages.index(ss)] += 1
+		s = ss
+	mu[s] += hil[-1]
+	for s in stages:
+		mu[s] /= len(x_stages[s])
+		trans[s] = [j/len(x_stages[s]) for j in trans[s]]
+
+	for step in range(len(hil)-1):
+		for s in stages:
+			if step+1 in x_stages[s]:
+				break
+		var[s] += (hil[step]-mu[s])**2
+	for s in stages:
+		var[s] /= len(x_stages[s])
+		print("\nSTAGE",s,"*****************")
+		print("Mean    :",round(mu[s],5))
+		print("Variance:",round(var[s],5))
+		for ss in stages:
+			print(s,"=>",ss,":",round(100*trans[s][stages.index(ss)],5),"%")
+	
+def write_training_test_set(fraction_test,name=''):
+	"""name is the name of the output files,
+	fraction_test is a float between ]0,1[ correspondin to the fraction of sequences in the test set """
+	hil, stages, x_stages = read_files()
+	hil = normalize(hil)
+	seqs = []
+	for i in range(len(hil)//EVALUATING_WINDOW_SIZE_SEC):
+		seqs.append(hil[i*WINDOW_SIZE_SEC:(i+1)*WINDOW_SIZE_SEC])
+	seqs.append(hil[(i+1)*WINDOW_SIZE_SEC:])
+	
+	shuffle(seqs)
+	test_seqs = seqs[:int(fraction_test)*len(seqs)]
+	training_seqs = seqs[int(fraction_test)*len(seqs):] 
+	
+	training_set = setFromList(training_seqs)
+	test_set = setFromList(test_seqs)
+
+	saveSet(training_set,"training_set"+name+".txt")
+	saveSet(test_set,"test_set"+name+".txt")
+#IDEE:
+#WINDOW_SIZE_SEC = 1
+#pour chaque sec => 1 hilbert value
+#separer le tout en sequences de EVAMUATING_WINSOW_SIZE_SEC
+#generer un training set avec 1-<fraction_test> des seq et l'inverse pour le training set
+#apprendre un model avec autant de states que de stages et une distr sur l'initial state
+
+tr = loadSet("training_set.txt")
+ts = loadSet("test_set.txt")
+
+write_training_test_set(0.1)
+rm = modelCOMC_random(NB_STATES,True,-0.2,0.5,0.05,4.5)
+algo = BW_coMC(rm)
+out = algo.learn(tr)
+
+print("Loglikelihood on test_set for initial model ",rm.logLikelihood(ts))
+print("Loglikelihood on test_set for output  model ",out.logLikelihood(ts))
+
+
+def write_training_sets_each_stage(hil,stages,x_stages):
 	for s in stages:
 		for j in x_stages[s]:
 			seq = []
@@ -149,51 +235,12 @@ def write_training_sets(hil,stages,x_stages):
 					t.append(1)
 		saveSet([seq,t],str(s)+"_training.txt")
 
-hil, stages, x_stages = read_files()
-mu  = mean(hil)
-std = stdev(hil)
-
-hil = [(i-mu)/std for i in hil] #normalizing
-mu   = {}
-var  = {}
-trans= {}
-for s in stages:
-	mu[s]    = 0.0
-	var[s]   = 0.0
-	trans[s] = [0.0 for i in range(len(stages))]
-
-for s in stages:
-	if 0 in x_stages[s]:
-		break
-
-for step in range(len(hil)-1):
-	mu[s] += hil[step]
-	for ss in stages:
-		if step+1 in x_stages[ss]:
-			break
-	trans[s][stages.index(ss)] += 1
-	s = ss
-mu[s] += hil[-1]
-for s in stages:
-	mu[s] /= len(x_stages[s])
-	trans[s] = [j/len(x_stages[s]) for j in trans[s]]
-
-for step in range(len(hil)-1):
-	for s in stages:
-		if step+1 in x_stages[s]:
-			break
-	var[s] += (hil[step]-mu[s])**2
-for s in stages:
-	var[s] /= len(x_stages[s])
-	print("\nSTAGE",s,"*****************")
-	print("Mean    :",round(mu[s],5))
-	print("Variance:",round(var[s],5))
-	for ss in stages:
-		print(s,"=>",ss,":",round(100*trans[s][stages.index(ss)],5),"%")
-	
-
-	
-	
+#IDEE:
+#WINDOW_SIZE_SEC = 1
+#pour chaque sec => 1 hilbert value
+#séparer le training set pour chaque stage
+#train un model par stage sur son training set
+#pour sequence de 30 secondes (30 hilbert values), calculer la proba que chaque model génere cette  sequence
 """
 write_training_sets(hil,stages,x_stages)
 
@@ -209,62 +256,47 @@ for s in stages:
 
 
 
-#IDEE:
-#WINDOW_SIZE_SEC = 1
-#pour chaque sec => 1 hilbert value
-#séparer le training set pour chaque stage
-#train un model par stage sur son training set
-#pour sequence de 30 secondes (30 hilbert values), calculer la proba que chaque model génere cette  sequence
+def printing_stuffs(stages,x_stages,amp,freq,means):
+	fig, ax = plt.subplots()
+	for s in stages:
+		first = True
+		for x in x_stages[s]:
+			if first:
+				first = False
+				plt.plot(x,[amp[i] for i in x],color=colors[stages.index(s)],label=s)
+			else:
+				plt.plot(x,[amp[i] for i in x],color=colors[stages.index(s)])
+	ax.legend()
+	ax.set_title("Amplitude "+SIGNAL_NAME)
+	plt.show()
+
+	fig, ax = plt.subplots()
+	for s in stages:
+		first = True
+		for x in x_stages[s]:
+			if first:
+				first = False
+				plt.plot(x,[freq[i] for i in x],color=colors[stages.index(s)],label=s)
+			else:
+				plt.plot(x,[freq[i] for i in x],color=colors[stages.index(s)])
+	ax.legend()
+	ax.set_title("Frequency "+SIGNAL_NAME)
+	plt.show()
 
 
-
-
-
-
-"""
-fig, ax = plt.subplots()
-for s in stages:
-	first = True
-	for x in x_stages[s]:
-		if first:
-			first = False
-			plt.plot(x,[amp[i] for i in x],color=colors[stages.index(s)],label=s)
-		else:
-			plt.plot(x,[amp[i] for i in x],color=colors[stages.index(s)])
-ax.legend()
-ax.set_title("Amplitude "+SIGNAL_NAME)
-plt.show()
-
-fig, ax = plt.subplots()
-for s in stages:
-	first = True
-	for x in x_stages[s]:
-		if first:
-			first = False
-			plt.plot(x,[freq[i] for i in x],color=colors[stages.index(s)],label=s)
-		else:
-			plt.plot(x,[freq[i] for i in x],color=colors[stages.index(s)])
-ax.legend()
-ax.set_title("Frequency "+SIGNAL_NAME)
-plt.show()
-
-
-fig, ax = plt.subplots()
-for s in stages:
-	first = True
-	for x in x_stages[s]:
-		if first:
-			first = False
-			plt.plot(x,[means[i] for i in x],color=colors[stages.index(s)],label=s)
-		else:
-			plt.plot(x,[means[i] for i in x],color=colors[stages.index(s)])
-ax.legend()
-ax.set_title("Mean "+SIGNAL_NAME)
-plt.show()
-"""
-
-
-#plt.plot(range(window_size),window)
-#plt.plot(range(window_size),[sum(window)/window_size for i in range(window_size)])
-#plt.show()
-#print(peak_to_peak_amplitude_and_freq(window))
+	fig, ax = plt.subplots()
+	for s in stages:
+		first = True
+		for x in x_stages[s]:
+			if first:
+				first = False
+				plt.plot(x,[means[i] for i in x],color=colors[stages.index(s)],label=s)
+			else:
+				plt.plot(x,[means[i] for i in x],color=colors[stages.index(s)])
+	ax.legend()
+	ax.set_title("Mean "+SIGNAL_NAME)
+	plt.show()
+	#plt.plot(range(window_size),window)
+	#plt.plot(range(window_size),[sum(window)/window_size for i in range(window_size)])
+	#plt.show()
+	#print(peak_to_peak_amplitude_and_freq(window))
