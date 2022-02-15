@@ -16,7 +16,7 @@ from src.learning.BW_coMC import BW_coMC
 from random import shuffle
 
 
-EDF_FILE   = "C:/Users/rafr7/Desktop/nox/eh_20210211.edf"
+EDF_FILE   = "eh_20210211.edf"
 EVENT_FILE = "Event_Grid.csv"
 SIZE_ALPHABET = 10
 #SIGNALS
@@ -208,10 +208,11 @@ def write_training_test_set(fraction_test,name=''):
 #generer un training set avec 1-<fraction_test> des seq et l'inverse pour le training set
 #apprendre un model avec autant de states que de stages et une distr sur l'initial state
 
+
+write_training_test_set(0.1)
 tr = loadSet("training_set.txt")
 ts = loadSet("test_set.txt")
 
-write_training_test_set(0.1)
 rm = modelCOMC_random(NB_STATES,True,-0.2,0.5,0.05,4.5)
 algo = BW_coMC(rm)
 out = algo.learn(tr)

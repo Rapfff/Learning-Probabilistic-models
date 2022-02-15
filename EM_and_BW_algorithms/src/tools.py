@@ -160,5 +160,6 @@ def setFromList(l):
 	for s in l:
 		if s not in res[0]:
 			res[0].append(s)
+			res[1].append(0)
 		res[1][res[0].index(s)] += 1
 	return res
