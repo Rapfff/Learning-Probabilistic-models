@@ -1,6 +1,0 @@
-unknown CTMC
-0
-0.23852239519904794
-<super: <class 'CTMC_state'>, <CTMC_state object>>0.07864768677684951
-<super: <class 'CTMC_state'>, <CTMC_state object>>0.3903779690510866
-<super: <class 'CTMC_state'>, <CTMC_state object>>

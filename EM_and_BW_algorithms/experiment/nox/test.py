@@ -10,9 +10,9 @@ from statistics import mean, stdev
 from scipy.signal import hilbert
 from math import exp
 from experiment.nox.edfreader import EDFreader
-from examples.examples_models import modelMCGT_random, modelCOMC_random
+from examples.examples_models import modelMCGT_random, modelCOHMM_nox
 from src.tools import saveSet, loadSet, setFromList
-from src.learning.BW_coMC import BW_coMC
+from src.learning.BW_coHMM import BW_coHMM
 from random import shuffle
 
 
@@ -29,7 +29,7 @@ SIGNAL_NAME = "F3_M2"
 WINDOW_SIZE_SEC = 1
 EVALUATING_WINDOW_SIZE_SEC = 30
 
-NB_STATES = 6
+NB_STATES = 5
 
 def clean(s):
     i = 1
@@ -189,13 +189,12 @@ def write_training_test_set(fraction_test,name=''):
 	hil = normalize(hil)
 	seqs = []
 	for i in range(len(hil)//EVALUATING_WINDOW_SIZE_SEC):
-		seqs.append(hil[i*WINDOW_SIZE_SEC:(i+1)*WINDOW_SIZE_SEC])
-	seqs.append(hil[(i+1)*WINDOW_SIZE_SEC:])
-	
+		seqs.append(hil[i*EVALUATING_WINDOW_SIZE_SEC:(i+1)*EVALUATING_WINDOW_SIZE_SEC])
+	seqs.append(hil[(i+1)*EVALUATING_WINDOW_SIZE_SEC:])
 	shuffle(seqs)
-	test_seqs = seqs[:int(fraction_test)*len(seqs)]
-	training_seqs = seqs[int(fraction_test)*len(seqs):] 
-	
+	test_seqs = seqs[:int(fraction_test*len(seqs))]
+	training_seqs = seqs[int(fraction_test*len(seqs)):]
+
 	training_set = setFromList(training_seqs)
 	test_set = setFromList(test_seqs)
 
@@ -204,18 +203,19 @@ def write_training_test_set(fraction_test,name=''):
 #IDEE:
 #WINDOW_SIZE_SEC = 1
 #pour chaque sec => 1 hilbert value
-#separer le tout en sequences de EVAMUATING_WINSOW_SIZE_SEC
+#separer le tout en sequences de EVALUATING_WINSOW_SIZE_SEC
 #generer un training set avec 1-<fraction_test> des seq et l'inverse pour le training set
 #apprendre un model avec autant de states que de stages et une distr sur l'initial state
 
 
-write_training_test_set(0.1)
-tr = loadSet("training_set.txt")
-ts = loadSet("test_set.txt")
+#write_training_test_set(0.1)
+tr = loadSet("training_set.txt",True)
+ts = loadSet("test_set.txt",True)
 
-rm = modelCOMC_random(NB_STATES,True,-0.2,0.5,0.05,4.5)
-algo = BW_coMC(rm)
-out = algo.learn(tr)
+rm = modelCOHMM_nox(self_loop_prob=0.5)
+algo = BW_coHMM(rm)
+out = algo.learn(tr,verbose=True)
+out.pprint()
 
 print("Loglikelihood on test_set for initial model ",rm.logLikelihood(ts))
 print("Loglikelihood on test_set for output  model ",out.logLikelihood(ts))

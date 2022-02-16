@@ -60,7 +60,7 @@ class BW:
 		#overrided
 		pass
 
-	def learn(self,traces,output_file="output_model.txt",epsilon=0.01,pp=''):
+	def learn(self,traces,output_file="output_model.txt",epsilon=0.01,verbose=False,pp=''):
 		"""
 		Given a set of sequences of pairs action-observation,
 		it adapts the parameters of h in order to maximize the probability to get 
@@ -71,8 +71,10 @@ class BW:
 
 		counter = 0
 		prevloglikelihood = 10
+		nb_traces = sum(traces[1])
 		while True:
-			#print(datetime.now(),pp,counter, prevloglikelihood)
+			if verbose:
+				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces)
 			self.hhat, currentloglikelihood = self.generateHhat(traces)
 			
 			counter += 1

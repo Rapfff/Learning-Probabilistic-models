@@ -67,7 +67,7 @@ class coHMM_state(Model_state):
 			return res
 
 class coHMM(Model):
-	def __init__(self,states,initial_state,name="unknown HMM"):
+	def __init__(self,states,initial_state,name="unknown coHMM"):
 		super().__init__(states,initial_state,name)
 
 	def a(self,s1,s2):

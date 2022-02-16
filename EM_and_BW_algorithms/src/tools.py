@@ -9,7 +9,7 @@ def normpdf(x, params, variation=0.01):
 	return norm.cdf(x+variation,params[0],params[1]) - norm.cdf(x-variation,params[0],params[1])
 
 
-def loadSet(file_path):
+def loadSet(file_path, float_obs=False):
 	res_set = [[],[]]
 	f = open(file_path,'r')
 	l = f.readline()
@@ -21,6 +21,9 @@ def loadSet(file_path):
 		res_set[1].append(int(l[:-1]))
 		l = f.readline()
 	f.close()
+	if float_obs:
+		for i in range(len(res_set[0])):
+			res_set[0][i] = [float(j) for j in res_set[0][i]]
 	return res_set
 
 def saveSet(t_set,file_path):
