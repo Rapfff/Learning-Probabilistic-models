@@ -48,7 +48,7 @@ class BW_coHMM(BW):
 		for s in range(self.nb_states):
 			a.append([0 for i in range(self.nb_states)])
 		mu  = [ 0.0 for i in range(self.nb_states)]
-		std = [ 0.0 for i in range(self.nb_states)]
+		va  = [ 0.0 for i in range(self.nb_states)]
 		den = [ 0.0 for i in range(self.nb_states)]
 		
 		p = Pool(processes = NB_PROCESS)
@@ -73,12 +73,12 @@ class BW_coHMM(BW):
 				a[s][x] = sum([i[1][s][x] for i in temp])
 
 			mu[s]  = sum(i[2][s] for i in temp)
-			std[s] = sum(i[3][s] for i in temp)
+			va[s] = sum(i[3][s] for i in temp)
 
 		new_states = []
 		for s in range(self.nb_states):
 			la = [ correct_proba([a[s][i]/den[s] for i in range(self.nb_states)]) , list(range(self.nb_states))]
-			lb = [mu[s]/den[s],sqrt(std[s]/den[s])]
+			lb = [mu[s]/den[s],sqrt(va[s]/den[s])]
 			new_states.append(coHMM_state(la,lb))
 
 		initial_state = [num_init[s]/sum_proba for s in range(self.nb_states)]

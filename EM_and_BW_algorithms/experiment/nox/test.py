@@ -10,7 +10,7 @@ from statistics import mean, stdev
 from scipy.signal import hilbert
 from math import exp
 from experiment.nox.edfreader import EDFreader
-from examples.examples_models import modelMCGT_random, modelCOHMM_nox
+from examples.examples_models import modelMCGT_random, modelCOHMM_nox, modelCOHMM_random
 from src.tools import saveSet, loadSet, setFromList
 from src.learning.BW_coHMM import BW_coHMM
 from random import shuffle
@@ -27,7 +27,7 @@ SIGNAL_ID = 44
 SIGNAL_NAME = "F3_M2"
 
 WINDOW_SIZE_SEC = 1
-EVALUATING_WINDOW_SIZE_SEC = 30
+EVALUATING_WINDOW_SIZE_SEC = 15
 
 NB_STATES = 5
 
@@ -185,6 +185,8 @@ def naive_analysis():
 def write_training_test_set(fraction_test,name=''):
 	"""name is the name of the output files,
 	fraction_test is a float between ]0,1[ correspondin to the fraction of sequences in the test set """
+	if name != '':
+		name = '_'+str(name)
 	hil, stages, x_stages = read_files()
 	hil = normalize(hil)
 	seqs = []
@@ -209,19 +211,68 @@ def write_training_test_set(fraction_test,name=''):
 
 
 #write_training_test_set(0.1)
+min_mu  = -0.2
+max_mu  =  0.5
+min_std =  0.05
+max_std =  4.5
+"""
 tr = loadSet("training_set.txt",True)
 ts = loadSet("test_set.txt",True)
 
-rm = modelCOHMM_nox(self_loop_prob=0.5)
+rm = modelCOHMM_random(5,True,min_mu,max_mu,min_std,max_std)
 algo = BW_coHMM(rm)
 out = algo.learn(tr,verbose=True)
 out.pprint()
 
 print("Loglikelihood on test_set for initial model ",rm.logLikelihood(ts))
 print("Loglikelihood on test_set for output  model ",out.logLikelihood(ts))
+"""
+min_mu  *= 10
+max_mu  *= 10
+delta_mu = max_mu-min_mu
+min_std *= -10
+max_std *= 10
+delta_std= max_std-min_mu
+
+def to_rgb_mu(val):
+	val = float(val)
+	val = max(min_mu,val)
+	val = min(max_mu,val)
+	val -= min_mu
+	val /= delta_mu
+	return val
+def to_rgb_std(val):
+	val = float(val)
+	val = max(min_std,val)
+	val = min(max_std,val)
+	val -= min_std
+	val /= delta_std
+	return val
+
+from matplotlib.animation import FuncAnimation
+
+x = [1.0,2.0,4.0,5.0,7.0,8.0,10.0,11.0,13.0,14.0]
+y = []
+f = open("colors.txt",'r')
+for i in range(int(len(x)/2)):
+	y.append(to_rgb_mu(f.readline()[:-1]))
+	y.append(to_rgb_std(f.readline()[:-1]))
+fig = plt.figure()
+
+def animation_func(i):
+	y = []
+	for s in range(int(len(x)/2)):
+		y.append(to_rgb_mu(f.readline()[:-1]))
+		y.append(to_rgb_std(f.readline()[:-1]))
+	plt.bar(x,y,color='blue')
+  
+animation = FuncAnimation(fig, animation_func,interval=200)
+plt.show()
 
 
-def write_training_sets_each_stage(hil,stages,x_stages):
+def write_training_sets_each_stage():
+	hil, stages, x_stages = read_files()
+	hil = normalize(hil)
 	for s in stages:
 		for j in x_stages[s]:
 			seq = []
@@ -236,6 +287,15 @@ def write_training_sets_each_stage(hil,stages,x_stages):
 					t.append(1)
 		saveSet([seq,t],str(s)+"_training.txt")
 
+	seqs = []
+	for i in range(len(hil)//EVALUATING_WINDOW_SIZE_SEC):
+		seqs.append(hil[i*EVALUATING_WINDOW_SIZE_SEC:(i+1)*EVALUATING_WINDOW_SIZE_SEC])
+	shuffle(seqs)
+	test_seqs = seqs[:int(fraction_test*len(seqs))]
+	test_set = setFromList(test_seqs)
+	saveSet(test_set,"test_set"+name+".txt")
+
+
 #IDEE:
 #WINDOW_SIZE_SEC = 1
 #pour chaque sec => 1 hilbert value
@@ -243,20 +303,16 @@ def write_training_sets_each_stage(hil,stages,x_stages):
 #train un model par stage sur son training set
 #pour sequence de 30 secondes (30 hilbert values), calculer la proba que chaque model génere cette  sequence
 """
-write_training_sets(hil,stages,x_stages)
+write_training_sets_each_stage(hil,stages,x_stages)
 
 model_stages = []
-rm = modelMCGT_random(NB_STATES,stages)
+rm = coHMM(1)
 for s in stages:
 	model_stages.append(rm)
-	algo = Estimation_algorithm_MCGT(model_stages[-1],stages)
-	algo.learn(loadSet(str(s)+"_training.txt"))
-	model_stages[-1] = algo.learn(loadSet(str(s)+"_training.txt"),output_file=str(s)+"_model.txt",pp=str(s))	
+	algo = BW_coHMM(model_stages[-1])
+	model_stages[-1] = algo.learn(loadSet(str(s)+"_training.txt",True),output_file=str(s)+"_model.txt",pp=str(s))
 
 """
-
-
-
 def printing_stuffs(stages,x_stages,amp,freq,means):
 	fig, ax = plt.subplots()
 	for s in stages:
