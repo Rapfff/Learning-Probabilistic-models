@@ -10,10 +10,10 @@ from statistics import mean, stdev
 from scipy.signal import hilbert
 from math import exp
 from experiment.nox.edfreader import EDFreader
-from examples.examples_models import modelMCGT_random, modelCOHMM_nox, modelCOHMM_random
-from src.tools import saveSet, loadSet, setFromList
+from src.tools import saveSet, loadSet, setFromList, randomProbabilities
 from src.learning.BW_coHMM import BW_coHMM
-from random import shuffle
+from src.models.coHMM import coHMM, coHMM_state
+from random import shuffle, uniform
 
 
 EDF_FILE   = "eh_20210211.edf"
@@ -210,18 +210,30 @@ def write_training_test_set(fraction_test,name=''):
 #apprendre un model avec autant de states que de stages et une distr sur l'initial state
 
 
+
 #write_training_test_set(0.1)
+
 min_mu  = -0.2
 max_mu  =  0.5
 min_std =  0.05
 max_std =  4.5
-"""
+
+def noxCOHMM():
+	wake = coHMM_state([[0.676,0.222,0.067,0.004,0.031],[0,1,2,3,4]],[round(uniform(min_mu,max_mu),3),round(uniform(min_std,max_std),3)])
+	n1   = coHMM_state([[0.09 ,0.516,0.355,0.003,0.036],[0,1,2,3,4]],[round(uniform(min_mu,max_mu),3),round(uniform(min_std,max_std),3)])
+	n2   = coHMM_state([[0.028,0.031,0.888,0.037,0.016],[0,1,2,3,4]],[round(uniform(min_mu,max_mu),3),round(uniform(min_std,max_std),3)])
+	n3   = coHMM_state([[0.014,0.003,0.058,0.924,0.001],[0,1,2,3,4]],[round(uniform(min_mu,max_mu),3),round(uniform(min_std,max_std),3)])
+	rem  = coHMM_state([[0.035,0.019,0.012,0.000,0.934],[0,1,2,3,4]],[round(uniform(min_mu,max_mu),3),round(uniform(min_std,max_std),3)])
+	return coHMM([wake,n1,n2,n3,rem],randomProbabilities(5),"noxCOHMM")
+
+
+
 tr = loadSet("training_set.txt",True)
 ts = loadSet("test_set.txt",True)
 
-rm = modelCOHMM_random(5,True,min_mu,max_mu,min_std,max_std)
+rm = noxCOHMM()
 algo = BW_coHMM(rm)
-out = algo.learn(tr,verbose=True)
+out = algo.learn(tr,verbose=True,epsilon=0.05)
 out.pprint()
 
 print("Loglikelihood on test_set for initial model ",rm.logLikelihood(ts))
@@ -268,7 +280,7 @@ def animation_func(i):
   
 animation = FuncAnimation(fig, animation_func,interval=200)
 plt.show()
-
+"""
 
 def write_training_sets_each_stage():
 	hil, stages, x_stages = read_files()

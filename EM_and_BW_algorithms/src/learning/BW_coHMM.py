@@ -35,7 +35,7 @@ class BW_coHMM(BW):
 					den[-1] += gamma
 					observation = sequence[t]
 					for ss in range(self.nb_states):
-						num_a[-1][ss]  += alpha_matrix[s][t]*self.h.tau(s,ss,observation)*beta_matrix[ss][t+1]*times/proba_seq
+						#num_a[-1][ss]  += alpha_matrix[s][t]*self.h.tau(s,ss,observation)*beta_matrix[ss][t+1]*times/proba_seq
 						num_mu[-1] += gamma*observation
 						num_va[-1] += gamma*(observation-self.h.states[s].output_parameters[0])**2
 			####################
@@ -77,9 +77,9 @@ class BW_coHMM(BW):
 
 		new_states = []
 		for s in range(self.nb_states):
-			la = [ correct_proba([a[s][i]/den[s] for i in range(self.nb_states)]) , list(range(self.nb_states))]
+			#la = [ correct_proba([a[s][i]/den[s] for i in range(self.nb_states)]) , list(range(self.nb_states))]
 			lb = [mu[s]/den[s],sqrt(va[s]/den[s])]
-			new_states.append(coHMM_state(la,lb))
+			new_states.append(coHMM_state(self.h.states[s].next_matrix,lb))
 
 		initial_state = [num_init[s]/sum_proba for s in range(self.nb_states)]
 		
