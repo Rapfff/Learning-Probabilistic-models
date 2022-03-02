@@ -12,7 +12,7 @@ from math import exp
 from experiment.nox.edfreader import EDFreader
 from src.tools import saveSet, loadSet, setFromList, randomProbabilities
 from src.learning.BW_coHMM import BW_coHMM
-from src.models.coHMM import coHMM, coHMM_state
+from src.models.coHMM import coHMM, coHMM_state, loadcoHMM
 from random import shuffle, uniform
 
 
@@ -231,9 +231,12 @@ def noxCOHMM():
 tr = loadSet("training_set.txt",True)
 ts = loadSet("test_set.txt",True)
 
-rm = noxCOHMM()
+#rm = noxCOHMM()
+#rm.save("init_model.txt")
+rm = loadcoHMM("init_model.txt")
+
 algo = BW_coHMM(rm)
-out = algo.learn(tr,verbose=True,epsilon=0.05)
+out = algo.learn(tr,verbose=True)
 out.pprint()
 
 print("Loglikelihood on test_set for initial model ",rm.logLikelihood(ts))

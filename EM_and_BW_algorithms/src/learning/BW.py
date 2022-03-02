@@ -68,15 +68,10 @@ class BW:
 		traces = [[trace1,trace2,...],[number_of_trace1,number_of_trace2,...]]
 		trace = [obs1,obs2,...,obsx]
 		"""
-		f = open("colors.txt",'w')
-
 		counter = 0
 		prevloglikelihood = 10
 		nb_traces = sum(traces[1])
 		while True:
-			for s in range(self.nb_states):
-				f.write(str(self.h.states[s].output_parameters[0])+'\n')
-				f.write(str(self.h.states[s].output_parameters[1])+'\n')
 			if verbose:
 				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces)
 			self.hhat, currentloglikelihood = self.generateHhat(traces)
@@ -88,6 +83,5 @@ class BW:
 			else:
 				prevloglikelihood = currentloglikelihood
 				
-		f.close()
 		self.h.save(output_file)
 		return self.h
