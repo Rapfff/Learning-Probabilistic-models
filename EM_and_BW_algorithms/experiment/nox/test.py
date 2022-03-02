@@ -11,9 +11,10 @@ from scipy.signal import hilbert
 from math import exp
 from experiment.nox.edfreader import EDFreader
 from src.tools import saveSet, loadSet, setFromList, randomProbabilities
-from src.learning.BW_coHMM import BW_coHMM
-from src.models.coHMM import coHMM, coHMM_state, loadcoHMM
+from src.learning.BW_HMM import BW_HMM
+from examples.examples_models import modelHMM_random
 from random import shuffle, uniform
+from pyts.approximation import SymbolicFourierApproximation
 
 
 EDF_FILE   = "eh_20210211.edf"
@@ -107,7 +108,7 @@ def read_files():
 	#amp  = []
 	#freq = []
 	#means= []
-	hil = []
+	data = []
 
 	while r.ftell(SIGNAL_ID)+window_size < length:
 		window = np.arange(window_size,dtype=np.float_)
@@ -118,8 +119,7 @@ def read_files():
 		#amp.append(ta)
 		#freq.append(tf)
 		#means.append(tm)
-		analytic_signal = hilbert(window)
-		hil.append(mean(abs(analytic_signal)))
+		data.append([i for i in window])
 
 	stages = []
 	x_stages = {}
@@ -138,7 +138,7 @@ def read_files():
 		l = events.readline()
 		c += d
 	events.close()
-	return [hil,stages,x_stages]
+	return [data,stages,x_stages]
 
 def naive_analysis():
 	hil, stages, x_stages = read_files()
@@ -182,17 +182,15 @@ def naive_analysis():
 		for ss in stages:
 			print(s,"=>",ss,":",round(100*trans[s][stages.index(ss)],5),"%")
 	
-def write_training_test_set(fraction_test,name=''):
+def write_training_test_set(fraction_test,name='',n_coefs=6,n_bins=6):
 	"""name is the name of the output files,
-	fraction_test is a float between ]0,1[ correspondin to the fraction of sequences in the test set """
+	fraction_test is a float between ]0,1[ corresponding to the fraction of sequences in the test set """
 	if name != '':
 		name = '_'+str(name)
-	hil, stages, x_stages = read_files()
-	hil = normalize(hil)
-	seqs = []
-	for i in range(len(hil)//EVALUATING_WINDOW_SIZE_SEC):
-		seqs.append(hil[i*EVALUATING_WINDOW_SIZE_SEC:(i+1)*EVALUATING_WINDOW_SIZE_SEC])
-	seqs.append(hil[(i+1)*EVALUATING_WINDOW_SIZE_SEC:])
+	data, stages, x_stages = read_files()
+	transformer = SymbolicFourierApproximation(n_coefs=n_coefs,n_bins=n_bins)
+	seqs = transformer.fit_transform(data)
+	input(seqs)
 	shuffle(seqs)
 	test_seqs = seqs[:int(fraction_test*len(seqs))]
 	training_seqs = seqs[int(fraction_test*len(seqs)):]
@@ -202,88 +200,25 @@ def write_training_test_set(fraction_test,name=''):
 
 	saveSet(training_set,"training_set"+name+".txt")
 	saveSet(test_set,"test_set"+name+".txt")
+
 #IDEE:
-#WINDOW_SIZE_SEC = 1
-#pour chaque sec => 1 hilbert value
-#separer le tout en sequences de EVALUATING_WINSOW_SIZE_SEC
-#generer un training set avec 1-<fraction_test> des seq et l'inverse pour le training set
-#apprendre un model avec autant de states que de stages et une distr sur l'initial state
 
-
-
-#write_training_test_set(0.1)
-
-min_mu  = -0.2
-max_mu  =  0.5
-min_std =  0.05
-max_std =  4.5
-
-def noxCOHMM():
-	wake = coHMM_state([[0.676,0.222,0.067,0.004,0.031],[0,1,2,3,4]],[round(uniform(min_mu,max_mu),3),round(uniform(min_std,max_std),3)])
-	n1   = coHMM_state([[0.09 ,0.516,0.355,0.003,0.036],[0,1,2,3,4]],[round(uniform(min_mu,max_mu),3),round(uniform(min_std,max_std),3)])
-	n2   = coHMM_state([[0.028,0.031,0.888,0.037,0.016],[0,1,2,3,4]],[round(uniform(min_mu,max_mu),3),round(uniform(min_std,max_std),3)])
-	n3   = coHMM_state([[0.014,0.003,0.058,0.924,0.001],[0,1,2,3,4]],[round(uniform(min_mu,max_mu),3),round(uniform(min_std,max_std),3)])
-	rem  = coHMM_state([[0.035,0.019,0.012,0.000,0.934],[0,1,2,3,4]],[round(uniform(min_mu,max_mu),3),round(uniform(min_std,max_std),3)])
-	return coHMM([wake,n1,n2,n3,rem],randomProbabilities(5),"noxCOHMM")
-
-
+n_bins = 6
+write_training_test_set(0.1,n_bins=n_bins)
 
 tr = loadSet("training_set.txt",True)
 ts = loadSet("test_set.txt",True)
 
-#rm = noxCOHMM()
-#rm.save("init_model.txt")
+rm = modelHMM_random(5,[chr(i) for i in range(97,97+n_bins)])
+rm.save("init_model.txt")
 rm = loadcoHMM("init_model.txt")
 
-algo = BW_coHMM(rm)
+algo = BW_HMM(rm)
 out = algo.learn(tr,verbose=True)
 out.pprint()
 
 print("Loglikelihood on test_set for initial model ",rm.logLikelihood(ts))
 print("Loglikelihood on test_set for output  model ",out.logLikelihood(ts))
-"""
-min_mu  *= 10
-max_mu  *= 10
-delta_mu = max_mu-min_mu
-min_std *= -10
-max_std *= 10
-delta_std= max_std-min_mu
-
-def to_rgb_mu(val):
-	val = float(val)
-	val = max(min_mu,val)
-	val = min(max_mu,val)
-	val -= min_mu
-	val /= delta_mu
-	return val
-def to_rgb_std(val):
-	val = float(val)
-	val = max(min_std,val)
-	val = min(max_std,val)
-	val -= min_std
-	val /= delta_std
-	return val
-
-from matplotlib.animation import FuncAnimation
-
-x = [1.0,2.0,4.0,5.0,7.0,8.0,10.0,11.0,13.0,14.0]
-y = []
-f = open("colors.txt",'r')
-for i in range(int(len(x)/2)):
-	y.append(to_rgb_mu(f.readline()[:-1]))
-	y.append(to_rgb_std(f.readline()[:-1]))
-fig = plt.figure()
-
-def animation_func(i):
-	y = []
-	for s in range(int(len(x)/2)):
-		y.append(to_rgb_mu(f.readline()[:-1]))
-		y.append(to_rgb_std(f.readline()[:-1]))
-	plt.bar(x,y,color='blue')
-  
-animation = FuncAnimation(fig, animation_func,interval=200)
-plt.show()
-"""
 
 def write_training_sets_each_stage():
 	hil, stages, x_stages = read_files()
@@ -311,23 +246,7 @@ def write_training_sets_each_stage():
 	saveSet(test_set,"test_set"+name+".txt")
 
 
-#IDEE:
-#WINDOW_SIZE_SEC = 1
-#pour chaque sec => 1 hilbert value
-#séparer le training set pour chaque stage
-#train un model par stage sur son training set
-#pour sequence de 30 secondes (30 hilbert values), calculer la proba que chaque model génere cette  sequence
-"""
-write_training_sets_each_stage(hil,stages,x_stages)
 
-model_stages = []
-rm = coHMM(1)
-for s in stages:
-	model_stages.append(rm)
-	algo = BW_coHMM(model_stages[-1])
-	model_stages[-1] = algo.learn(loadSet(str(s)+"_training.txt",True),output_file=str(s)+"_model.txt",pp=str(s))
-
-"""
 def printing_stuffs(stages,x_stages,amp,freq,means):
 	fig, ax = plt.subplots()
 	for s in stages:

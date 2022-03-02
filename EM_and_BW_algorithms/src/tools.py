@@ -161,6 +161,7 @@ def getActionsObservationsFromSequences(sequences):
 def setFromList(l):
 	res = [[],[]]
 	for s in l:
+		s = list(s)
 		if s not in res[0]:
 			res[0].append(s)
 			res[1].append(0)
