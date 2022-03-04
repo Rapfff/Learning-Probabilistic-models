@@ -40,7 +40,7 @@ class BW_coHMM(BW):
 						num_mu[-1] += gamma*observation
 						num_va[-1] += gamma*(observation-self.h.states[s].output_parameters[0])**2
 			####################
-			num_init = [alpha_matrix[s][0]*beta_matrix[s][0]*times for s in range(self.nb_states)]
+			num_init = [alpha_matrix[s][0]*beta_matrix[s][0]*times/proba_seq for s in range(self.nb_states)]
 			return [den,num_a,num_mu,num_va,proba_seq,times,num_init]
 		return False
 
@@ -70,7 +70,6 @@ class BW_coHMM(BW):
 		#######################################################
 
 		currentloglikelihood = sum([log(i[4])*i[5] for i in temp])
-		sum_proba= sum([i[4]*i[5] for i in temp ])
 
 		for s in range(self.nb_states):
 			for x in range(self.nb_states):
@@ -87,7 +86,7 @@ class BW_coHMM(BW):
 			lb = [ mu[s]/den[s] , sqrt(va[s]/den[s])]
 			new_states.append(coHMM_state(la,lb))
 
-		initial_state = [num_init[s]/sum_proba for s in range(self.nb_states)]
+		initial_state = [num_init[s]/sum(num_init) for s in range(self.nb_states)]
 		
 		return [coHMM(new_states,initial_state),currentloglikelihood]
 

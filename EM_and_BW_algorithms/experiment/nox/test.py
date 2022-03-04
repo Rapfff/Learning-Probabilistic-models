@@ -6,15 +6,16 @@ sys.path.append(parentdir)
 
 import numpy as np
 import matplotlib.pyplot as plt
-from statistics import mean, stdev
-from scipy.signal import hilbert
 from math import exp, sqrt
+from pyts.approximation import SymbolicFourierApproximation
+from random import shuffle, uniform
+from itertools import product
+
 from experiment.nox.edfreader import EDFreader
 from src.tools import saveSet, loadSet, setFromList, randomProbabilities
 from src.learning.BW_HMM import BW_HMM
+from src.models.HMM import loadHMM
 from examples.examples_models import modelHMM_random
-from random import shuffle, uniform
-from pyts.approximation import SymbolicFourierApproximation
 
 
 EDF_FILE   = "eh_20210211.edf"
@@ -27,7 +28,8 @@ SIZE_ALPHABET = 10
 SIGNAL_ID = 44
 SIGNAL_NAME = "F3_M2"
 
-WINDOW_SIZE_SEC_MAX = 10
+WINDOW_SIZE_SEC_MAX = 10 #nb of sec as input to DFA
+NB_WINDOWS_BY_SEQ = 6 #nb of sec by seuquence = WINDOW_SIZE_SEC_MAX*NB_WINDOW_BY_SEQ
 
 NB_STATES = 5
 
@@ -86,7 +88,7 @@ def read_files():
 	return [data,stages,x_stages]
 
 	
-def write_training_test_set(fraction_test,name='',n_coefs=6,n_bins=6):
+def write_training_test_set(fraction_test,name='',n_coefs=4,n_bins=6):
 	"""name is the name of the output files,
 	fraction_test is a float between ]0,1[ corresponding to the fraction of sequences in the test set """
 	if name != '':
@@ -95,31 +97,21 @@ def write_training_test_set(fraction_test,name='',n_coefs=6,n_bins=6):
 	transformer = SymbolicFourierApproximation(n_coefs=n_coefs,n_bins=n_bins)
 	data = transformer.fit_transform(data)
 
-
-	"""
-	coords = [[] for i in stages]
-	set_seq = []
-	for i in range(len(data)):
-		seq = list(data[i])
-		if not seq in set_seq:
-			set_seq.append(seq)
-			for s in range(len(stages)):
-				coords[s].append(0)
-		j = set_seq.index(seq)
-		coords[stages.index(x_stages[i])][j] += 1
-	dist = []
-	for s in range(len(stages)-1):
-		#dist.append([])
-		for ss in range(s+1,len(stages)):
-			print(stages[s], " - ",stages[ss], " ",sqrt(sum([(coords[s][i]-coords[ss][i])**2 for i in range(len(set_seq))])))
-			#dist[-1].append(sqrt(sum([(coords[s][i]-coords[ss][i])**2 for i in range(len(set_seq))])))
-	"""
+	data = [''.join(i) for i in data]
+	new_data = []
+	new_x_stages = []
+	for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
+		new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
+		new_x_stages.append([x_stages[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
+	new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
+	new_x_stages.append([x_stages[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
+	data = new_data
+	x_stages = new_x_stages
 
 	l = [i for i in range(len(data))]
+	shuffle(l)
 	data_shuffled = [ data[i] for i in l]
 	x_stages_shuffled = [ x_stages[i] for i in l]
-
-
 	test_seqs = data_shuffled[:int(fraction_test*len(data_shuffled))]
 	training_seqs = data_shuffled[int(fraction_test*len(data_shuffled)):]
 
@@ -128,21 +120,72 @@ def write_training_test_set(fraction_test,name='',n_coefs=6,n_bins=6):
 
 	saveSet(training_set,"training_set"+name+".txt")
 	saveSet(test_set,"test_set"+name+".txt")
+	return (data_shuffled,x_stages_shuffled,stages)
 
 
-n_bins = 6
-#write_training_test_set(0.1,n_bins=n_bins)
+n_bins = 4
+nb_states = 5
+n_coefs= 4
+data,x_stages,stages = write_training_test_set(0.0,n_bins=n_bins,n_coefs=n_coefs)
 
 tr = loadSet("training_set.txt")
-ts = loadSet("test_set.txt")
 
-#rm = modelHMM_random(5,[chr(i) for i in range(97,97+n_bins)])
+alphabet = [''.join(j) for j in list(product(*[[chr(i) for i in range(97,97+n_bins)]]*n_coefs))]
+
+rm = modelHMM_random(nb_states,alphabet,random_initial_state=True)
 #rm.save("init_model.txt")
-rm = loadHMM("init_model.txt")
+#rm = loadHMM("init_model.txt")
 
 algo = BW_HMM(rm)
 out = algo.learn(tr,verbose=True)
+out.save("output_model.txt")
 out.pprint()
+out = loadHMM("output_model.txt")
+#print("Loglikelihood on test_set for initial model ",rm.logLikelihood(ts))
+#print("Loglikelihood on test_set for output  model ",out.logLikelihood(ts))
 
-print("Loglikelihood on test_set for initial model ",rm.logLikelihood(ts))
-print("Loglikelihood on test_set for output  model ",out.logLikelihood(ts))
+algo = BW_HMM(out)
+stages_states = []
+
+tot_stages = [0 for i in stages]
+for seq in x_stages:
+	for i in stages:
+		tot_stages[stages.index(i)] +=  seq.count(i)
+
+for i in range(len(stages)):
+	stages_states.append([0.0 for i in range(nb_states)])
+
+for i in range(len(data)):
+	alphas = algo.computeAlphas(data[i])
+	betas  = algo.computeBetas (data[i])
+	proba = sum([alphas[s][-1] for s in range(nb_states)])
+	for j in range(len(x_stages[i])):
+		stage_index = stages.index(x_stages[i][j])
+		for s in range(nb_states):
+			stages_states[stage_index][s] += (100*alphas[s][j]*betas[s][j])/(proba*tot_stages[stage_index])
+
+for i in range(len(stages)):
+	for j in range(nb_states):
+		stages_states[i][j] = round(stages_states[i][j],2)
+states = ['s'+str(i) for i in range(1,nb_states+1)]
+
+fig, ax = plt.subplots()
+im = ax.imshow(stages_states)
+
+# Show all ticks and label them with the respective list entries
+ax.set_xticks(np.arange(len(states)), labels=states)	
+ax.set_yticks(np.arange(len(stages)), labels=stages)
+
+# Rotate the tick labels and set their alignment.
+plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+		 rotation_mode="anchor")
+
+# Loop over data dimensions and create text annotations.
+for i in range(len(stages)):
+	for j in range(len(states)):
+		text = ax.text(j, i, stages_states[i][j],
+					   ha="center", va="center", color="w")
+
+ax.set_title("Correlation between stages and states")
+fig.tight_layout()
+plt.show()

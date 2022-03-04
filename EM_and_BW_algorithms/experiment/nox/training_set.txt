@@ -1,34 +1,296 @@
-['b', 'b', 'e', 'b', 'e', 'b']
-299
-['c', 'c', 'd', 'c', 'd', 'c']
-283
-['d', 'd', 'c', 'd', 'c', 'd']
-287
-['d', 'd', 'd', 'd', 'd', 'd']
-34
-['c', 'c', 'c', 'c', 'c', 'c']
-34
-['c', 'c', 'e', 'c', 'e', 'c']
-29
-['b', 'b', 'd', 'b', 'd', 'b']
-27
-['a', 'a', 'f', 'a', 'f', 'a']
-391
-['e', 'e', 'c', 'e', 'c', 'e']
-14
-['e', 'e', 'b', 'e', 'b', 'e']
-340
-['d', 'd', 'b', 'd', 'b', 'd']
-15
-['b', 'b', 'f', 'b', 'f', 'b']
-14
-['a', 'b', 'f', 'b', 'f', 'b']
+['aada', 'aada', 'aada', 'aada', 'aada', 'aada']
+65
+['ccbc', 'ccbc', 'ccbc', 'ccbc', 'ccbc', 'ccbc']
+51
+['ddad', 'ddad', 'ddad', 'ddad', 'ddad', 'ddad']
+97
+['bbcb', 'aada', 'aada', 'aada', 'bbcb', 'bbcb']
 1
-['a', 'a', 'e', 'a', 'e', 'a']
-15
-['f', 'f', 'a', 'f', 'a', 'f']
-401
-['e', 'e', 'a', 'e', 'a', 'e']
-6
-['f', 'f', 'b', 'f', 'b', 'f']
-6
+['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'ccbc']
+2
+['aada', 'aada', 'aada', 'aada', 'bbcb', 'bbcb']
+3
+['ccbc', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+2
+['ccbc', 'ccbc', 'ccbc', 'ccbc', 'bbcb', 'ccbc']
+3
+['cccc', 'bbbb', 'bbcb', 'cccc', 'ccbc', 'bbcb']
+1
+['bbcb', 'bbcb', 'bbdb', 'bbcb', 'aada', 'aada']
+1
+['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbbb', 'ccbc']
+1
+['bbcb', 'bbcb', 'bbcb', 'bbcb', 'ccbc', 'ccbc']
+1
+['bbcb', 'aada', 'aada', 'aada', 'aada', 'bbdb']
+1
+['bbdb', 'bbcb', 'bbcb', 'bbbb', 'ccbc', 'ccbc']
+1
+['bbcb', 'bbcb', 'bbcb', 'bbcb', 'ccbc', 'bbcb']
+4
+['aada', 'aada', 'aada', 'bbcb', 'aaca', 'aada']
+1
+['ccbc', 'ccbc', 'ccbc', 'ccbc', 'cccc', 'ccbc']
+3
+['ccbc', 'ccbc', 'ccbc', 'cccc', 'ccbc', 'cccc']
+1
+['bbcb', 'ccbc', 'bbcb', 'ccbc', 'bbcb', 'bbbb']
+1
+['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+18
+['aada', 'bbcb', 'aada', 'bbcb', 'aada', 'bbcb']
+1
+['bbcb', 'bbcb', 'bbdb', 'bbcb', 'bbdb', 'bbcb']
+1
+['aada', 'bbcb', 'bbcb', 'ccbc', 'ccbc', 'bbcb']
+1
+['bbcb', 'bbcb', 'aada', 'aada', 'aada', 'bbcb']
+2
+['aada', 'aada', 'aada', 'aada', 'bbcb', 'aada']
+2
+['aada', 'aaca', 'aada', 'aada', 'aada', 'aada']
+1
+['ccbc', 'ccbc', 'bbcb', 'bbcb', 'aada', 'aada']
+1
+['ccbc', 'bbcb', 'ccbc', 'cccc', 'ccbc', 'ccbc']
+1
+['bbcb', 'bbcb', 'bbcb', 'ccbc', 'bbcb', 'bbcb']
+2
+['ccbc', 'cccc', 'bbcb', 'ccbc', 'cccc', 'bbcb']
+1
+['bbcb', 'bbcb', 'bbcb', 'bbbb', 'ccbc', 'ccbc']
+1
+['bbcb', 'bbcb', 'ccbc', 'ccbc', 'ccbc', 'ccbc']
+2
+['bbcb', 'ccbc', 'ccbc', 'bbbb', 'ccbc', 'ccbc']
+1
+['aada', 'bbcb', 'bbcb', 'bbcb', 'aada', 'aada']
+1
+['cccc', 'bbcb', 'ccbc', 'bbcb', 'bbcb', 'aada']
+1
+['bbcb', 'aada', 'bbcb', 'aaca', 'aada', 'aada']
+1
+['aada', 'bbcb', 'bbcb', 'bbbb', 'ccbc', 'bbcb']
+1
+['bbcb', 'bbcb', 'aada', 'aada', 'bbcb', 'aada']
+1
+['bbdb', 'bbcb', 'bbcb', 'bbcb', 'aada', 'aada']
+1
+['ddad', 'ddad', 'ddad', 'ddbd', 'ddad', 'ddbd']
+1
+['bbcb', 'bbcb', 'ccbc', 'bbcb', 'bbcb', 'bbcb']
+2
+['ddad', 'ddad', 'ddbd', 'ddbd', 'ddad', 'ccbc']
+1
+['cccc', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbbb']
+1
+['bbcb', 'bbbb', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+3
+['aada', 'aada', 'aaca', 'bbdb', 'bbcb', 'aada']
+1
+['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'aada']
+1
+['ccbc', 'ccbc', 'bbcb', 'ccbc', 'cccc', 'ccbc']
+1
+['bbbb', 'bbcb', 'ccbc', 'ccbc', 'ccbc', 'ccbc']
+1
+['ccbc', 'cccc', 'bbcb', 'ccbc', 'bbcb', 'bbcb']
+1
+['aada', 'aada', 'aaca', 'aada', 'aada', 'bbdb']
+1
+['cccc', 'ccbc', 'bbcb', 'ccbc', 'ccbc', 'bbcb']
+1
+['aada', 'aada', 'aada', 'aada', 'aada', 'bbdb']
+1
+['bbbb', 'ccbc', 'bbcb', 'ccbc', 'ccbc', 'ccbc']
+1
+['bbcb', 'bbcb', 'bbdb', 'bbcb', 'aaca', 'bbcb']
+1
+['bbcb', 'ccbc', 'cccc', 'bbcb', 'bbcb', 'bbcb']
+1
+['bbcb', 'bbcb', 'bbcb', 'ccbc', 'ccbc', 'bbcb']
+1
+['bbcb', 'ccbc', 'bbcb', 'ccbc', 'ccbc', 'bbcb']
+1
+['aada', 'bbdb', 'aada', 'aaca', 'aada', 'aaca']
+1
+['aada', 'aaca', 'aada', 'bbcb', 'bbcb', 'aaca']
+1
+['bbcb', 'bbdb', 'bbcb', 'aada', 'bbcb', 'aada']
+1
+['bbcb', 'bbcb', 'bbcb', 'ccbc', 'bbcb', 'ccbc']
+1
+['bbcb', 'aada', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+2
+['ccbc', 'ccbc', 'ccbc', 'bbcb', 'ccbc', 'ccbc']
+1
+['bbcb', 'aada', 'aada', 'bbcb', 'bbcb', 'bbcb']
+1
+['ccbc', 'ccbc', 'ccbc', 'ccbc', 'ccbc', 'ccac']
+2
+['aada', 'aada', 'aada', 'bbdb', 'aada', 'bbcb']
+1
+['bbcb', 'bbdb', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+1
+['aada', 'aada', 'aada', 'bbcb', 'aada', 'aada']
+1
+['ccbc', 'ccbc', 'ccbc', 'ccbc', 'ddad', 'ccbc']
+1
+['aada', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+3
+['ccbc', 'cccc', 'ccbc', 'cccc', 'ccbc', 'bbcb']
+1
+['bbcb', 'aada', 'aada', 'aada', 'aada', 'aada']
+3
+['ccbc', 'ddad', 'ddad', 'ddad', 'ccbc', 'ccbc']
+1
+['ddbd', 'ddad', 'ddbd', 'ccbc', 'ccbc', 'ddad']
+1
+['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbbb', 'bbcb']
+2
+['cccc', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+1
+['ccac', 'ccbc', 'ccbc', 'ddbd', 'ccbc', 'ccbc']
+1
+['bbcb', 'ccbc', 'bbbb', 'bbcb', 'ccbc', 'bbcb']
+1
+['bbbb', 'bbcb', 'bbcb', 'cccc', 'bbcb', 'bbcb']
+1
+['aada', 'aada', 'aada', 'aada', 'aaca', 'bbcb']
+1
+['ccbc', 'bbcb', 'ccbc', 'ccbc', 'ccbc', 'ccbc']
+1
+['bbcb', 'ccbc', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+1
+['bbcb', 'bbcb', 'bbcb', 'bbcb', 'aada', 'aada']
+1
+['bbcb', 'bbcb', 'bbbb', 'cccc', 'bbcb', 'bbcb']
+1
+['aada', 'aaca', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+2
+['bbcb', 'bbcb', 'bbcb', 'bbbb', 'bbcb', 'bbcb']
+1
+['ccbc', 'ccac', 'ccbc', 'ccac', 'ccbc', 'ccac']
+1
+['bbcb', 'bbcb', 'bbcb', 'bbcb', 'aada', 'bbdb']
+1
+['bbcb', 'ccbc', 'bbcb', 'ccbc', 'bbcb', 'bbcb']
+1
+['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'cccc']
+1
+['aada', 'aada', 'bbdb', 'aada', 'aada', 'bbcb']
+1
+['ccbc', 'bbcb', 'bbbb', 'bbdb', 'bbbb', 'bbcb']
+1
+['ccbc', 'ccbc', 'ccbc', 'bbcb', 'bbcb', 'bbcb']
+3
+['bbcb', 'ccbc', 'ddad', 'ddad', 'ddad', 'ddad']
+1
+['aaca', 'bbcb', 'aada', 'bbcb', 'aada', 'aada']
+1
+['aada', 'aaca', 'bbcb', 'bbcb', 'aaca', 'aaca']
+1
+['bbbb', 'bbcb', 'bbbb', 'ccbc', 'ccbc', 'ccbc']
+1
+['bbcb', 'aada', 'bbcb', 'aada', 'bbcb', 'aada']
+1
+['bbcb', 'bbcb', 'bbcb', 'ccbc', 'bbcb', 'cccc']
+1
+['bbcb', 'aaca', 'bbcb', 'aada', 'aada', 'aada']
+1
+['aada', 'aada', 'aada', 'aada', 'aada', 'bbcb']
+3
+['bbbb', 'ccbc', 'ccbc', 'ccbc', 'ccbc', 'ccbc']
+1
+['bbcb', 'bbbb', 'ccbc', 'ccbc', 'ccbc', 'ccbc']
+1
+['ccbc', 'ccbc', 'ccbc', 'bbcb', 'ccbc', 'cccc']
+1
+['ccbc', 'ccbc', 'ccbc', 'cccc', 'ccbc', 'ccbc']
+1
+['ccbc', 'cccc', 'ccbc', 'bbcb', 'ccbc', 'ccbc']
+1
+['aada', 'aada', 'aada', 'aada', 'aada', 'aaca']
+2
+['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbdb']
+1
+['ccbc', 'ccac', 'ddbd', 'ccbc', 'ccbc', 'ccac']
+1
+['ccbc', 'ccbc', 'ccbc', 'ccbc', 'ccbc', 'bbcb']
+1
+['aada', 'aada', 'aada']
+1
+['cccc', 'bbcb', 'bbcb', 'ccbc', 'bbcb', 'bbcb']
+1
+['bbcb', 'bbcb', 'ccbc', 'bbcb', 'ccbc', 'cccc']
+1
+['bbdb', 'aada', 'aada', 'aada', 'aada', 'aada']
+1
+['bbcb', 'aada', 'aaca', 'bbcb', 'bbcb', 'bbcb']
+1
+['bbcb', 'ccbc', 'ccbc', 'bbcb', 'ccbc', 'bbcb']
+1
+['bbcb', 'ccbc', 'ccbc', 'ccbc', 'ccbc', 'ccbc']
+1
+['bbbb', 'ccbc', 'bbcb', 'ccbc', 'cccc', 'bbcb']
+1
+['bbcb', 'bbcb', 'bbcb', 'aada', 'bbcb', 'bbdb']
+1
+['ccbc', 'ccbc', 'ccbc', 'bbcb', 'ccbc', 'bbcb']
+2
+['aada', 'bbcb', 'aada', 'bbdb', 'aada', 'aada']
+1
+['aada', 'aada', 'aada', 'aaca', 'bbcb', 'aada']
+1
+['bbcb', 'bbbb', 'bbcb', 'ccbc', 'bbcb', 'bbcb']
+1
+['ddad', 'ccbc', 'ddad', 'ccbc', 'ddad', 'ccbc']
+1
+['aada', 'bbdb', 'bbcb', 'bbcb', 'bbcb', 'bbdb']
+1
+['ccbc', 'ccbc', 'bbcb', 'bbbb', 'ccbc', 'ccbc']
+1
+['ccbc', 'cccc', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+1
+['aada', 'aada', 'bbcb', 'aaca', 'bbcb', 'bbcb']
+1
+['bbcb', 'bbcb', 'ccbc', 'aada', 'bbcb', 'bbcb']
+1
+['bbcb', 'bbcb', 'aada', 'bbcb', 'aada', 'aada']
+1
+['ccbc', 'ccbc', 'ccbc', 'bbbb', 'ccbc', 'ccbc']
+1
+['ccbc', 'cccc', 'ccbc', 'ccbc', 'bbcb', 'ccbc']
+1
+['bbbb', 'ccbc', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+1
+['bbcb', 'cccc', 'cccc', 'bbcb', 'cccc', 'bbcb']
+1
+['aaca', 'aada', 'aada', 'aada', 'aada', 'aada']
+1
+['bbcb', 'aaca', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+1
+['bbcb', 'bbcb', 'ccbc', 'bbcb', 'bbcb', 'bbbb']
+1
+['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbdb', 'aada']
+1
+['cccc', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbdb']
+1
+['ccbc', 'ccbc', 'bbcb', 'ccbc', 'ccbc', 'ccbc']
+1
+['bbcb', 'ccbc', 'bbcb', 'bbcb', 'cccc', 'bbbb']
+1
+['bbcb', 'ccbc', 'bbbb', 'bbbb', 'bbcb', 'ccbc']
+1
+['ccbc', 'bbcb', 'bbcb', 'bbcb', 'ccbc', 'ccbc']
+1
+['ccbc', 'bbbb', 'bbbb', 'bbcb', 'bbcb', 'bbcb']
+1
+['bbcb', 'bbbb', 'ccbc', 'bbcb', 'bbcb', 'bbcb']
+1
+['bbcb', 'ccbc', 'ccbc', 'bbcb', 'bbbb', 'bbcb']
+1
+['bbcb', 'bbcb', 'ccbc', 'cccc', 'bbcb', 'bbcb']
+1
+['ccbc', 'bbcb', 'ccbc', 'bbcb', 'ccbc', 'ccbc']
+1

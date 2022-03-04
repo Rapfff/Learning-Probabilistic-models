@@ -105,7 +105,7 @@ def loadHMM(file_path):
 			l  = f.readline()[:-2].split(' ')
 			po = [ float(i) for i in l]
 			o  = f.readline()[:-2].split(' ')
-			states.append(HMM_state([ps,s],[po,o]))
+			states.append(HMM_state([po,o],[ps,s]))
 
 		l = f.readline()
 

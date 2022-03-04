@@ -21,25 +21,22 @@ class BW_HMM(BW):
 		
 		proba_seq = sum([alpha_matrix[s][-1] for s in range(self.nb_states)])
 		if proba_seq != 0.0:
-			####################
-			den = []
-			for s in range(self.nb_states):
-				den.append(0.0)
-				for t in range(len(sequence)):
-					den[-1] += alpha_matrix[s][t]*beta_matrix[s][t]*times/proba_seq
-			####################
 			num_a = []
 			num_b = []
+			den   = []
 			for s in range(self.nb_states):
+				den.append(0.0)
 				num_a.append([0.0 for i in range(self.nb_states)])
 				num_b.append([0.0 for i in range(len(self.h.observations()))])
 				for t in range(len(sequence)):
+					gamma = alpha_matrix[s][t]*beta_matrix[s][t]*times/proba_seq
+					den[-1] += gamma
 					observation = sequence[t]
 					for ss in range(self.nb_states):
 						num_a[-1][ss] += alpha_matrix[s][t]*self.h.a(s,ss)*self.h.b(s,observation)*beta_matrix[ss][t+1]*times/proba_seq
-					num_b[-1][self.h.observations().index(observation)] += alpha_matrix[s][t]*beta_matrix[s][t]*times/proba_seq
+					num_b[-1][self.h.observations().index(observation)] += gamma
 			####################
-			num_init = [alpha_matrix[s][0]*beta_matrix[s][0] for s in range(self.nb_states)]
+			num_init = [alpha_matrix[s][0]*beta_matrix[s][0]*times/proba_seq for s in range(self.nb_states)]
 			return [den,num_a,num_b,proba_seq,times,num_init]
 		return False
 
@@ -62,10 +59,11 @@ class BW_HMM(BW):
 		
 		temp = [res.get() for res in tasks if res.get() != False]
 		currentloglikelihood = sum([log(i[3])*i[4] for i in temp])
-		sum_proba= sum([i[3]*i[4] for i in temp ])
+		#sum_proba= sum([i[3]*i[4] for i in temp ])
 
 		num_init = [0.0 for s in range(self.nb_states)]
 		for i in temp:
+
 			for s in range(self.nb_states):
 				num_init[s] += i[5][s]*i[4]
 
@@ -85,6 +83,6 @@ class BW_HMM(BW):
 
 			new_states.append(HMM_state(lb,la))
 
-		initial_state = [num_init[s]/sum_proba for s in range(self.nb_states)]
+		initial_state = [num_init[s]/sum(num_init) for s in range(self.nb_states)]
 		
 		return [HMM(new_states,initial_state),currentloglikelihood]
