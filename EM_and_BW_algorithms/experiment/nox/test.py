@@ -123,8 +123,8 @@ def write_training_test_set(fraction_test,name='',n_coefs=4,n_bins=6):
 	return (data_shuffled,x_stages_shuffled,stages)
 
 
-n_bins = 4
-nb_states = 5
+n_bins = 6 #nb of letters
+nb_states = 10
 n_coefs= 4
 data,x_stages,stages = write_training_test_set(0.0,n_bins=n_bins,n_coefs=n_coefs)
 

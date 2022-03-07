@@ -1,296 +1,442 @@
-['aada', 'aada', 'aada', 'aada', 'aada', 'aada']
-65
-['ccbc', 'ccbc', 'ccbc', 'ccbc', 'ccbc', 'ccbc']
-51
-['ddad', 'ddad', 'ddad', 'ddad', 'ddad', 'ddad']
-97
-['bbcb', 'aada', 'aada', 'aada', 'bbcb', 'bbcb']
+['eebe', 'eebe', 'eebe', 'eebe', 'eebe', 'eebe']
+38
+['ddcd', 'eebe', 'ddcd', 'ddbd', 'ddcd', 'eebe']
 1
-['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'ccbc']
-2
-['aada', 'aada', 'aada', 'aada', 'bbcb', 'bbcb']
+['ffaf', 'ffaf', 'ffaf', 'ffaf', 'ffaf', 'ffaf']
+62
+['ddcd', 'ddcd', 'ddcd', 'ccdc', 'ccdc', 'ccdc']
 3
-['ccbc', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+['ccdc', 'bbdb', 'ccdc', 'ccdc', 'bbeb', 'ccdc']
+1
+['abfb', 'bbeb', 'bbeb', 'bbfb', 'bbdb', 'bbeb']
+1
+['bbeb', 'bbeb', 'bbeb', 'bbeb', 'ccdc', 'ccdc']
+1
+['ccdc', 'ccdc', 'bbeb', 'bbeb', 'bbeb', 'bbeb']
 2
-['ccbc', 'ccbc', 'ccbc', 'ccbc', 'bbcb', 'ccbc']
+['bbeb', 'ccdc', 'ccdc', 'ccdc', 'ddcd', 'ccdc']
+2
+['aafa', 'aafa', 'aafa', 'aafa', 'aafa', 'aafa']
+45
+['bbeb', 'bbeb', 'bbeb', 'bbeb', 'aafa', 'bbeb']
+1
+['bbfb', 'bbeb', 'aafa', 'aaea', 'bbfb', 'aafa']
+1
+['ddcd', 'cccc', 'cccc', 'ccdc', 'ccdc', 'bbdb']
+1
+['ccdc', 'ccdc', 'ccdc', 'ccdc', 'ccdc', 'ccdc']
+1
+['ccdc', 'bbeb', 'bbeb', 'bbeb', 'aafa', 'aaea']
+1
+['bbeb', 'bbeb', 'bbeb', 'bbeb', 'bbeb', 'bbdb']
+1
+['ddcd', 'ddcd', 'ddcd', 'ddcd', 'ddcd', 'ddcd']
+12
+['ccdc', 'ccdc', 'ccdc', 'ddcd', 'ccdc', 'dddd']
+1
+['ddcd', 'ddcd', 'eebe', 'ddcd', 'ddcd', 'eebe']
+1
+['bbeb', 'bbeb', 'aafa', 'aafa', 'aafa', 'aafa']
 3
-['cccc', 'bbbb', 'bbcb', 'cccc', 'ccbc', 'bbcb']
+['bbeb', 'bbeb', 'bbdb', 'bbeb', 'bbdb', 'aafa']
 1
-['bbcb', 'bbcb', 'bbdb', 'bbcb', 'aada', 'aada']
+['eebe', 'ddcd', 'ddcd', 'ddcd', 'ddcd', 'ddcd']
 1
-['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbbb', 'ccbc']
+['ddcd', 'ddcd', 'ccdc', 'ccec', 'bbeb', 'bbeb']
 1
-['bbcb', 'bbcb', 'bbcb', 'bbcb', 'ccbc', 'ccbc']
+['bbeb', 'bbeb', 'bbeb', 'bbeb', 'bbeb', 'bbeb']
+10
+['eebe', 'eebe', 'eebe', 'eebe', 'ddbd', 'ddcd']
 1
-['bbcb', 'aada', 'aada', 'aada', 'aada', 'bbdb']
+['ccdc', 'ccdc', 'ddcd', 'dddd', 'ccdc', 'bbeb']
 1
-['bbdb', 'bbcb', 'bbcb', 'bbbb', 'ccbc', 'ccbc']
+['aafa', 'aafa', 'aafa', 'aafa', 'bbeb', 'bbeb']
 1
-['bbcb', 'bbcb', 'bbcb', 'bbcb', 'ccbc', 'bbcb']
-4
-['aada', 'aada', 'aada', 'bbcb', 'aaca', 'aada']
+['dddd', 'ccdc', 'ccdc', 'ccdc', 'ccdc', 'cccc']
 1
-['ccbc', 'ccbc', 'ccbc', 'ccbc', 'cccc', 'ccbc']
+['bbdb', 'ccdc', 'ccdc', 'ccdc', 'ccdc', 'ccdc']
+2
+['ccdc', 'ddcd', 'ddcd', 'ddcd', 'eece', 'ddcd']
+1
+['ccdc', 'bbeb', 'bbeb', 'ccdc', 'bbeb', 'bbeb']
+2
+['ddcd', 'eebe', 'ddcd', 'ddcd', 'ddcd', 'ddbd']
+1
+['ffaf', 'ffaf', 'ffaf', 'eebe', 'eebe', 'eebe']
+1
+['eebe', 'eebe', 'eebe', 'eebe', 'eebe', 'ddbd']
+1
+['bbeb', 'bbeb', 'bbeb', 'bbdb', 'bbeb', 'bbeb']
+2
+['ccec', 'ddbd', 'eebe', 'eebe', 'eebe', 'eebe']
+1
+['eebe', 'ddbd', 'eece', 'ddbd', 'eebe', 'ddcd']
+1
+['bbeb', 'aafa', 'bbeb', 'bbeb', 'bbeb', 'bbeb']
+1
+['ccdc', 'ccdc', 'ccdc', 'ccdc', 'cccc', 'ccdc']
+1
+['ccdc', 'ddcd', 'eece', 'ccdc', 'ddcd', 'ccdc']
+1
+['ccec', 'ccdc', 'cccc', 'dddd', 'ccdc', 'ccec']
+1
+['ccdc', 'cccc', 'ddcd', 'ddcd', 'ddcd', 'ddcd']
+1
+['ddcd', 'ddcd', 'eebe', 'eebe', 'dddd', 'ddbd']
+1
+['ddcd', 'ddcd', 'ddcd', 'ddcd', 'ddcd', 'eebe']
+1
+['ccdc', 'ccdc', 'ccdc', 'ccdc', 'bbeb', 'bbeb']
+2
+['eebe', 'eebe', 'eebe', 'ffaf', 'eebe', 'eebe']
+1
+['aafa', 'aafa', 'aafa', 'aafa', 'bbfb', 'aafa']
+1
+['bbeb', 'ccec', 'ccdc', 'ccec', 'ccdc', 'bbdb']
+1
+['ccdc', 'bbeb', 'ccdc', 'bbeb', 'ccdc', 'ccdc']
+1
+['bbeb', 'ccdc', 'ccdc', 'bbdb', 'ccdc', 'ccdc']
+1
+['ddcd', 'ddcd', 'ddcd', 'cccc', 'ddcd', 'ddcd']
+1
+['ddcd', 'dddd', 'ccdc', 'ddcd', 'ccdc', 'ccdc']
+1
+['ddcd', 'ccdc', 'ddcd', 'ccdc', 'ddcd', 'ddcd']
+1
+['ddcd', 'ddcd', 'ddcd', 'ddcd', 'ccdc', 'ddcd']
 3
-['ccbc', 'ccbc', 'ccbc', 'cccc', 'ccbc', 'cccc']
+['ddcd', 'ddcd', 'ddcd', 'ddcd', 'ddbd', 'ddcd']
 1
-['bbcb', 'ccbc', 'bbcb', 'ccbc', 'bbcb', 'bbbb']
+['ddcd', 'ccdc', 'ddcd', 'eece', 'ddcd', 'ddcd']
 1
-['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
-18
-['aada', 'bbcb', 'aada', 'bbcb', 'aada', 'bbcb']
+['bbeb', 'bbfb', 'aafa', 'aaea', 'bbeb', 'aafa']
 1
-['bbcb', 'bbcb', 'bbdb', 'bbcb', 'bbdb', 'bbcb']
+['dddd', 'ccdc', 'ddcd', 'ccec', 'ccdc', 'bbeb']
 1
-['aada', 'bbcb', 'bbcb', 'ccbc', 'ccbc', 'bbcb']
+['aafa', 'aafa', 'aafa', 'aafa', 'aafa', 'bbdb']
 1
-['bbcb', 'bbcb', 'aada', 'aada', 'aada', 'bbcb']
+['eebe', 'eebe', 'eebe', 'eebe', 'eece', 'eebe']
 2
-['aada', 'aada', 'aada', 'aada', 'bbcb', 'aada']
+['bbeb', 'ccec', 'bbeb', 'bbeb', 'bbeb', 'bbeb']
+1
+['bbeb', 'bbeb', 'bbeb', 'bbeb', 'bbdb', 'bbeb']
+1
+['cccc', 'ccdc', 'ddcd', 'ddcd', 'ddcd', 'ddcd']
+1
+['cccc', 'ddcd', 'ccdc', 'ddcd', 'ddcd', 'ddcd']
+1
+['ccdc', 'ccdc', 'ddcd', 'ccdc', 'ccec', 'bbeb']
+1
+['eebe', 'eebe', 'eebe', 'eece', 'ddcd', 'eebe']
+1
+['bbeb', 'bbeb', 'bbeb', 'bbeb', 'bbeb', 'bbfb']
 2
-['aada', 'aaca', 'aada', 'aada', 'aada', 'aada']
+['bbeb', 'bbeb', 'ccdc', 'bbeb', 'bbeb', 'bbeb']
 1
-['ccbc', 'ccbc', 'bbcb', 'bbcb', 'aada', 'aada']
+['ccdc', 'dddd', 'dddd', 'ccdc', 'dddd', 'ccdc']
 1
-['ccbc', 'bbcb', 'ccbc', 'cccc', 'ccbc', 'ccbc']
+['ccdc', 'ddcd', 'cccc', 'ccdc', 'ddcd', 'ccec']
 1
-['bbcb', 'bbcb', 'bbcb', 'ccbc', 'bbcb', 'bbcb']
+['bbeb', 'ccec', 'ccdc', 'ddcd', 'ddcd', 'ccdc']
+1
+['bbeb', 'bbeb', 'bbeb', 'bbeb', 'bbeb', 'aafa']
 2
-['ccbc', 'cccc', 'bbcb', 'ccbc', 'cccc', 'bbcb']
+['ccdc', 'bbeb', 'bbeb', 'bbeb', 'ccdc', 'ccdc']
 1
-['bbcb', 'bbcb', 'bbcb', 'bbbb', 'ccbc', 'ccbc']
+['ddcd', 'ddcd', 'ddcd', 'dddd', 'ddcd', 'dddd']
 1
-['bbcb', 'bbcb', 'ccbc', 'ccbc', 'ccbc', 'ccbc']
+['ccdc', 'bbeb', 'ccec', 'aafa', 'aafa', 'aafa']
+1
+['ddcd', 'ddcd', 'ddcd', 'ddcd', 'dddd', 'ddcd']
+1
+['aaea', 'aafa', 'aafa', 'aafa', 'aafa', 'bbeb']
+1
+['aafa', 'aafa', 'aafa', 'bbeb', 'bbeb', 'aafa']
+1
+['ddcd', 'dddd', 'ccdc', 'ddcd', 'dddd', 'ccdc']
+1
+['ccdc', 'ccec', 'bbeb', 'ccdc', 'cccc', 'ddcd']
+1
+['bbeb', 'bbeb', 'ddcd', 'bbeb', 'ccdc', 'ccec']
+1
+['ffaf', 'ffaf', 'eebe', 'ffaf', 'eebe', 'ffaf']
+1
+['ccdc', 'ccdc', 'ccdc', 'ddcd', 'bbeb', 'ddcd']
+1
+['eebe', 'ddcd', 'eebe', 'ddcd', 'eebe', 'eebe']
+1
+['bbeb', 'bbeb', 'ccdc', 'bbeb', 'bbdb', 'ccdc']
+1
+['bbeb', 'ccdc', 'bbeb', 'ccdc', 'ccdc', 'ccdc']
+1
+['ccdc', 'cccc', 'ddcd', 'ccdc', 'ccdc', 'ccec']
+1
+['ccec', 'bbeb', 'bbeb', 'bbeb', 'bbdb', 'bbeb']
+1
+['ffaf', 'ffaf', 'eebe', 'ffaf', 'ffbf', 'ffaf']
+1
+['ddcd', 'ddcd', 'ddcd', 'eebe', 'eebe', 'ddcd']
+1
+['bbeb', 'bbeb', 'bbeb', 'bbeb', 'aafa', 'aafa']
 2
-['bbcb', 'ccbc', 'ccbc', 'bbbb', 'ccbc', 'ccbc']
+['eebe', 'eebe', 'ffbf', 'eebe', 'eebe', 'eebe']
 1
-['aada', 'bbcb', 'bbcb', 'bbcb', 'aada', 'aada']
+['eebe', 'eeae', 'ffbf', 'eeae', 'ffaf', 'ffaf']
 1
-['cccc', 'bbcb', 'ccbc', 'bbcb', 'bbcb', 'aada']
+['ccdc', 'ccdc', 'ccdc', 'ccdc', 'ccec', 'bbeb']
 1
-['bbcb', 'aada', 'bbcb', 'aaca', 'aada', 'aada']
+['ccdc', 'cccc', 'bbeb', 'bbeb', 'bbeb', 'bbeb']
 1
-['aada', 'bbcb', 'bbcb', 'bbbb', 'ccbc', 'bbcb']
+['bbeb', 'bbeb', 'aafa', 'bbeb', 'bbeb', 'bbeb']
 1
-['bbcb', 'bbcb', 'aada', 'aada', 'bbcb', 'aada']
+['ccdc', 'ddcd', 'ccdc', 'ccdc', 'dddd', 'cccc']
 1
-['bbdb', 'bbcb', 'bbcb', 'bbcb', 'aada', 'aada']
+['ddcd', 'ddcd', 'ccdc', 'ddcd', 'dddd', 'ddcd']
 1
-['ddad', 'ddad', 'ddad', 'ddbd', 'ddad', 'ddbd']
+['ddcd', 'ddcd', 'ddcd', 'ccdc', 'ddcd', 'dddd']
 1
-['bbcb', 'bbcb', 'ccbc', 'bbcb', 'bbcb', 'bbcb']
+['ccdc', 'ddbd', 'ddcd', 'cccc', 'ddcd', 'ddcd']
+1
+['bbdb', 'ddcd', 'bbdb', 'ddcd', 'ccdc', 'ccdc']
+1
+['bbeb', 'bbeb', 'bbfb', 'aafa', 'bbeb', 'bbeb']
+1
+['ccdc', 'ccdc', 'ccdc', 'ddcd', 'ccdc', 'ccec']
+1
+['ccdc', 'ccdc', 'bbeb', 'ccdc', 'ccdc', 'ccdc']
+1
+['ccdc', 'ccec', 'ccdc', 'ccdc', 'ccdc', 'ccdc']
 2
-['ddad', 'ddad', 'ddbd', 'ddbd', 'ddad', 'ccbc']
+['eebe', 'ffaf', 'eebe', 'eebe', 'eebe', 'eebe']
 1
-['cccc', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbbb']
+['cccc', 'ccec', 'cccc', 'ddcd', 'ddcd', 'ddcd']
 1
-['bbcb', 'bbbb', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
-3
-['aada', 'aada', 'aaca', 'bbdb', 'bbcb', 'aada']
+['ddcd', 'eebe', 'eebe', 'eebe', 'eebe', 'eebe']
 1
-['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'aada']
+['aafa', 'bbeb', 'aafa', 'bbeb', 'bbeb', 'ccdc']
 1
-['ccbc', 'ccbc', 'bbcb', 'ccbc', 'cccc', 'ccbc']
+['ccdc', 'bbfb', 'bbeb', 'bbeb', 'bbeb', 'ccdc']
 1
-['bbbb', 'bbcb', 'ccbc', 'ccbc', 'ccbc', 'ccbc']
+['ccdc', 'ccec', 'ddcd', 'ccdc', 'ccdc', 'cccc']
 1
-['ccbc', 'cccc', 'bbcb', 'ccbc', 'bbcb', 'bbcb']
+['ccdc', 'ddcd', 'ddcd', 'ccdc', 'cccc', 'ccdc']
 1
-['aada', 'aada', 'aaca', 'aada', 'aada', 'bbdb']
+['eebe', 'ffaf', 'ffbf', 'eeae', 'eebe', 'ffaf']
 1
-['cccc', 'ccbc', 'bbcb', 'ccbc', 'ccbc', 'bbcb']
+['bbeb', 'bbdb', 'bbeb', 'ccdc', 'ccdc', 'ccdc']
 1
-['aada', 'aada', 'aada', 'aada', 'aada', 'bbdb']
-1
-['bbbb', 'ccbc', 'bbcb', 'ccbc', 'ccbc', 'ccbc']
-1
-['bbcb', 'bbcb', 'bbdb', 'bbcb', 'aaca', 'bbcb']
-1
-['bbcb', 'ccbc', 'cccc', 'bbcb', 'bbcb', 'bbcb']
-1
-['bbcb', 'bbcb', 'bbcb', 'ccbc', 'ccbc', 'bbcb']
-1
-['bbcb', 'ccbc', 'bbcb', 'ccbc', 'ccbc', 'bbcb']
-1
-['aada', 'bbdb', 'aada', 'aaca', 'aada', 'aaca']
-1
-['aada', 'aaca', 'aada', 'bbcb', 'bbcb', 'aaca']
-1
-['bbcb', 'bbdb', 'bbcb', 'aada', 'bbcb', 'aada']
-1
-['bbcb', 'bbcb', 'bbcb', 'ccbc', 'bbcb', 'ccbc']
-1
-['bbcb', 'aada', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+['eebe', 'ddcd', 'eebe', 'eebe', 'eebe', 'eebe']
 2
-['ccbc', 'ccbc', 'ccbc', 'bbcb', 'ccbc', 'ccbc']
+['ddbd', 'ddcd', 'eece', 'ddcd', 'eece', 'eebe']
 1
-['bbcb', 'aada', 'aada', 'bbcb', 'bbcb', 'bbcb']
+['bbeb', 'ccdc', 'bbeb', 'bbeb', 'bbeb', 'bbdb']
 1
-['ccbc', 'ccbc', 'ccbc', 'ccbc', 'ccbc', 'ccac']
+['eebe', 'eebe', 'eebe', 'eebe', 'ddcd', 'eebe']
 2
-['aada', 'aada', 'aada', 'bbdb', 'aada', 'bbcb']
+['ddcd', 'dddd', 'ddcd', 'ccdc', 'ddcd', 'ddcd']
 1
-['bbcb', 'bbdb', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+['ccdc', 'ccdc', 'ddcd', 'bbeb', 'ccdc', 'ccdc']
 1
-['aada', 'aada', 'aada', 'bbcb', 'aada', 'aada']
+['dddd', 'bbeb', 'bbdb', 'ccdc', 'ccdc', 'bbeb']
 1
-['ccbc', 'ccbc', 'ccbc', 'ccbc', 'ddad', 'ccbc']
-1
-['aada', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
-3
-['ccbc', 'cccc', 'ccbc', 'cccc', 'ccbc', 'bbcb']
-1
-['bbcb', 'aada', 'aada', 'aada', 'aada', 'aada']
-3
-['ccbc', 'ddad', 'ddad', 'ddad', 'ccbc', 'ccbc']
-1
-['ddbd', 'ddad', 'ddbd', 'ccbc', 'ccbc', 'ddad']
-1
-['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbbb', 'bbcb']
+['bbdb', 'ccdc', 'ddcd', 'ddcd', 'ddcd', 'ddcd']
 2
-['cccc', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+['bbeb', 'cccc', 'ccdc', 'ccdc', 'ccdc', 'ccec']
 1
-['ccac', 'ccbc', 'ccbc', 'ddbd', 'ccbc', 'ccbc']
+['ddcd', 'eebe', 'ddcd', 'eebe', 'ddbd', 'eebe']
 1
-['bbcb', 'ccbc', 'bbbb', 'bbcb', 'ccbc', 'bbcb']
+['aafa', 'aafa', 'bbeb', 'aafa', 'aafa', 'bbeb']
 1
-['bbbb', 'bbcb', 'bbcb', 'cccc', 'bbcb', 'bbcb']
+['ccdc', 'ddcd', 'cccc', 'cccc', 'ccdc', 'ddcd']
 1
-['aada', 'aada', 'aada', 'aada', 'aaca', 'bbcb']
+['ccdc', 'cccc', 'ccdc', 'ddcd', 'bbeb', 'ccdc']
 1
-['ccbc', 'bbcb', 'ccbc', 'ccbc', 'ccbc', 'ccbc']
+['ddcd', 'ccdc', 'ccdc', 'ccdc', 'ccdc', 'ccdc']
 1
-['bbcb', 'ccbc', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+['aafa', 'aafa', 'aafa']
 1
-['bbcb', 'bbcb', 'bbcb', 'bbcb', 'aada', 'aada']
+['ccdc', 'ccdc', 'ccdc', 'ccec', 'cccc', 'ccec']
 1
-['bbcb', 'bbcb', 'bbbb', 'cccc', 'bbcb', 'bbcb']
-1
-['aada', 'aaca', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+['aafa', 'aafa', 'bbeb', 'bbeb', 'bbeb', 'bbeb']
 2
-['bbcb', 'bbcb', 'bbcb', 'bbbb', 'bbcb', 'bbcb']
+['aafa', 'aafa', 'aaea', 'bbeb', 'aafa', 'bbeb']
 1
-['ccbc', 'ccac', 'ccbc', 'ccac', 'ccbc', 'ccac']
+['bbeb', 'bbdb', 'bbeb', 'bbeb', 'bbfb', 'bbeb']
 1
-['bbcb', 'bbcb', 'bbcb', 'bbcb', 'aada', 'bbdb']
+['ddcd', 'eece', 'eece', 'ccdc', 'ddcd', 'ccec']
 1
-['bbcb', 'ccbc', 'bbcb', 'ccbc', 'bbcb', 'bbcb']
+['cccc', 'ddcd', 'ccdc', 'bbeb', 'bbeb', 'bbeb']
 1
-['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'cccc']
+['cccc', 'ccdc', 'ccdc', 'dddd', 'ccdc', 'ccdc']
 1
-['aada', 'aada', 'bbdb', 'aada', 'aada', 'bbcb']
+['ccdc', 'ccdc', 'ddcd', 'ccdc', 'ddcd', 'dddd']
 1
-['ccbc', 'bbcb', 'bbbb', 'bbdb', 'bbbb', 'bbcb']
+['bbeb', 'ccdc', 'ccdc', 'cccc', 'ddcd', 'ddcd']
 1
-['ccbc', 'ccbc', 'ccbc', 'bbcb', 'bbcb', 'bbcb']
-3
-['bbcb', 'ccbc', 'ddad', 'ddad', 'ddad', 'ddad']
+['ddcd', 'ddcd', 'ccdc', 'cccc', 'ddcd', 'ddcd']
 1
-['aaca', 'bbcb', 'aada', 'bbcb', 'aada', 'aada']
+['ccdc', 'ccdc', 'ccdc', 'bbeb', 'ccdc', 'ccdc']
 1
-['aada', 'aaca', 'bbcb', 'bbcb', 'aaca', 'aaca']
+['ccdc', 'ccdc', 'bbeb', 'cccc', 'ddcd', 'ddcd']
 1
-['bbbb', 'bbcb', 'bbbb', 'ccbc', 'ccbc', 'ccbc']
+['bbdb', 'bbeb', 'bbeb', 'bbeb', 'bbeb', 'bbeb']
 1
-['bbcb', 'aada', 'bbcb', 'aada', 'bbcb', 'aada']
+['dddd', 'cccc', 'ccdc', 'dddd', 'eebe', 'bbdb']
 1
-['bbcb', 'bbcb', 'bbcb', 'ccbc', 'bbcb', 'cccc']
-1
-['bbcb', 'aaca', 'bbcb', 'aada', 'aada', 'aada']
-1
-['aada', 'aada', 'aada', 'aada', 'aada', 'bbcb']
-3
-['bbbb', 'ccbc', 'ccbc', 'ccbc', 'ccbc', 'ccbc']
-1
-['bbcb', 'bbbb', 'ccbc', 'ccbc', 'ccbc', 'ccbc']
-1
-['ccbc', 'ccbc', 'ccbc', 'bbcb', 'ccbc', 'cccc']
-1
-['ccbc', 'ccbc', 'ccbc', 'cccc', 'ccbc', 'ccbc']
-1
-['ccbc', 'cccc', 'ccbc', 'bbcb', 'ccbc', 'ccbc']
-1
-['aada', 'aada', 'aada', 'aada', 'aada', 'aaca']
+['aafa', 'bbeb', 'aafa', 'aafa', 'aafa', 'aafa']
 2
-['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbdb']
+['aafa', 'aafa', 'aafa', 'bbeb', 'aafa', 'aaea']
 1
-['ccbc', 'ccac', 'ddbd', 'ccbc', 'ccbc', 'ccac']
+['ccdc', 'bbeb', 'bbeb', 'bbeb', 'bbeb', 'bbeb']
 1
-['ccbc', 'ccbc', 'ccbc', 'ccbc', 'ccbc', 'bbcb']
+['ccec', 'cccc', 'ccdc', 'ccdc', 'ccdc', 'ccdc']
 1
-['aada', 'aada', 'aada']
-1
-['cccc', 'bbcb', 'bbcb', 'ccbc', 'bbcb', 'bbcb']
-1
-['bbcb', 'bbcb', 'ccbc', 'bbcb', 'ccbc', 'cccc']
-1
-['bbdb', 'aada', 'aada', 'aada', 'aada', 'aada']
-1
-['bbcb', 'aada', 'aaca', 'bbcb', 'bbcb', 'bbcb']
-1
-['bbcb', 'ccbc', 'ccbc', 'bbcb', 'ccbc', 'bbcb']
-1
-['bbcb', 'ccbc', 'ccbc', 'ccbc', 'ccbc', 'ccbc']
-1
-['bbbb', 'ccbc', 'bbcb', 'ccbc', 'cccc', 'bbcb']
-1
-['bbcb', 'bbcb', 'bbcb', 'aada', 'bbcb', 'bbdb']
-1
-['ccbc', 'ccbc', 'ccbc', 'bbcb', 'ccbc', 'bbcb']
+['eebe', 'eebe', 'eebe', 'eebe', 'eebe', 'eece']
 2
-['aada', 'bbcb', 'aada', 'bbdb', 'aada', 'aada']
+['bbfb', 'aafa', 'aafa', 'bbeb', 'aafa', 'aafa']
 1
-['aada', 'aada', 'aada', 'aaca', 'bbcb', 'aada']
+['bbeb', 'bbeb', 'bbfb', 'bbeb', 'bbeb', 'bbeb']
 1
-['bbcb', 'bbbb', 'bbcb', 'ccbc', 'bbcb', 'bbcb']
+['aaea', 'bbeb', 'aafa', 'bbeb', 'aafa', 'bbeb']
 1
-['ddad', 'ccbc', 'ddad', 'ccbc', 'ddad', 'ccbc']
+['bbeb', 'aafa', 'aafa', 'aafa', 'aaea', 'bbeb']
 1
-['aada', 'bbdb', 'bbcb', 'bbcb', 'bbcb', 'bbdb']
+['ddcd', 'ddcd', 'ccdc', 'ddcd', 'ddcd', 'ddcd']
 1
-['ccbc', 'ccbc', 'bbcb', 'bbbb', 'ccbc', 'ccbc']
+['ccdc', 'ccdc', 'bbdb', 'ddcd', 'ccdc', 'ccdc']
 1
-['ccbc', 'cccc', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+['ddcd', 'eebe', 'ddcd', 'ddcd', 'dddd', 'ddbd']
 1
-['aada', 'aada', 'bbcb', 'aaca', 'bbcb', 'bbcb']
+['bbfb', 'bbdb', 'ccdc', 'bbeb', 'bbfb', 'aaea']
 1
-['bbcb', 'bbcb', 'ccbc', 'aada', 'bbcb', 'bbcb']
+['bbeb', 'bbeb', 'aafa', 'aafa', 'bbeb', 'bbeb']
 1
-['bbcb', 'bbcb', 'aada', 'bbcb', 'aada', 'aada']
+['ddcd', 'ccdc', 'ccdc', 'ccdc', 'ddcd', 'ddcd']
 1
-['ccbc', 'ccbc', 'ccbc', 'bbbb', 'ccbc', 'ccbc']
+['ccdc', 'bbeb', 'bbeb', 'ccdc', 'ccdc', 'ddcd']
 1
-['ccbc', 'cccc', 'ccbc', 'ccbc', 'bbcb', 'ccbc']
+['bbeb', 'bbeb', 'ccdc', 'cccc', 'ddcd', 'ccdc']
 1
-['bbbb', 'ccbc', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+['ccdc', 'ccdc', 'ccdc', 'ccdc', 'ddcd', 'ccdc']
 1
-['bbcb', 'cccc', 'cccc', 'bbcb', 'cccc', 'bbcb']
+['ccdc', 'ddcd', 'dddd', 'ccdc', 'ccdc', 'ccdc']
 1
-['aaca', 'aada', 'aada', 'aada', 'aada', 'aada']
+['ddcd', 'ddcd', 'ddcd', 'ddcd', 'ddcd', 'ccdc']
 1
-['bbcb', 'aaca', 'bbcb', 'bbcb', 'bbcb', 'bbcb']
+['bbeb', 'aafa', 'bbeb', 'aafa', 'aaea', 'ccdc']
 1
-['bbcb', 'bbcb', 'ccbc', 'bbcb', 'bbcb', 'bbbb']
+['ccdc', 'ddcd', 'ccdc', 'ccdc', 'ccdc', 'ccdc']
 1
-['bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbdb', 'aada']
+['bbeb', 'bbeb', 'ccdc', 'ccdc', 'ccdc', 'ccdc']
 1
-['cccc', 'bbcb', 'bbcb', 'bbcb', 'bbcb', 'bbdb']
+['dddd', 'ddcd', 'ccdc', 'ddcd', 'ddcd', 'ccdc']
 1
-['ccbc', 'ccbc', 'bbcb', 'ccbc', 'ccbc', 'ccbc']
+['bbeb', 'aafa', 'aaea', 'bbeb', 'bbeb', 'bbeb']
 1
-['bbcb', 'ccbc', 'bbcb', 'bbcb', 'cccc', 'bbbb']
+['ddcd', 'dddd', 'ddcd', 'dddd', 'ddcd', 'ccdc']
 1
-['bbcb', 'ccbc', 'bbbb', 'bbbb', 'bbcb', 'ccbc']
+['bbeb', 'ccdc', 'bbeb', 'ccdc', 'ddcd', 'ccdc']
 1
-['ccbc', 'bbcb', 'bbcb', 'bbcb', 'ccbc', 'ccbc']
+['eebe', 'eebe', 'ddcd', 'ddcd', 'ddcd', 'ddcd']
 1
-['ccbc', 'bbbb', 'bbbb', 'bbcb', 'bbcb', 'bbcb']
+['ccdc', 'bbeb', 'ccdc', 'ccdc', 'ccdc', 'bbeb']
 1
-['bbcb', 'bbbb', 'ccbc', 'bbcb', 'bbcb', 'bbcb']
+['eebe', 'eebe', 'eebe', 'eebe', 'ddcd', 'ddcd']
+2
+['aafa', 'aafa', 'aafa', 'aafa', 'aaea', 'aafa']
 1
-['bbcb', 'ccbc', 'ccbc', 'bbcb', 'bbbb', 'bbcb']
+['bbeb', 'bbeb', 'ccdc', 'bbeb', 'ccec', 'ccdc']
 1
-['bbcb', 'bbcb', 'ccbc', 'cccc', 'bbcb', 'bbcb']
+['ddcd', 'ccdc', 'eebe', 'dddd', 'ddcd', 'ddcd']
 1
-['ccbc', 'bbcb', 'ccbc', 'bbcb', 'ccbc', 'ccbc']
+['aaea', 'aaea', 'aafa', 'aafa', 'aafa', 'aafa']
+1
+['ddcd', 'ddbd', 'ddcd', 'ddcd', 'ddcd', 'ddcd']
+1
+['ffbf', 'eeae', 'ffaf', 'ffaf', 'eebe', 'ffaf']
+1
+['eebe', 'eebe', 'eece', 'eebe', 'eebe', 'eebe']
+1
+['ccdc', 'bbeb', 'ccdc', 'bbeb', 'ddcd', 'ddcd']
+1
+['dddd', 'ccdc', 'ccdc', 'ddcd', 'ccdc', 'ccdc']
+1
+['ddcd', 'ddcd', 'eebe', 'eebe', 'eebe', 'ddbd']
+1
+['eebe', 'eebe', 'eebe', 'eebe', 'eebe', 'ddcd']
+1
+['ddcd', 'ddcd', 'ddcd', 'ccdc', 'ddcd', 'ddcd']
+1
+['ccdc', 'ddcd', 'bbeb', 'ddcd', 'ccdc', 'cccc']
+1
+['aafa', 'aafa', 'aafa', 'aafa', 'aaea', 'bbeb']
+1
+['ccdc', 'ccdc', 'bbeb', 'bbdb', 'bbeb', 'ccdc']
+1
+['bbeb', 'ccdc', 'bbeb', 'bbeb', 'bbeb', 'bbeb']
+1
+['aafa', 'bbeb', 'bbeb', 'bbeb', 'bbeb', 'ccdc']
+1
+['ccdc', 'ddcd', 'ccdc', 'ddcd', 'ddcd', 'ccdc']
+1
+['ccdc', 'ccdc', 'bbeb', 'cccc', 'bbeb', 'bbdb']
+1
+['ddcd', 'bbeb', 'cccc', 'bbeb', 'cccc', 'bbeb']
+1
+['ddcd', 'eebe', 'ddcd', 'ddcd', 'ddcd', 'eebe']
+1
+['aafa', 'aafa', 'aafa', 'aafa', 'bbeb', 'aafa']
+1
+['ddcd', 'ccdc', 'ccdc', 'bbeb', 'bbeb', 'ccdc']
+1
+['bbeb', 'aafa', 'aafa', 'aafa', 'aafa', 'aafa']
+1
+['ccdc', 'ccdc', 'ccdc', 'ddcd', 'ddcd', 'ccdc']
+1
+['eebe', 'eebe', 'ffaf', 'eebe', 'eebe', 'eebe']
+1
+['ddcd', 'dddd', 'ccdc', 'ccdc', 'ccdc', 'ccdc']
+1
+['ccdc', 'bbeb', 'bbeb', 'bbeb', 'bbdb', 'ccdc']
+1
+['ccec', 'bbeb', 'bbeb', 'bbeb', 'bbeb', 'bbeb']
+1
+['cccc', 'ddcd', 'ddcd', 'ddcd', 'ddcd', 'ddcd']
+1
+['eebe', 'ffaf', 'ffaf', 'eebe', 'eebe', 'eebe']
+1
+['ffaf', 'eebe', 'ffaf', 'eebe', 'ffaf', 'eeae']
+1
+['cccc', 'ddcd', 'ccdc', 'ddcd', 'dddd', 'ccdc']
+1
+['dddd', 'ccdc', 'bbeb', 'ccdc', 'ccdc', 'ccdc']
+1
+['ccdc', 'ccdc', 'ccdc', 'ccdc', 'ccdc', 'ddcd']
+1
+['ddcd', 'dddd', 'ddcd', 'ddcd', 'ccdc', 'ddcd']
+1
+['eebe', 'ddcd', 'ddcd', 'ddcd', 'eebe', 'ddcd']
+1
+['bbeb', 'bbeb', 'bbeb', 'bbeb', 'ccec', 'bbeb']
+1
+['ddbd', 'eece', 'ddcd', 'ddcd', 'ddcd', 'ddcd']
+1
+['ccdc', 'ccdc', 'ccdc', 'ccdc', 'ccdc', 'dddd']
+1
+['bbeb', 'bbeb', 'ccdc', 'bbeb', 'bbdb', 'bbeb']
+1
+['ccdc', 'ccdc', 'ccdc', 'ccdc', 'ccdc', 'ccec']
+1
+['aafa', 'bbeb', 'bbeb', 'bbeb', 'bbeb', 'bbeb']
+1
+['eebe', 'eece', 'eebe', 'eebe', 'eebe', 'eebe']
+1
+['ddcd', 'ddcd', 'ddcd', 'ccdc', 'ddcd', 'ccdc']
+1
+['eebe', 'ddcd', 'ddcd', 'dddd', 'ddcd', 'ddcd']
+1
+['eebe', 'ffaf', 'ffaf', 'ffaf', 'eeae', 'ffbf']
+1
+['ccdc', 'ccec', 'bbeb', 'bbeb', 'bbeb', 'bbeb']
 1
