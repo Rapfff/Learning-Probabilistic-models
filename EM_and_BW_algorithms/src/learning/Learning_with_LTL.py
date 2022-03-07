@@ -1,94 +1,56 @@
-class Node:
-	def __init__(self,incoming=[],now=[],nnext=[]):
-		self.incoming = incoming
-		self.now = now
-		self.next = nnext
-		self.labels = []
-		self.next_nodes = []
+import re
 
-def isLiteral(f):
-	if not " U " in f and not " R " in f and not " or " in f and not " and " in f and not "X " in f:
-		return True
-	return False
+
+class TGBA_state:
+	def __init__(self,f):
+		self.f = f
+		self.next = []
+
+class TGBA:
+	def __init__(self):
+		self.states = []
+		self.initial_state = []
+
+	def addState(s):
+		self.states.append(s)
 
 def neg(f):
-	if f[0] == '!':
-		return f[1:]
-	return'!'+f
-
-def expand(curr, old, nnext, incoming):
-	"""	LTLSet:   curr
-		LTLSet:   old
-		LTLSet:   nnext
-		list int: incoming
-	"""
-	if len(curr) == 0:
-		flag = True
-		for n in nodes:
-			if n.next == nnext and n.now == old:
-				n.incoming += incoming
-				flag = False
-				#break
-		if flag:
-			nodes.append(Node(incoming,old,nnext))
-			expand(nnext,[],[],[len(nodes)-1])
-	
+	if f[0] != '!':
+		return '!'+f
 	else:
-		while len(curr)>0:
-			f = curr[0]
-			curr = curr[1:]
-			old.append(f)
-			
-			if isLiteral(f):
-				if not f in literals:
-					literals.append(f)
-				if f !="false" and not neg(f) in old:
-					expand(curr, old, nnext, incoming)
-			
-			elif " and " in f:
-				to_add = [i for i in f.split(" and ") if not i in old]
-				expand(curr+to_add, old, nnext, incoming)
-			
-			elif "X " in f:
-				expand(curr, old, nnext+[f[2:]], incoming)
-			
-			elif " or " in f or " U " in f or " R " in f:
-				if " U " in f:
-					curr1 = [f.split(" U ")[0]] if f.split(" U ")[0] not in old else []
-					curr2 = [f.split(" U ")[1]] if f.split(" U ")[1] not in old else []
-					next1 = [f]
-				elif " R " in f:
-					curr1 = [f.split(" R ")[1]] if f.split(" R ")[1] not in old else []
-					curr2 = [i for i in f.split(" R ") if not i in old]
-					next1 = [f]
-				else: # "or" case
-					curr1 = [f.split(" or ")[1]] if f.split(" or ")[1] not in old else []
-					curr2 = [f.split(" or ")[0]] if f.split(" or ")[0] not in old else []
-					next1 = []
+		return f[1:]
 
-				expand(curr+curr1, old, nnext+next1, incoming)
-				expand(curr+curr2, old, nnext, incoming)
+def r(f):
+	if f == "!false":
+		return ["true"]
+	elif f == "!true":
+		return ["false"]
+	elif f[:2] == "!!":
+		return [f[2:]]
+	elif "|" in f:
+		return f.split("|")
+	elif "&" in f:
+		return [f.split("&")]
+	elif re.search("!(.+&.+)",f):
+		return [neg(i) for i in f[2:-1].split("&")]
+	elif re.search("!(.+|.+)",f):
+		return [[neg(i) for i in f[2:-1].split("|")]]
+	elif f[:2] == "!X":
+		return "X"+neg(f[2:])
+	elif "U" in f:
+		f2 = f[f.find("U")+len("U"):]
+		f1 = f[:f.find("U")]
+		return [f2,[f1,"X("+f+")","P"+f2]]
+	elif re.search("!(.+U.+)",f):
+		f2 = f[f.find("U")+len("U"):]
+		f1 = f[:f.find("U")]
+		return [[neg(f1),neg(f2)],[neg(f2),"X("+f+")"]]
+		
+	else:
+		return f
 
-def LGBA_construct():
-	for n_index in range(len(nodes)):
-		n = nodes[n_index]
-		for a in literals:
-			if (neg(a) not in n.now) and a in n.now:
-				n.labels.append(a)
-		for nprime in n.incoming:
-			nodes[nprime].next_nodes.append(n_index)
-	initial_states = nodes[0].next_nodes
-	return initial_states
+def LTLtoTGBA(f):
+	
 
-nodes = [Node()]
-literals = ["true","false"]
 formula = "f U g"
-expand([formula],[],[],[0])
-initial_states = LGBA_construct()
-
-print(initial_states)
-for i in nodes:
-	print("\n",i.labels)
-	print(i.next_nodes)
-
 
