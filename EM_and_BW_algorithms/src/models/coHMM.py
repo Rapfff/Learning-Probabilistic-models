@@ -19,8 +19,8 @@ class coHMM_state(Model_state):
 		self.output_parameters = output_parameters
 
 	def a(self,state):
-		if state in self.next_matrix[1]:
-			return self.next_matrix[0][self.next_matrix[1].index(state)]
+		if state in self.transition_matrix[1]:
+			return self.transition_matrix[0][self.transition_matrix[1].index(state)]
 		else:
 			return 0.0
 
@@ -32,7 +32,7 @@ class coHMM_state(Model_state):
 		return normal(mu,sigma,1)[0]
 
 	def next_state(self):
-		return self.next_matrix[1][resolveRandom(self.next_matrix[0])]
+		return self.transition_matrix[1][resolveRandom(self.transition_matrix[0])]
 
 	def next(self):
 		return [self.next_state(),self.next_obs()]
@@ -44,22 +44,22 @@ class coHMM_state(Model_state):
 		
 	def pprint(self,i):
 		print("----STATE s",i,"----",sep='')
-		for j in range(len(self.next_matrix[0])):
-			if self.next_matrix[0][j] > 0.000001:
-				print("s",i," -> s",self.next_matrix[1][j]," : ",self.next_matrix[0][j],sep='')
+		for j in range(len(self.transition_matrix[0])):
+			if self.transition_matrix[0][j] > 0.000001:
+				print("s",i," -> s",self.transition_matrix[1][j]," : ",self.transition_matrix[0][j],sep='')
 		print("************")
 		print("mean:",round(self.output_parameters[0],4))
 		print("std :",round(self.output_parameters[1],4))
 
 	def __str__(self):
-		if len(self.next_matrix[0]) == 0: #end state
+		if len(self.transition_matrix[0]) == 0: #end state
 			return "-\n"
 		else:
 			res = ""
-			for proba in self.next_matrix[0]:
+			for proba in self.transition_matrix[0]:
 				res += str(proba)+' '
 			res += '\n'
-			for state in self.next_matrix[1]:
+			for state in self.transition_matrix[1]:
 				res += str(state)+' '
 			res += '\n'
 			res += str(self.output_parameters)
@@ -86,7 +86,7 @@ def loadcoHMM(file_path):
 	l = f.readline()
 	while l and l != '\n':
 		if l == '-\n':
-			states.append(MCGT_state([[],[],[]]))
+			states.append(coHMM_state([[],[],[]]))
 		else:
 			ps = [ float(i) for i in l[:-2].split(' ')]
 			l  = f.readline()[:-2].split(' ')

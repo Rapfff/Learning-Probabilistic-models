@@ -19,16 +19,16 @@ class coMC_state(Model_state):
 		self.obs_matrix  = obs_matrix
 
 	def next(self):
-		c = resolveRandom(self.next_matrix[0])
-		next_state = self.next_matrix[1][c]
+		c = resolveRandom(self.transition_matrix[0])
+		next_state = self.transition_matrix[1][c]
 		mu, sigma  = self.obs_matrix[next_state]
 		next_obs   = normal(mu,sigma,1)[0]
 		return [next_state,next_obs]
 
 	def tau(self,state,obs):
-		for i in range(len(self.next_matrix[0])):
-			if self.next_matrix[1][i] == state:
-				p1 = self.next_matrix[0][i]
+		for i in range(len(self.transition_matrix[0])):
+			if self.transition_matrix[1][i] == state:
+				p1 = self.transition_matrix[0][i]
 				if p1 > 0.0:
 					return p1*normpdf(obs,self.obs_matrix[state])
 		return 0.0
@@ -37,22 +37,22 @@ class coMC_state(Model_state):
 
 	def pprint(self,i):
 		print("----STATE s",i,"----",sep='')
-		for j in range(len(self.next_matrix[0])):
-			if self.next_matrix[0][j] > 0.000001:
+		for j in range(len(self.transition_matrix[0])):
+			if self.transition_matrix[0][j] > 0.000001:
 				print("s",i," - (mean: ",sep="",end="")
-				print(round(self.obs_matrix[self.next_matrix[1][j]][0],4),sep='',end='')
-				print(', std: ',round(self.obs_matrix[self.next_matrix[1][j]][1],4),sep='',end='')
-				print(") -> s",self.next_matrix[1][j]," : ",self.next_matrix[0][j],sep='')
+				print(round(self.obs_matrix[self.transition_matrix[1][j]][0],4),sep='',end='')
+				print(', std: ',round(self.obs_matrix[self.transition_matrix[1][j]][1],4),sep='',end='')
+				print(") -> s",self.transition_matrix[1][j]," : ",self.transition_matrix[0][j],sep='')
 
 	def __str__(self):
-		if len(self.next_matrix[0]) == 0: #end state
+		if len(self.transition_matrix[0]) == 0: #end state
 			return "-\n"
 		else:
 			res = ""
-			for proba in self.next_matrix[0]:
+			for proba in self.transition_matrix[0]:
 				res += str(proba)+' '
 			res += '\n'
-			for state in self.next_matrix[1]:
+			for state in self.transition_matrix[1]:
 				res += str(state)+' '
 			res += '\n'
 			res += str(self.obs_matrix)

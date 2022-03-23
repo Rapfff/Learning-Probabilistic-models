@@ -151,9 +151,9 @@ class TGBA:
 				for s in self.states[n].next:
 					new_states.append(MCGT_state([[],[],[]]))
 					for t in transitions:
-						new_states[curr].next_matrix[0].append(0.0)
-						new_states[curr].next_matrix[1].append()
-						new_states[curr].next_matrix[2].append()
+						new_states[curr].transition_matrix[0].append(0.0)
+						new_states[curr].transition_matrix[1].append()
+						new_states[curr].transition_matrix[2].append()
 						#TO DO
 
 

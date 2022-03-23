@@ -16,36 +16,36 @@ class MCGT_state(Model_state):
 		super().__init__(next_matrix)
 
 	def next(self):
-		c = resolveRandom(self.next_matrix[0])
-		return [self.next_matrix[1][c],self.next_matrix[2][c]]
+		c = resolveRandom(self.transition_matrix[0])
+		return [self.transition_matrix[1][c],self.transition_matrix[2][c]]
 
 	def tau(self,state,obs):
-		for i in range(len(self.next_matrix[0])):
-			if self.next_matrix[1][i] == state and self.next_matrix[2][i] == obs:
-				return self.next_matrix[0][i]
+		for i in range(len(self.transition_matrix[0])):
+			if self.transition_matrix[1][i] == state and self.transition_matrix[2][i] == obs:
+				return self.transition_matrix[0][i]
 		return 0.0
 
 	def observations(self):
-		return list(set(self.next_matrix[2]))
+		return list(set(self.transition_matrix[2]))
 
 	def pprint(self,i):
 		print("----STATE s",i,"----",sep='')
-		for j in range(len(self.next_matrix[0])):
-			if self.next_matrix[0][j] > 0.000001:
-				print("s",i," - (",self.next_matrix[2][j],") -> s",self.next_matrix[1][j]," : ",self.next_matrix[0][j],sep='')
+		for j in range(len(self.transition_matrix[0])):
+			if self.transition_matrix[0][j] > 0.000001:
+				print("s",i," - (",self.transition_matrix[2][j],") -> s",self.transition_matrix[1][j]," : ",self.transition_matrix[0][j],sep='')
 
 	def __str__(self):
-		if len(self.next_matrix[0]) == 0: #end state
+		if len(self.transition_matrix[0]) == 0: #end state
 			return "-\n"
 		else:
 			res = ""
-			for proba in self.next_matrix[0]:
+			for proba in self.transition_matrix[0]:
 				res += str(proba)+' '
 			res += '\n'
-			for state in self.next_matrix[1]:
+			for state in self.transition_matrix[1]:
 				res += str(state)+' '
 			res += '\n'
-			for obs in self.next_matrix[2]:
+			for obs in self.transition_matrix[2]:
 				res += str(obs)+' '
 			res += '\n'
 			return res

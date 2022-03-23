@@ -62,7 +62,7 @@ class CTMC(MCGT):
 		for i in range(len(sequences[0])):
 			seq = sequences[0][i]
 			times=sequences[1][i]
-			alpha_matrix = self.initAlphaMatrix(len(seq)//2)
+			alpha_matrix = self._initAlphaMatrix(len(seq)//2)
 
 			for k in range(0,len(seq),2):
 				for s in range(len(self.states)):
