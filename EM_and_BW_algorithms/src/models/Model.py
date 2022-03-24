@@ -17,23 +17,33 @@ class Model_state:
 		self.transition_matrix = next_matrix
 
 	def next(self):
-		#overrided
+		"""
+		overrided
+		"""
 		pass
 
 	def tau(self,state,obs):
-		#overrided
+		"""
+		overrided
+		"""
 		pass
 
 	def observations(self):
-		#overrided
+		"""
+		overrided
+		"""
 		pass
 
 	def pprint(self):
-		#overrided
+		"""
+		overrided
+		"""
 		pass
 
 	def __str__(self):
-		#overrided
+		"""
+		overrided
+		"""
 		pass
 
 

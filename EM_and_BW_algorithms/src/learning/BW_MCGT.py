@@ -2,7 +2,7 @@ import os, sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
-from models.MCGT import *
+from models.MC import *
 from learning.BW import *
 from multiprocessing import cpu_count, Pool
 from tools import correct_proba
@@ -81,8 +81,8 @@ class BW_MCGT(BW):
 		new_states = []
 		for s in range(self.nb_states):
 			l = [ correct_proba([tau[s][i]/den[s] for i in range(len(list_sta))]) , list_sta, list_obs ]
-			new_states.append(MCGT_state(l))
+			new_states.append(MC_state(l))
 
 		initial_state = [num_init[s]/sum(num_init) for s in range(self.nb_states)]
 
-		return [MCGT(new_states,initial_state),currentloglikelihood]
+		return [MC(new_states,initial_state),currentloglikelihood]

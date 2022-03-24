@@ -2,7 +2,7 @@ import os, sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
-from models.MCGT import *
+from models.MC import *
 from math import sqrt, log
 from tools import correct_proba, getAlphabetFromSequences
 class Alergia:
@@ -165,5 +165,5 @@ class Alergia:
 				self.states_transitions[i][0] = [j/self.states_counter[i] for j in self.states_transitions[i][0]]
 				self.states_transitions[i][0] = correct_proba(self.states_transitions[i][0])
 				self.states_transitions[i][1] = [j-self.states_lbl[:j].count(None) for j in self.states_transitions[i][1]]
-				states.append(MCGT_state(self.states_transitions[i]))
-		return MCGT(states,0)
+				states.append(MC_state(self.states_transitions[i]))
+		return MC(states,0)

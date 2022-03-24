@@ -1,8 +1,6 @@
-from random import random, randint
-from functools import reduce
+from random import random
 from numpy.random import geometric
 from scipy.stats import norm
-from math import exp, pi
 
 
 def normpdf(x, params, variation=0.01):

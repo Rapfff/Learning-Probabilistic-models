@@ -3,7 +3,7 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from src.models.HMM import *
-from src.models.MCGT import *
+from src.models.MC import *
 from src.models.CTMC import *
 from src.models.MDP import *
 from src.models.coMC import *
@@ -107,69 +107,69 @@ def modelCOHMM1():
 
 # ---- MCGT ---------------------------
 
-def modelMCGT1():
-	g_s0 = MCGT_state([[0.15,0.15,0.2,0.2,0.15,0.15],[1,1,2,2,3,3],['x','y','x','y','x','y']])
-	g_s1 = MCGT_state([[1.0],[4],['a']])
-	g_s2 = MCGT_state([[1.0],[4],['b']])
-	g_s3 = MCGT_state([[1.0],[4],['c']])
-	g_s4 = MCGT_state([[0.5,0.5],[4,4],['d','e']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0,"MCGT1")
+def modelMC1():
+	g_s0 = MC_state([[0.15,0.15,0.2,0.2,0.15,0.15],[1,1,2,2,3,3],['x','y','x','y','x','y']])
+	g_s1 = MC_state([[1.0],[4],['a']])
+	g_s2 = MC_state([[1.0],[4],['b']])
+	g_s3 = MC_state([[1.0],[4],['c']])
+	g_s4 = MC_state([[0.5,0.5],[4,4],['d','e']])
+	return MC([g_s0,g_s1,g_s2,g_s3,g_s4],0,"MCGT1")
 
-def modelMCGT2():
-	g_s0 = MCGT_state([[0.2,0.2,0.3,0.3],[1,1,2,2],['x','y','x','y']])
-	g_s1 = MCGT_state([[1.0],[3],['a']])
-	g_s2 = MCGT_state([[1.0],[3],['b']])
-	g_s3 = MCGT_state([[1.0],[3],['d']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3],0,"MCGT2")
+def modelMC2():
+	g_s0 = MC_state([[0.2,0.2,0.3,0.3],[1,1,2,2],['x','y','x','y']])
+	g_s1 = MC_state([[1.0],[3],['a']])
+	g_s2 = MC_state([[1.0],[3],['b']])
+	g_s3 = MC_state([[1.0],[3],['d']])
+	return MC([g_s0,g_s1,g_s2,g_s3],0,"MCGT2")
 
-def modelMCGT3():
-	g_s0 = MCGT_state([[1/3,1/3,1/3],[1,2,3],['$','$','$']])
-	g_s1 = MCGT_state([[1.0],[4],['a']])
-	g_s2 = MCGT_state([[1.0],[4],['b']])
-	g_s3 = MCGT_state([[1.0],[4],['c']])
-	g_s4 = MCGT_state([[1.0],[4],['d']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0,"MCGT3")
+def modelMC3():
+	g_s0 = MC_state([[1/3,1/3,1/3],[1,2,3],['$','$','$']])
+	g_s1 = MC_state([[1.0],[4],['a']])
+	g_s2 = MC_state([[1.0],[4],['b']])
+	g_s3 = MC_state([[1.0],[4],['c']])
+	g_s4 = MC_state([[1.0],[4],['d']])
+	return MC([g_s0,g_s1,g_s2,g_s3,g_s4],0,"MCGT3")
 
-def modelMCGT4():
-	g_s0 = MCGT_state([[0.5,0.5],[1,2],['x','y']])
-	g_s1 = MCGT_state([[0.4,0.1,0.35,0.15],[3,3,4,4],['a','b','a','b']])
-	g_s2 = MCGT_state([[0.3,0.2,0.1,0.4],[1,1,4,4],['b','a','a','b']])
-	g_s3 = MCGT_state([[0.5,0.5],[4,5],['c','c']])
-	g_s4 = MCGT_state([[1.0],[5],['d']])
-	g_s5 = MCGT_state([[1.0],[5],['e']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5],0,"MCGT4")
+def modelMC4():
+	g_s0 = MC_state([[0.5,0.5],[1,2],['x','y']])
+	g_s1 = MC_state([[0.4,0.1,0.35,0.15],[3,3,4,4],['a','b','a','b']])
+	g_s2 = MC_state([[0.3,0.2,0.1,0.4],[1,1,4,4],['b','a','a','b']])
+	g_s3 = MC_state([[0.5,0.5],[4,5],['c','c']])
+	g_s4 = MC_state([[1.0],[5],['d']])
+	g_s5 = MC_state([[1.0],[5],['e']])
+	return MC([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5],0,"MCGT4")
 
-def modelMCGT5(p1=0.4,p2=0.3,p3=0.2,p4=0.05):
-	g_s0 = MCGT_state([[p1,p2,p3,1-p1-p2-p3],[0,0,1,1],['a','b','a','b']])
-	g_s1 = MCGT_state([[p4,1-p4],[0,0],['a','b']])
-	return MCGT([g_s0,g_s1],0,"MCGT5")
+def modelMC5(p1=0.4,p2=0.3,p3=0.2,p4=0.05):
+	g_s0 = MC_state([[p1,p2,p3,1-p1-p2-p3],[0,0,1,1],['a','b','a','b']])
+	g_s1 = MC_state([[p4,1-p4],[0,0],['a','b']])
+	return MC([g_s0,g_s1],0,"MCGT5")
 
-def modelMCGT_game():
-	s_dice = MCGT_state([[1/3,1/3,1/3],[0,0,1],['1-2','3-4','5-6']])
-	s_cards= MCGT_state([[10/13,3/13],[1,2],["Number","Face"]])
-	s_win  = MCGT_state([[1.0],[2],["Win"]])
-	return MCGT([s_dice,s_cards,s_win],0,"MCGT_games")
+def modelMC_game():
+	s_dice = MC_state([[1/3,1/3,1/3],[0,0,1],['1-2','3-4','5-6']])
+	s_cards= MC_state([[10/13,3/13],[1,2],["Number","Face"]])
+	s_win  = MC_state([[1.0],[2],["Win"]])
+	return MC([s_dice,s_cards,s_win],0,"MCGT_games")
 
-def modelMCGT_REBER():
-	g_s0 = MCGT_state([[1.0],[1],['B']])
-	g_s1 = MCGT_state([[0.5,0.5],[2,3],['T','P']])
-	g_s2 = MCGT_state([[0.6,0.4],[2,4],['S','X']])
-	g_s3 = MCGT_state([[0.7,0.3],[3,5],['T','V']])
-	g_s4 = MCGT_state([[0.5,0.5],[3,6],['X','S']])
-	g_s5 = MCGT_state([[0.5,0.5],[4,6],['P','V']])
-	g_s6 = MCGT_state([[1.0],[6],['E']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5,g_s6],0,"MCGT_REBER")
+def modelMC_REBER():
+	g_s0 = MC_state([[1.0],[1],['B']])
+	g_s1 = MC_state([[0.5,0.5],[2,3],['T','P']])
+	g_s2 = MC_state([[0.6,0.4],[2,4],['S','X']])
+	g_s3 = MC_state([[0.7,0.3],[3,5],['T','V']])
+	g_s4 = MC_state([[0.5,0.5],[3,6],['X','S']])
+	g_s5 = MC_state([[0.5,0.5],[4,6],['P','V']])
+	g_s6 = MC_state([[1.0],[6],['E']])
+	return MC([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5,g_s6],0,"MCGT_REBER")
 
 
-def modelMCGT1_assist():
-	g_s0 = MCGT_state([randomProbabilities(6),[1,1,2,2,3,3],['x','y','x','y','x','y']])
-	g_s1 = MCGT_state([randomProbabilities(4),[1,2,3,4],['a','a','a','a']])
-	g_s2 = MCGT_state([randomProbabilities(4),[1,2,3,4],['b','b','b','b']])
-	g_s3 = MCGT_state([randomProbabilities(4),[1,2,3,4],['c','c','c','c']])
-	g_s4 = MCGT_state([randomProbabilities(4),[1,2,3,4],['d','d','d','d']])
-	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4],0,"MCGT1_assist")
+def modelMC1_assist():
+	g_s0 = MC_state([randomProbabilities(6),[1,1,2,2,3,3],['x','y','x','y','x','y']])
+	g_s1 = MC_state([randomProbabilities(4),[1,2,3,4],['a','a','a','a']])
+	g_s2 = MC_state([randomProbabilities(4),[1,2,3,4],['b','b','b','b']])
+	g_s3 = MC_state([randomProbabilities(4),[1,2,3,4],['c','c','c','c']])
+	g_s4 = MC_state([randomProbabilities(4),[1,2,3,4],['d','d','d','d']])
+	return MC([g_s0,g_s1,g_s2,g_s3,g_s4],0,"MCGT1_assist")
 
-def modelMCGT_equiprobable(nb_states,alphabet):
+def modelMC_equiprobable(nb_states,alphabet):
 	s = []
 	for i in range(nb_states):
 		s += [i] * len(alphabet)
@@ -177,10 +177,10 @@ def modelMCGT_equiprobable(nb_states,alphabet):
 	
 	states = []
 	for i in range(nb_states):
-		states.append(MCGT_state([[1/len(obs)]*len(obs),s,obs]))
-	return MCGT(states,0,"MCGT_equiprobable_"+str(nb_states)+"states")
+		states.append(MC_state([[1/len(obs)]*len(obs),s,obs]))
+	return MC(states,0,"MCGT_equiprobable_"+str(nb_states)+"states")
 
-def modelMCGT_random(nb_states,alphabet,random_initial_state=False):
+def modelMC_random(nb_states,alphabet,random_initial_state=False):
 	s = []
 	for i in range(nb_states):
 		s += [i] * len(alphabet)
@@ -188,16 +188,13 @@ def modelMCGT_random(nb_states,alphabet,random_initial_state=False):
 	
 	states = []
 	for i in range(nb_states):
-		states.append(MCGT_state([randomProbabilities(len(obs)),s,obs]))
+		states.append(MC_state([randomProbabilities(len(obs)),s,obs]))
 	
 	if random_initial_state:
 		init = randomProbabilities(nb_states)
 	else:
 		init = 0
-	return MCGT(states,init,"MCGT_random_"+str(nb_states)+"states")
-
-def modelMCGT1_equiprobable():
-	return modelMCGT_equiprobable(5,['x','y','a','b','c','d'])
+	return MC(states,init,"MCGT_random_"+str(nb_states)+"states")
 
 # ---- CTMC----------------------------
 

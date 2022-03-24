@@ -7,9 +7,9 @@ from tools import resolveRandom
 from math import  log, exp
 from numpy.random import exponential
 
-from models.MCGT import MCGT_state, MCGT
+from models.MC import MC_state, MC
 
-class CTMC_state(MCGT_state):
+class CTMC_state(MC_state):
 	"""
 	MCGT but stay in state for a duration given by an exp law of parameter exp_lambda
 	"""
@@ -27,7 +27,7 @@ class CTMC_state(MCGT_state):
 		return str(self.exp_lambda)+"\n"+str(super())
 
 
-class CTMC(MCGT):
+class CTMC(MC):
 
 	def __init__(self,states,initial_state,name="unknown CTMC"):
 		super().__init__(states,initial_state,name)

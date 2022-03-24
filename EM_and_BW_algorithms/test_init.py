@@ -1,13 +1,13 @@
 from src.tools import generateSet
 
 from src.learning.BW_MCGT import BW_MCGT
-from examples.examples_models import modelMCGT_REBER, modelMCGT_random
+from examples.examples_models import modelMC_REBER, modelMC_random
 
-print("\nMCGT")
-m = modelMCGT_REBER()
+print("\nMC")
+m = modelMC_REBER()
 s = generateSet(m,100,10)
 
-m2 = modelMCGT_random(7,m.alphabet(),True)
+m2 = modelMC_random(7,m.alphabet(),True)
 print(m2.initial_state)
 algo = BW_MCGT(m2)
 

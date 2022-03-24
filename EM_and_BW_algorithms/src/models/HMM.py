@@ -8,7 +8,7 @@ from ast import literal_eval
 
 class HMM_state(Model_state):
 	"""
-	Initiate an HMM state
+	Initialise an HMM state
 	Takes on input the transition matrix and the generation matrix of this state
 
 	:param output_matrix: [[proba_symbol1,proba_symbol2,...],[symbol1,symbol2,...]] . output_matrix[0][x] is the probability to generate the observation output_matrix[1][x]
@@ -107,6 +107,12 @@ class HMM_state(Model_state):
 		
 
 	def pprint(self,i):
+		"""
+		Print the state on terminal on terminal.
+
+		:param i: id of the current state
+		:type i: int
+		"""
 		print("----STATE s",i,"----",sep='')
 		for j in range(len(self.transition_matrix[0])):
 			if self.transition_matrix[0][j] > 0.000001:
@@ -138,16 +144,61 @@ class HMM_state(Model_state):
 			return res
 
 class HMM(Model):
+	"""
+	Initialise an HMM.
+
+	:param states: a list of states
+	:type states: list of  HMM_state
+
+	:param initial_state: determine which state is the initial one (then it's the id of the state), or what are the probability to start in each state (then it's a list of probabilities) 
+	:type initial_state: int or list of float
+
+	:param name: name of the model
+	:type name: str
+	"""
 	def __init__(self,states,initial_state,name="unknown HMM"):
 		super().__init__(states,initial_state,name)
 
 	def a(self,s1,s2):
+		"""
+		Return the probability of moving from state <s1> to state <s2>
+
+		:param s1: ID of the source state
+		:type s1: int
+		
+		:param s2: ID of the destination state
+		:type s2: int
+		
+		:return: probability of moving from state <s1> to state <s2>
+		:rtype: float
+		"""
 		return self.states[s1].a(s2)
 
 	def b(self,s,o):
+		"""
+		Return the probability of generating <o> in state <s>
+
+		:param s: ID of the source state
+		:type s: int
+		
+		:param o: observation
+		:type o: str
+		
+		:return: probability of generating <o> in state <s>
+		:rtype: float
+		"""
 		return self.states[s].b(o)
 
 def loadHMM(file_path):
+	"""
+	Load a model saved into a text file
+
+	:param file_path: location of the text file
+	:type file_path: str
+
+	:return: an HMM
+	:rtype: HMM
+	"""
 	f = open(file_path,'r')
 	name = f.readline()[:-1]
 	initial_state = literal_eval(f.readline()[:-1])
