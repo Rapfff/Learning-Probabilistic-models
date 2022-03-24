@@ -86,7 +86,7 @@ def loadcoHMM(file_path):
 	l = f.readline()
 	while l and l != '\n':
 		if l == '-\n':
-			states.append(MCGT_state([[],[],[]]))
+			states.append(coHMM_state([[],[],[]]))
 		else:
 			ps = [ float(i) for i in l[:-2].split(' ')]
 			l  = f.readline()[:-2].split(' ')
