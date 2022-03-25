@@ -12,8 +12,8 @@ class BW_LTL:
 	def __init__(self) -> None:
 		pass
 	
-	def learn(self,formula: str,traces: list,alphabet: list,output_file="output_model.txt",epsilon=0.01,verbose=False,pp='',nb_states=None) -> MCGT:
-		self.generateInitialModel(formula,nb_states,alphabet)
+	def learn(self,formula: str,traces: list,output_file="output_model.txt",epsilon=0.01,verbose=False,pp='',nb_states=None, alphabet=None) -> MCGT:
+		self.generateInitialModel(formula,nb_states)
 		bw = BW_MCGT(self.initial_model)
 		output_model = bw.learn(traces,output_file,epsilon,verbose,pp)
 		return output_model
@@ -22,7 +22,7 @@ class BW_LTL:
 		hoa = spot.translate(formula, 'Buchi', 'deterministic', 'state-based').to_str("hoa")
 		self.initial_model = HOAtoMCGT(hoa,alphabet)
 		self.initial_model.pprint()
-		self.initial_model.save("initial_model.txt")
+		
 		if nb_states != None:
 			missing_states = nb_states - len(self.initial_model.states)
 			if missing_states > 0:
@@ -46,12 +46,17 @@ class BW_LTL:
 		for s in range(len(self.initial_model.states)):
 			for ss in self.initial_model.states[s].next_matrix[1]:
 				incoming_edges[ss].append(s)
-		while to_add > 0:
+		while to_add >= 0:
+			print("------------------------------------")
+			self.initial_model.pprint()
+			print(incoming_edges)
 			nb_incoming_edges = [len(s) for s in incoming_edges]
+			print(nb_incoming_edges)
 			chosen = nb_incoming_edges.index(max(nb_incoming_edges))
-			next_states = self.initial_model.states[chosen].next_matrix[1]
-			next_obs    = self.initial_model.states[chosen].next_matrix[1]
-			next_proba  = randomProbabilities(len(next_states))
+			print(chosen)
+			next_proba  = self.initial_model.states[chosen].next_matrix[0][:]
+			next_states = self.initial_model.states[chosen].next_matrix[1][:]
+			next_obs    = self.initial_model.states[chosen].next_matrix[2][:]
 			new_state   = MCGT_state([next_proba,next_states,next_obs])
 			self.initial_model.states.append(new_state)
 			#split edges
@@ -74,8 +79,6 @@ def HOAtoMCGT(hoa,alphabet) -> MCGT:
 	while hoa[i][:6] != "Start:":
 		i += 1
 	initial_state = int(hoa[i].split(" ")[1])
-	i += 1
-	alphabet_LTL = hoa[i][4:].replace('"','').split(" ")[1:]
 	while hoa[i-1] != "--BODY--":
 		i += 1
 	while hoa[i] != "--END--":
@@ -85,7 +88,7 @@ def HOAtoMCGT(hoa,alphabet) -> MCGT:
 			hoa[i] = hoa[i].replace("{0}",'')
 			hoa[i] = hoa[i].split("] ")
 			dest_state = int(hoa[i][1])
-			labels = _transitionLabels(hoa[i][0][1:],alphabet_LTL,alphabet)
+			labels = _transitionLabels(hoa[i][0][1:],alphabet)
 			for l in labels:
 				next_matrix[1].append(dest_state)
 				next_matrix[2].append(l)
@@ -94,7 +97,7 @@ def HOAtoMCGT(hoa,alphabet) -> MCGT:
 		states.append(MCGT_state(next_matrix))
 	return MCGT(states,initial_state)
 
-def _transitionLabels(l,alphabet_LTL,alphabet) -> list:
+def _transitionLabels(l,alphabet) -> list:
 	l = l.replace(" ","")
 	if l == "t":
 		return alphabet
@@ -102,8 +105,8 @@ def _transitionLabels(l,alphabet_LTL,alphabet) -> list:
 	res = []
 	for l in g:
 		l = l.split('&')
-		pos_AP = [alphabet_LTL[int(i)]     for i in l if i[0] != '!'] # list of all positive AP for this transition
-		neg_AP = [alphabet_LTL[int(i[1:])] for i in l if i[0] == '!'] # list of all negative AP for this transition
+		pos_AP = [alphabet[int(i)]     for i in l if i[0] != '!'] # list of all positive AP for this transition
+		neg_AP = [alphabet[int(i[1:])] for i in l if i[0] == '!'] # list of all negative AP for this transition
 		nb_pos_AP = len(pos_AP)
 		if nb_pos_AP > 1: # if more than one positive AP -> transition impossible
 			pass
