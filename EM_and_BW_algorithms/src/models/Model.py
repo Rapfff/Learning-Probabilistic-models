@@ -9,7 +9,7 @@ class Model_state:
 	:param transition_matrix: The transition matrix, depends on the instanciated class.
 	:type transition_matrix: list
 	"""
-	def __init__(self,next_matrix):
+	def __init__(self,next_matrix: list) -> None:
 
 		if round(sum(next_matrix[0]),2) != 1.0 and sum(next_matrix[0]) != 0:
 			print("Sum of the probabilies of the next_matrix should be 1 or 0 here it's ",sum(next_matrix[0]))
@@ -61,7 +61,7 @@ class Model:
 	:param name: name of the model
 	:type name: str
 	"""
-	def __init__(self,states,initial_state,name):
+	def __init__(self,states: list,initial_state,name: str) -> None:
 		# initial_state can be a list of probability or an int
 		if type(initial_state) == int:
 			self.initial_state = [0.0 for i in range(len(states))]
@@ -71,10 +71,10 @@ class Model:
 		self.states = states
 		self.name = name
 
-	def __str__(self):
+	def __str__(self) -> str:
 		return self.name
 
-	def save(self,file_path):
+	def save(self,file_path: str) -> None:
 		"""
 		Save the model into a txt file
 
@@ -90,7 +90,7 @@ class Model:
 			f.write(str(s))
 		f.close()
 
-	def tau(self,s1,s2,obs):
+	def tau(self,s1: int,s2: int,obs: str) -> float:
 		"""
 		Return the probability of moving from state s1 to s2 generating observation obs
 
@@ -105,7 +105,7 @@ class Model:
 		"""
 		return self.states[s1].tau(s2,obs)
 
-	def alphabet(self):
+	def alphabet(self) -> list:
 		"""
 		Return the alphabet of the model
 
@@ -117,7 +117,7 @@ class Model:
 			res += s.observations()
 		return list(set(res))
 
-	def pi(self,s):
+	def pi(self,s: int) -> float:
 		"""
 		Return the probability of starting in state s
 
@@ -129,7 +129,7 @@ class Model:
 		"""
 		return self.initial_state[s]
 
-	def run(self,number_steps):
+	def run(self,number_steps: int) -> list:
 		"""
 		Simulate a run of length number_steps of the model and return the sequence of observations generated.
 
@@ -149,7 +149,7 @@ class Model:
 
 		return output
 
-	def pprint(self):
+	def pprint(self) -> None:
 		"""
 		Print the model on terminal.
 		"""
@@ -166,7 +166,7 @@ class Model:
 			self.states[i].pprint(i)
 		print()
 
-	def _updateAlphaMatrix(self,sequence,common,alpha_matrix):
+	def _updateAlphaMatrix(self,sequence: list,common: int,alpha_matrix: list) -> list:
 		"""
 		Update the given alpha values for all the states for a new <sequence> of observations. It keeps the alpha values for the <common> first observations of the sequence.
 		The idea is the following: if you have already computed the alpha values for a previous sequence and you want to compute the alpha values of a new sequence that starts *
@@ -195,7 +195,7 @@ class Model:
 				alpha_matrix[s][k+1] = summ
 		return alpha_matrix
 
-	def _initAlphaMatrix(self,len_seq):
+	def _initAlphaMatrix(self,len_seq: int) -> list:
 		"""
 		Return a matrix with the correct size to be updated by the updateAlphaMatrix method
 
@@ -211,7 +211,7 @@ class Model:
 			alpha_matrix[-1] += [None for i in range(len_seq)]
 		return alpha_matrix
 
-	def logLikelihood(self,sequences):
+	def logLikelihood(self,sequences: list) -> float:
 		"""
 		Compute the average loglikelihood of a set of sequences which all have the same length
 

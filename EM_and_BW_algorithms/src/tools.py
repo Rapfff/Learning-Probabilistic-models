@@ -3,11 +3,42 @@ from numpy.random import geometric
 from scipy.stats import norm
 
 
-def normpdf(x, params, variation=0.01):
+def normpdf(x: float, params: list, variation:float = 0.01) -> float:
+	"""
+	Return the probability of <x> under a normal distribution returns of 
+	parameters <params>. Since this probability should be 0 it returns in
+	fact the probability that the normal distribution gives us a value
+	between x-variation and x+variation.
+
+	:param x: the value of the normal distribution
+	:type x: float
+
+	:param params: the parameters of the distribution: [mean,sd]
+	:type params: list of two float
+
+	:param variation: the vicinity
+	:type variation: float
+
+	:return: the probability of <x> under a normal distribution returns of 
+	parameters <params>.
+	:rtype: float
+	"""
 	return norm.cdf(x+variation,params[0],params[1]) - norm.cdf(x-variation,params[0],params[1])
 
 
-def loadSet(file_path, float_obs=False):
+def loadSet(file_path:str , float_obs: bool = False) -> list:
+	"""
+	Load a training/test set saved into a text file.
+
+	:param file_path: location of the file
+	:type file_path: str
+
+	:param float_obs: Should be True if the observations are float (False by default)
+	:type float_obs: bool
+
+	:return: a training/test set
+	:rtype: float
+	"""
 	res_set = [[],[]]
 	f = open(file_path,'r')
 	l = f.readline()
@@ -24,17 +55,33 @@ def loadSet(file_path, float_obs=False):
 			res_set[0][i] = [float(j) for j in res_set[0][i]]
 	return res_set
 
-def saveSet(t_set,file_path):
+def saveSet(t_set: list, file_path: str) -> None:
+	"""
+	Save a training/test set into a text file.
+	
+	:param t_set: the training/test set to save
+	:type t_set: list
+
+	:param file_path: where to save
+	:type file_path: str
+	"""
 	f = open(file_path,'w')
 	for i in range(len(t_set[0])):
 		f.write(str(t_set[0][i])+'\n')
 		f.write(str(t_set[1][i])+'\n')
 	f.close()
 
-def resolveRandom(m):
+def resolveRandom(m: list) -> int:
 	"""
-	m = [proba1,proba2,...]
-	return index of the probability choosen
+	Given a list of probabilities it returns the index of the one choosen
+	according to the probabilities.
+	Example: if m=[0.7,0.3], it will returns 0 with probability 0.7, etc...
+	
+	:param m: list of probabilities
+	:type m: list of float
+
+	:return: an index
+	:rtype: int
 	"""
 	while True:
 		r = random()
@@ -45,7 +92,16 @@ def resolveRandom(m):
 			break
 	return i
 
-def correct_proba(ll,accuracy = 6,times=1):
+def correct_proba(ll: list,accuracy:int = 6,times:int =1) -> list:
+	"""
+	Given a list of float it adapts it such that the sum is equal to 1.0.
+
+	:param ll: list of probabilities to normalize
+	:type: list of float
+
+	"""
+	#return [i/sum(ll) for i in ll]
+	
 	diff = sum(ll)-1.0
 	res =  [round(i-diff/len(ll),accuracy) for i in ll]
 	f = False
