@@ -6,14 +6,14 @@ from random import sample
 from tools import randomProbabilities
 from models.MCGT import *
 from learning.BW_MCGT import BW_MCGT
-#import spot
+import spot
 
 class BW_LTL:
 	def __init__(self) -> None:
 		pass
 	
-	def learn(self,formula: str,traces: list,output_file="output_model.txt",epsilon=0.01,verbose=False,pp='',nb_states=None, alphabet=None) -> MCGT:
-		self.generateInitialModel(formula,nb_states)
+	def learn(self,formula: str,traces: list,alphabet: list,output_file="output_model.txt",epsilon=0.01,verbose=False,pp='',nb_states=None) -> MCGT:
+		self.generateInitialModel(formula,nb_states,alphabet)
 		bw = BW_MCGT(self.initial_model)
 		output_model = bw.learn(traces,output_file,epsilon,verbose,pp)
 		return output_model
@@ -22,7 +22,7 @@ class BW_LTL:
 		hoa = spot.translate(formula, 'Buchi', 'deterministic', 'state-based').to_str("hoa")
 		self.initial_model = HOAtoMCGT(hoa,alphabet)
 		self.initial_model.pprint()
-		
+		self.initial_model.save("initial_model.txt")
 		if nb_states != None:
 			missing_states = nb_states - len(self.initial_model.states)
 			if missing_states > 0:
@@ -74,6 +74,8 @@ def HOAtoMCGT(hoa,alphabet) -> MCGT:
 	while hoa[i][:6] != "Start:":
 		i += 1
 	initial_state = int(hoa[i].split(" ")[1])
+	i += 1
+	alphabet_LTL = hoa[i][4:].replace('"','').split(" ")[1:]
 	while hoa[i-1] != "--BODY--":
 		i += 1
 	while hoa[i] != "--END--":
@@ -83,7 +85,7 @@ def HOAtoMCGT(hoa,alphabet) -> MCGT:
 			hoa[i] = hoa[i].replace("{0}",'')
 			hoa[i] = hoa[i].split("] ")
 			dest_state = int(hoa[i][1])
-			labels = _transitionLabels(hoa[i][0][1:],alphabet)
+			labels = _transitionLabels(hoa[i][0][1:],alphabet_LTL,alphabet)
 			for l in labels:
 				next_matrix[1].append(dest_state)
 				next_matrix[2].append(l)
@@ -92,7 +94,7 @@ def HOAtoMCGT(hoa,alphabet) -> MCGT:
 		states.append(MCGT_state(next_matrix))
 	return MCGT(states,initial_state)
 
-def _transitionLabels(l,alphabet) -> list:
+def _transitionLabels(l,alphabet_LTL,alphabet) -> list:
 	l = l.replace(" ","")
 	if l == "t":
 		return alphabet
@@ -100,8 +102,8 @@ def _transitionLabels(l,alphabet) -> list:
 	res = []
 	for l in g:
 		l = l.split('&')
-		pos_AP = [alphabet[int(i)]     for i in l if i[0] != '!'] # list of all positive AP for this transition
-		neg_AP = [alphabet[int(i[1:])] for i in l if i[0] == '!'] # list of all negative AP for this transition
+		pos_AP = [alphabet_LTL[int(i)]     for i in l if i[0] != '!'] # list of all positive AP for this transition
+		neg_AP = [alphabet_LTL[int(i[1:])] for i in l if i[0] == '!'] # list of all negative AP for this transition
 		nb_pos_AP = len(pos_AP)
 		if nb_pos_AP > 1: # if more than one positive AP -> transition impossible
 			pass
