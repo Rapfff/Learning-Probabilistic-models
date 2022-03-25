@@ -8,6 +8,6 @@ training_set = generateSet(m,1000,7)
 test_set     = generateSet(m,1000,7)
 formula      = "b & X(t xor p) & GF e"
 
-output_model = BW_LTL().learn(formula,training_set,verbose=True)
+output_model = BW_LTL().learn(formula,training_set,alphabet=m.observations(),verbose=True,nb_states=7)
 
 output_model.pprint()
