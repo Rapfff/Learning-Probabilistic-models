@@ -6,26 +6,33 @@ from random import sample
 from tools import randomProbabilities
 from models.MCGT import *
 from learning.BW_MCGT import BW_MCGT
-import spot
+#import spot
 
 class BW_LTL:
 	def __init__(self) -> None:
 		pass
 	
-	def learn(self,formula: str,traces: list,output_file="output_model.txt",epsilon=0.01,verbose=False,pp='',nb_states=None) -> MCGT:
+	def learn(self,formula: str,traces: list,output_file="output_model.txt",epsilon=0.01,verbose=False,pp='',nb_states=None, alphabet=None) -> MCGT:
 		self.generateInitialModel(formula,nb_states)
 		bw = BW_MCGT(self.initial_model)
 		output_model = bw.learn(traces,output_file,epsilon,verbose,pp)
 		return output_model
 	
-	def generateInitialModel(self,formula: str,nb_states: int) -> None:
+	def generateInitialModel(self,formula: str,nb_states: int, alphabet: list) -> None:
 		hoa = spot.translate(formula, 'Buchi', 'deterministic', 'state-based').to_str("hoa")
-		self.initial_model = HOAtoMCGT(hoa)
-		self.initial_model.pprint()
-		if nb_states != None and len(self.initial_model.states) < nb_states:
-			self.addStates( nb_states - len(self.initial_model.states) )
+		self.initial_model = HOAtoMCGT(hoa,alphabet)
 		self.initial_model.pprint()
 		
+		if nb_states != None:
+			missing_states = nb_states - len(self.initial_model.states)
+			if missing_states > 0:
+				self.addStates( missing_states )
+		
+		missing_observations = list(set(alphabet)-set(self.initial_model.observations()))
+		if missing_observations != []:
+			self.addObservations(missing_observations)
+		self.initial_model.pprint()
+
 	def addStates(self,to_add: int) -> None:
 		"""
 		Split the states with the highest number of incoming transition in 
@@ -59,26 +66,24 @@ class BW_LTL:
 				incoming_edges[s].append(len(self.initial_model.states)-1)
 			
 			to_add -= 1
-
-def HOAtoMCGT(hoa) -> MCGT:
+	
+def HOAtoMCGT(hoa,alphabet) -> MCGT:
 	hoa = hoa.split("\n")
 	states = []
 	i = 0
 	while hoa[i][:6] != "Start:":
 		i += 1
 	initial_state = int(hoa[i].split(" ")[1])
-	i += 1
-	alphabet = hoa[i][4:].replace('"','').split(" ")[1:]
-	print(alphabet)
 	while hoa[i-1] != "--BODY--":
 		i += 1
 	while hoa[i] != "--END--":
 		i += 1
 		next_matrix = [[],[],[]]
 		while hoa[i][0] == '[':
-			hoa[i] = hoa[i].split(" ")
+			hoa[i] = hoa[i].replace("{0}",'')
+			hoa[i] = hoa[i].split("] ")
 			dest_state = int(hoa[i][1])
-			labels = _transitionLabels(hoa[i][0],alphabet)
+			labels = _transitionLabels(hoa[i][0][1:],alphabet)
 			for l in labels:
 				next_matrix[1].append(dest_state)
 				next_matrix[2].append(l)
@@ -88,10 +93,10 @@ def HOAtoMCGT(hoa) -> MCGT:
 	return MCGT(states,initial_state)
 
 def _transitionLabels(l,alphabet) -> list:
-	if l == "[t]":
+	l = l.replace(" ","")
+	if l == "t":
 		return alphabet
-	g = l[1:-1]
-	g = g.split('|')
+	g = l.split('|')
 	res = []
 	for l in g:
 		l = l.split('&')
