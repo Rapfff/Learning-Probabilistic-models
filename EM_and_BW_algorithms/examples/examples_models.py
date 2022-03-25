@@ -151,13 +151,13 @@ def modelMCGT_game():
 	return MCGT([s_dice,s_cards,s_win],0,"MCGT_games")
 
 def modelMCGT_REBER():
-	g_s0 = MCGT_state([[1.0],[1],['B']])
-	g_s1 = MCGT_state([[0.5,0.5],[2,3],['T','P']])
-	g_s2 = MCGT_state([[0.6,0.4],[2,4],['S','X']])
-	g_s3 = MCGT_state([[0.7,0.3],[3,5],['T','V']])
-	g_s4 = MCGT_state([[0.5,0.5],[3,6],['X','S']])
-	g_s5 = MCGT_state([[0.5,0.5],[4,6],['P','V']])
-	g_s6 = MCGT_state([[1.0],[6],['E']])
+	g_s0 = MCGT_state([[1.0],[1],['b']])
+	g_s1 = MCGT_state([[0.5,0.5],[2,3],['t','p']])
+	g_s2 = MCGT_state([[0.6,0.4],[2,4],['s','x']])
+	g_s3 = MCGT_state([[0.7,0.3],[3,5],['t','v']])
+	g_s4 = MCGT_state([[0.5,0.5],[3,6],['x','s']])
+	g_s5 = MCGT_state([[0.5,0.5],[4,6],['p','v']])
+	g_s6 = MCGT_state([[1.0],[6],['e']])
 	return MCGT([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5,g_s6],0,"MCGT_REBER")
 
 
