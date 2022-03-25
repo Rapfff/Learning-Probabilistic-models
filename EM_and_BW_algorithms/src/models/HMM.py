@@ -17,14 +17,14 @@ class HMM_state(Model_state):
 	:param next_matrix: [[proba_state1,proba_state2,...],[state1,state2,...]] . next_matrix[0][x] is the probability to move to state next_matrix[1][x]
 	:type next_matrix: list of one list of float and one list of int
 	"""
-	def __init__(self,output_matrix, next_matrix):
+	def __init__(self,output_matrix: list, next_matrix: list) -> None:
 		super().__init__(next_matrix)
 		if round(sum(output_matrix[0]),2) != 1.0 and sum(output_matrix[0]) != 0:
 			print("Sum of the probabilies of the output_matrix should be 1 or 0 here it's ",sum(output_matrix[0]))
 			#return False
 		self.output_matrix = output_matrix
 
-	def a(self,s):
+	def a(self, s: int) -> float:
 		"""
 		Return the probability of moving, from this state, to state <s>
 
@@ -39,7 +39,7 @@ class HMM_state(Model_state):
 		else:
 			return 0.0
 
-	def b(self,l):
+	def b(self, l: str) -> float:
 		"""
 		Return the probability of generating, from this state, observation l
 
@@ -54,7 +54,7 @@ class HMM_state(Model_state):
 		else:
 			return 0.0
 
-	def next_obs(self):
+	def next_obs(self) -> str:
 		"""
 		Generate one observation according to the distribution described by the output_matrix
 		
@@ -63,7 +63,7 @@ class HMM_state(Model_state):
 		"""
 		return self.output_matrix[1][resolveRandom(self.output_matrix[0])]
 
-	def next_state(self):
+	def next_state(self) -> int:
 		"""
 		Return one state according to the distribution described by the next_matrix
 		
@@ -72,7 +72,7 @@ class HMM_state(Model_state):
 		"""
 		return self.transition_matrix[1][resolveRandom(self.transition_matrix[0])]
 
-	def next(self):
+	def next(self) -> list:
 		"""
 		Return a state-observation pair according to the distributions described by next_matrix and output_matrix
 
@@ -81,7 +81,7 @@ class HMM_state(Model_state):
 		"""
 		return [self.next_state(),self.next_obs()]
 	
-	def tau(self,s,obs):
+	def tau(self,s: int,obs: str) -> None:
 		"""
 		Return the probability of generating, from this state, observation <obs> and moving to state <s>
 
@@ -96,7 +96,7 @@ class HMM_state(Model_state):
 		"""
 		return self.a(s)*self.b(obs)
 
-	def observations(self):
+	def observations(self) -> list:
 		"""
 		Return the list of all the observations that can be generated from this state
 
@@ -106,7 +106,7 @@ class HMM_state(Model_state):
 		return list(set(self.output_matrix[1]))
 		
 
-	def pprint(self,i):
+	def pprint(self,i: int) -> None:
 		"""
 		Print the state on terminal on terminal.
 
@@ -123,7 +123,7 @@ class HMM_state(Model_state):
 				print("s",i," => ",self.output_matrix[1][j]," : ",self.output_matrix[0][j],sep='')
 
 
-	def __str__(self):
+	def __str__(self) -> str:
 		if len(self.transition_matrix[0]) == 0: #end state
 			return "-\n"
 		else:
@@ -159,7 +159,7 @@ class HMM(Model):
 	def __init__(self,states,initial_state,name="unknown HMM"):
 		super().__init__(states,initial_state,name)
 
-	def a(self,s1,s2):
+	def a(self,s1: int,s2: int) -> float:
 		"""
 		Return the probability of moving from state <s1> to state <s2>
 
@@ -174,7 +174,7 @@ class HMM(Model):
 		"""
 		return self.states[s1].a(s2)
 
-	def b(self,s,o):
+	def b(self,s: int, o: str) -> float:
 		"""
 		Return the probability of generating <o> in state <s>
 
@@ -189,7 +189,7 @@ class HMM(Model):
 		"""
 		return self.states[s].b(o)
 
-def loadHMM(file_path):
+def loadHMM(file_path: str) -> HMM:
 	"""
 	Load a model saved into a text file
 
