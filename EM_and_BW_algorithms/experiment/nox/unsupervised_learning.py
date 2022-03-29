@@ -108,16 +108,19 @@ def write_training_test_set(psg_numbers: list,fraction_test: float,name='',n_coe
 n_bins = 5 #nb of letters
 n_coefs= 4
 
-# size alphabet = n_coefs*n_bins
+# size alphabet = n_bins**n_coefs
 # nb possible sequences = (size alphabet)**NB_WINDOWS_BY_SEQ 
 
 training_psgs = list(range(1,41))
 training_psgs.remove(21)
 
-tr = write_training_test_set(training_psgs,0.0,n_bins=n_bins,n_coefs=n_coefs)
-print("number of traces:",sum(tr[1]))
-#tr = loadSet("training_set.txt")
 
+test_psgs = list(range(41,51))
+
+ts = write_training_test_set(test_psgs,0.0,n_bins=n_bins,n_coefs=n_coefs,name="test")
+print("number of traces:",sum(ts[1]))
+#tr = loadSet("training_set.txt")
+input()
 alphabet = [''.join(j) for j in list(product(*[[chr(i) for i in range(97,97+n_bins)]]*n_coefs))]
 
 rm = modelHMM_random(NB_STATES,alphabet,random_initial_state=True)
