@@ -7,7 +7,7 @@ print("\nMC")
 m = modelMC_REBER()
 s = generateSet(m,100,10)
 
-m2 = modelMC_random(7,m.alphabet(),True)
+m2 = modelMC_random(7,m.observations(),True)
 print(m2.initial_state)
 algo = BW_MCGT(m2)
 
@@ -25,7 +25,7 @@ from examples.examples_models import modelHMM4, modelHMM_random
 m = modelHMM4()
 s = generateSet(m,100,10)
 
-m2 = modelHMM_random(5,m.alphabet(),True)
+m2 = modelHMM_random(5,m.observations(),True)
 print(m2.initial_state)
 algo = BW_HMM(m2)
 

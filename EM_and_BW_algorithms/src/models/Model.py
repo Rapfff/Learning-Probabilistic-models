@@ -105,7 +105,7 @@ class Model:
 		"""
 		return self.states[s1].tau(s2,obs)
 
-	def alphabet(self):
+	def observations(self):
 		"""
 		Return the alphabet of the model
 
