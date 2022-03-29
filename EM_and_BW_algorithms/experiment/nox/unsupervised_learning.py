@@ -1,5 +1,4 @@
 import os, sys
-from EM_and_BW_algorithms.experiment.nox.first_try.test import EVENT_FILE
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 parentdir = os.path.dirname(parentdir)
