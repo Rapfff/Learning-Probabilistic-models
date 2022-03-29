@@ -78,6 +78,7 @@ def write_training_test_set(psg_numbers: list,fraction_test: float,name='',n_coe
 	new_data = []
 	
 	for psg_number in psg_numbers:
+		print("PSG number:",psg_number)
 		data = read_files(psg_number)
 		transformer = SymbolicFourierApproximation(n_coefs=n_coefs,n_bins=n_bins)
 		data = transformer.fit_transform(data)
