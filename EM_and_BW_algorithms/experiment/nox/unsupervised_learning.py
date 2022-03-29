@@ -85,7 +85,7 @@ def write_training_test_set(fraction_test,name='',n_coefs=4,n_bins=6):
 	if fraction_test > 0.0:
 		test_set = setFromList(test_seqs)
 		#saveSet(test_set,"test_set"+name+".txt")
-	return data
+	return training_set
 
 
 n_bins = 6 #nb of letters
