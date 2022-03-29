@@ -114,7 +114,7 @@ n_coefs= 4
 training_psgs = list(range(1,41))
 training_psgs.remove(21)
 
-tr = write_training_test_set(list(range(1,41)),0.0,n_bins=n_bins,n_coefs=n_coefs)
+tr = write_training_test_set(training_psgs,0.0,n_bins=n_bins,n_coefs=n_coefs)
 print("number of traces:",sum(tr[1]))
 #tr = loadSet("training_set.txt")
 
