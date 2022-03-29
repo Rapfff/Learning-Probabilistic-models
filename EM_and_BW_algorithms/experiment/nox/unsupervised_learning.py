@@ -101,7 +101,7 @@ def write_training_test_set(psg_numbers: list,fraction_test: float,name='',n_coe
 	return training_set
 
 
-n_bins = 6 #nb of letters
+n_bins = 5 #nb of letters
 n_coefs= 4
 
 # size alphabet = n_coefs*n_bins
