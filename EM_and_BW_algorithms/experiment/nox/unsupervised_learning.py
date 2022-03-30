@@ -120,12 +120,14 @@ def evaluation(m: HMM, psg_numbers: list) -> list:
 
 			for t in range(len(g[0][seq])):
 				alphas_betas = [alphas[s][t+1]*betas[s][t+1] for s in range(len(m.states))]
-				chosen = alphas_betas.index(max(alphas_betas))
 				index_h = int((t+seq*NB_WINDOWS_BY_SEQ)*WINDOW_SIZE_SEC/MANUAL_SCORING_WINDOW_SEC)
 				if index_h >= len(h):
 					break
 				if h[index_h] in sleep_stages:
-					corr_matrix[chosen][sleep_stages.index(h[index_h])] += g[1][seq]
+					# chosen = alphas_betas.index(max(alphas_betas))
+					# corr_matrix[chosen][sleep_stages.index(h[index_h])] += g[1][seq]
+					for s in range(len(m.states)):
+						corr_matrix[s][sleep_stages.index(h[index_h])] += g[1][seq]*alphas_betas[s]
 	return corr_matrix
 
 
