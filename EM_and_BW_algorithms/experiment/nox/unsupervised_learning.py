@@ -102,7 +102,7 @@ def write_set(psg_numbers: list,name,n_coefs=4,n_bins=6,shuffling=True):
 		saveSet(data, name+".txt")
 	return data
 
-def evaluation(m: HMM, psg_numbers: list):
+def evaluation(m: HMM, psg_numbers: list) -> list:
 	sleep_stages = ["Wake","N1","N2","N3","REM"]
 	bw = BW(m)
 	corr_matrix = []
@@ -122,6 +122,7 @@ def evaluation(m: HMM, psg_numbers: list):
 				alphas_betas = [alphas[s][t+1]*betas[s][t+1] for s in range(len(m.states))]
 				chosen = alphas_betas.index(max(alphas_betas))
 				index_h = int((t+seq*NB_WINDOWS_BY_SEQ)*WINDOW_SIZE_SEC/MANUAL_SCORING_WINDOW_SEC)
+				print(h[index_h])
 				if h[index_h] in sleep_stages:
 					corr_matrix[chosen][sleep_stages.index(h[index_h])] += g[1][seq]
 	return corr_matrix
@@ -155,8 +156,8 @@ test_psgs = list(range(41,51))
 
 out = loadHMM("output_model.txt")
 corr_matrix = evaluation(out, test_psgs)
-print(corr_matrix)
-print(" "*8+'|  Wake  |   N1   |   N2   |   N3   |  REM   ')
+
+print(" "*8+'|  Wake  |   N1   |   N2   |   N3   |  REM   ',end='')
 for i in range(len(corr_matrix)):
 	row = corr_matrix[i]
 	print('\n'+'-'*53)
