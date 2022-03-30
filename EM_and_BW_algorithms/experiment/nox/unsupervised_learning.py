@@ -72,11 +72,9 @@ def read_files(psg_number: int):
 	return data
 
 
-def write_training_test_set(psg_numbers: list,fraction_test: float,name='',n_coefs=4,n_bins=6):
+def write_set(psg_numbers: list,name: str,n_coefs=4,n_bins=6):
 	"""name is the name of the output files,
 	fraction_test is a float between ]0,1[ corresponding to the fraction of sequences in the test set """
-	if name != '':
-		name = '_'+str(name)
 	
 	new_data = []
 	
@@ -94,15 +92,39 @@ def write_training_test_set(psg_numbers: list,fraction_test: float,name='',n_coe
 	data = new_data
 
 	shuffle(data)
-	test_seqs = data[:int(fraction_test*len(data))]
-	training_seqs = data[int(fraction_test*len(data)):]
 
-	training_set = setFromList(training_seqs)
-	saveSet(training_set,"training_set"+name+".txt")
-	if fraction_test > 0.0:
-		test_set = setFromList(test_seqs)
-		#saveSet(test_set,"test_set"+name+".txt")
-	return training_set
+	data = setFromList(data)
+	saveSet(data, name+".txt")
+	return data
+
+def evaluation(m: HMM, psg_numbers: list):
+	sleep_stages = ["Wake","N1","N2","N3","REM"]
+	
+	corr_matrix = []
+	for i in m.states:
+		corr_matrix.append([0 for j in sleep_stages])
+
+	for psg_number in psg_numbers:
+		h = pd.read_excel(file_paths_from_psg_number(psg_number)[1])
+		h = list(h["Event"])[1:]
+	
+		alpha_matrix = []
+		for s in range(len(m.states)):
+			alpha_matrix.append([m.initial_state[s]])
+	
+		for t in h:
+			for s in range(len(m.states)):
+				summ = 0.0
+				for ss in range(len(m.states)):
+					p = m.tau(ss,s,h[t])
+					summ += alpha_matrix[ss][t]*p
+				alpha_matrix[s].append(summ)
+			alphas = [ alpha_matrix[s][-1] for s in range(len(m.states)) ]
+			chosen = alphas.index(max(alphas))
+			corr_matrix[chosen][sleep_stages.index(h[t])] += 1
+	
+	return corr_matrix
+
 
 
 n_bins = 5 #nb of letters
@@ -113,23 +135,33 @@ n_coefs= 4
 
 training_psgs = list(range(1,41))
 training_psgs.remove(21)
-
-
 test_psgs = list(range(41,51))
 
-ts = write_training_test_set(test_psgs,0.0,n_bins=n_bins,n_coefs=n_coefs,name="test")
-print("number of traces:",sum(ts[1]))
-#tr = loadSet("training_set.txt")
-input()
-alphabet = [''.join(j) for j in list(product(*[[chr(i) for i in range(97,97+n_bins)]]*n_coefs))]
+# write_set(training_psgs,"training_set",n_coefs,n_bins)
+# write_set(test_psgs,"test_set",n_coefs,n_bins)
 
-rm = modelHMM_random(NB_STATES,alphabet,random_initial_state=True)
-#rm.save("init_model.txt")
-#rm = loadHMM("init_model.txt")
+# tr = loadSet("training_set.txt")
+# ts = loadSet("test_set.txt")
+ 
+# alphabet = [''.join(j) for j in list(product(*[[chr(i) for i in range(97,97+n_bins)]]*n_coefs))]
+ 
+# rm = modelHMM_random(NB_STATES,alphabet,random_initial_state=True)
 
-algo = BW_HMM(rm)
-out = algo.learn(tr, verbose=True)
-out.pprint()
-out.save("output_model.txt")
-#print("Loglikelihood on test_set for initial model ",rm.logLikelihood(ts))
-#print("Loglikelihood on test_set for output  model ",out.logLikelihood(ts))
+# algo = BW_HMM(rm)
+# out = algo.learn(tr, verbose=True)
+# out.pprint()
+# out.save("output_model.txt")
+
+out = loadHMM("output_model.txt")
+corr_matrix = evaluation(out, test_psgs)
+
+print(" "*8+'|  Wake  |   N1   |   N2   |   N3   |  REM   ')
+for i in range(len(corr_matrix)):
+	row = corr_matrix[i]
+	print('-'*53)
+	print("   s"+str(i)+"   ")
+	for j in row:
+		s = str(j)
+		print('|'+" "*(8-len(s))+s)
+print('-'*53)
+
