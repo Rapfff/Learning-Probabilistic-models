@@ -7,6 +7,7 @@ sys.path.append(parentdir)
 from experiment.nox.edfreader import EDFreader
 from src.tools import saveSet, loadSet, setFromList
 from src.learning.BW_HMM import BW_HMM
+from src.learning.BW import BW
 from src.models.HMM import loadHMM, HMM
 from examples.examples_models import modelHMM_random
 import numpy as np
@@ -17,6 +18,8 @@ import pandas as pd
 
 SIGNAL_ID = 44
 SIGNAL_NAME = "F3_M2"
+
+MANUAL_SCORING_WINDOW_SEC = 30
 
 WINDOW_SIZE_SEC = 10 #nb of sec as input to DFA
 NB_WINDOWS_BY_SEQ = 6 #nb of sec by sequence = WINDOW_SIZE_SEC_MAX*NB_WINDOWS_BY_SEQ
@@ -72,7 +75,7 @@ def read_files(psg_number: int):
 	return data
 
 
-def write_set(psg_numbers: list,name: str,n_coefs=4,n_bins=6):
+def write_set(psg_numbers: list,name,n_coefs=4,n_bins=6,shuffling=True):
 	"""name is the name of the output files,
 	fraction_test is a float between ]0,1[ corresponding to the fraction of sequences in the test set """
 	
@@ -90,16 +93,18 @@ def write_set(psg_numbers: list,name: str,n_coefs=4,n_bins=6):
 		new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
 	
 	data = new_data
-
-	shuffle(data)
+	if shuffling:
+		shuffle(data)
 
 	data = setFromList(data)
-	saveSet(data, name+".txt")
+
+	if name != False:
+		saveSet(data, name+".txt")
 	return data
 
 def evaluation(m: HMM, psg_numbers: list):
 	sleep_stages = ["Wake","N1","N2","N3","REM"]
-	
+	bw = BW(m)
 	corr_matrix = []
 	for i in m.states:
 		corr_matrix.append([0 for j in sleep_stages])
@@ -107,22 +112,17 @@ def evaluation(m: HMM, psg_numbers: list):
 	for psg_number in psg_numbers:
 		h = pd.read_excel(file_paths_from_psg_number(psg_number)[1])
 		h = list(h["Event"])[1:]
-	
-		alpha_matrix = []
-		for s in range(len(m.states)):
-			alpha_matrix.append([m.initial_state[s]])
-	
-		for t in range(len(h)):
-			if h[t] in sleep_stages:
-				for s in range(len(m.states)):
-					summ = 0.0
-					for ss in range(len(m.states)):
-						p = m.tau(ss,s,h[t])
-						summ += alpha_matrix[ss][-1]*p
-					alpha_matrix[s].append(summ)
-				alphas = [ alpha_matrix[s][-1] for s in range(len(m.states)) ]
-				chosen = alphas.index(max(alphas))
-				corr_matrix[chosen][sleep_stages.index(h[t])] += 1
+		g = write_set(psg_number,False,shuffling=False)
+
+		for seq in range(len(g[0])):
+			alphas = bw.computeAlphas(g[0][seq])
+			betas  = bw.computeBetas(g[0][seq])
+
+			for t in range(len(g[0][seq])):
+				alphas_betas = [alphas[s][t+1]*betas[s][t+1] for s in range(len(m.states))]
+				chosen = alphas_betas.index(max(alphas_betas))
+				index_h = int((t+seq*NB_WINDOWS_BY_SEQ)*WINDOW_SIZE_SEC/MANUAL_SCORING_WINDOW_SEC)
+				corr_matrix[chosen][sleep_stages.index(h[index_h])] += g[1][seq]
 	return corr_matrix
 
 
@@ -158,7 +158,7 @@ print(corr_matrix)
 print(" "*8+'|  Wake  |   N1   |   N2   |   N3   |  REM   ')
 for i in range(len(corr_matrix)):
 	row = corr_matrix[i]
-	print('-'*53)
+	print('\n'+'-'*53)
 	print("   s"+str(i)+"   ",end="")
 	for j in row:
 		s = str(j)
