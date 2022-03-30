@@ -113,15 +113,16 @@ def evaluation(m: HMM, psg_numbers: list):
 			alpha_matrix.append([m.initial_state[s]])
 	
 		for t in range(len(h)):
-			for s in range(len(m.states)):
-				summ = 0.0
-				for ss in range(len(m.states)):
-					p = m.tau(ss,s,h[t])
-					summ += alpha_matrix[ss][t]*p
-				alpha_matrix[s].append(summ)
-			alphas = [ alpha_matrix[s][-1] for s in range(len(m.states)) ]
-			chosen = alphas.index(max(alphas))
-			corr_matrix[chosen][sleep_stages.index(h[t])] += 1
+			if h[t] in sleep_stages:
+				for s in range(len(m.states)):
+					summ = 0.0
+					for ss in range(len(m.states)):
+						p = m.tau(ss,s,h[t])
+						summ += alpha_matrix[ss][t]*p
+					alpha_matrix[s].append(summ)
+				alphas = [ alpha_matrix[s][-1] for s in range(len(m.states)) ]
+				chosen = alphas.index(max(alphas))
+				corr_matrix[chosen][sleep_stages.index(h[t])] += 1
 	
 	return corr_matrix
 
