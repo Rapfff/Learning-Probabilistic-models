@@ -35,7 +35,7 @@ def file_paths_from_psg_number(nb):
 	else:
 		nb = str(nb)
 	edf_file = "/datasets/10x50_psg/edf_recordings/psg"+nb+"/edf_data_export.edf"
-	hypno_file = "/datasets/10x50_psg/raw_event_exports/01/psg"+nb+"/xls_events.xls"
+	hypno_file = "/datasets/10x50_psg/raw_event_exports/01/psg"+nb+"/xls_hypnogram.xls"
 	return [edf_file, hypno_file]
 
 def read_EDF_signal(r,size):
