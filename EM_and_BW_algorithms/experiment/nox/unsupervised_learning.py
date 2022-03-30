@@ -112,7 +112,7 @@ def evaluation(m: HMM, psg_numbers: list):
 	for psg_number in psg_numbers:
 		h = pd.read_excel(file_paths_from_psg_number(psg_number)[1])
 		h = list(h["Event"])[1:]
-		g = write_set(psg_number,False,shuffling=False)
+		g = write_set([psg_number],False,shuffling=False)
 
 		for seq in range(len(g[0])):
 			alphas = bw.computeAlphas(g[0][seq])
