@@ -7,7 +7,7 @@ sys.path.append(parentdir)
 from experiment.nox.edfreader import EDFreader
 from src.tools import saveSet, loadSet, setFromList
 from src.learning.BW_HMM import BW_HMM
-from src.models.HMM import loadHMM
+from src.models.HMM import loadHMM, HMM
 from examples.examples_models import modelHMM_random
 import numpy as np
 from pyts.approximation import SymbolicFourierApproximation
