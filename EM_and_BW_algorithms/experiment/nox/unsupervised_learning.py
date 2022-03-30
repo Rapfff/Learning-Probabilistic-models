@@ -154,14 +154,14 @@ test_psgs = list(range(41,51))
 
 out = loadHMM("output_model.txt")
 corr_matrix = evaluation(out, test_psgs)
-
+print(corr_matrix)
 print(" "*8+'|  Wake  |   N1   |   N2   |   N3   |  REM   ')
 for i in range(len(corr_matrix)):
 	row = corr_matrix[i]
 	print('-'*53)
-	print("   s"+str(i)+"   ")
+	print("   s"+str(i)+"   ",end="")
 	for j in row:
 		s = str(j)
-		print('|'+" "*(8-len(s))+s)
-print('-'*53)
+		print('|'+" "*(8-len(s))+s,end="")
+print('\n'+'-'*53)
 
