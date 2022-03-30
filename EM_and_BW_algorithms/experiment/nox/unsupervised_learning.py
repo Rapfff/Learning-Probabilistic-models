@@ -112,7 +112,7 @@ def evaluation(m: HMM, psg_numbers: list):
 		for s in range(len(m.states)):
 			alpha_matrix.append([m.initial_state[s]])
 	
-		for t in h:
+		for t in range(len(h)):
 			for s in range(len(m.states)):
 				summ = 0.0
 				for ss in range(len(m.states)):
