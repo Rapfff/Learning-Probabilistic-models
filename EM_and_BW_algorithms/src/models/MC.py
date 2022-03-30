@@ -16,10 +16,10 @@ class MC_state(Model_state):
 	:type next_matrix: list of one list of float, one list of int and one list of str
 	"""
 
-	def __init__(self,next_matrix):
+	def __init__(self,next_matrix: list) -> None:
 		super().__init__(next_matrix)
 
-	def next(self):
+	def next(self) -> list:
 		"""
 		Return a state-observation pair according to the distributions described by next_matrix
 
@@ -29,7 +29,7 @@ class MC_state(Model_state):
 		c = resolveRandom(self.transition_matrix[0])
 		return [self.transition_matrix[1][c],self.transition_matrix[2][c]]
 
-	def tau(self,state,obs):
+	def tau(self,state: int, obs: str) -> float:
 		"""
 		Return the probability of generating, from this state, observation <obs> and moving to state <s>
 
@@ -47,7 +47,7 @@ class MC_state(Model_state):
 				return self.transition_matrix[0][i]
 		return 0.0
 
-	def observations(self):
+	def observations(self) -> list:
 		"""
 		Return the list of all the observations that can be generated from this state
 
@@ -56,7 +56,7 @@ class MC_state(Model_state):
 		"""
 		return list(set(self.transition_matrix[2]))
 
-	def pprint(self,i):
+	def pprint(self,i: int) -> None:
 		"""
 		Print the state on terminal on terminal.
 
@@ -68,7 +68,7 @@ class MC_state(Model_state):
 			if self.transition_matrix[0][j] > 0.000001:
 				print("s",i," - (",self.transition_matrix[2][j],") -> s",self.transition_matrix[1][j]," : ",self.transition_matrix[0][j],sep='')
 
-	def __str__(self):
+	def __str__(self) -> str:
 		if len(self.transition_matrix[0]) == 0: #end state
 			return "-\n"
 		else:
@@ -98,11 +98,11 @@ class MC(Model):
 	:param name: name of the model
 	:type name: str
 	"""
-	def __init__(self,states,initial_state,name="unknown MC"):
+	def __init__(self,states: list, initial_state: int ,name: str ="unknown MC") -> None:
 		super().__init__(states,initial_state,name)
 
 
-def HMMtoMC(h):
+def HMMtoMC(h: HMM) -> MC:
 	"""
 	Translate a given HMM <h> to a MC
 
@@ -124,7 +124,7 @@ def HMMtoMC(h):
 	return MC(states_g,h.initial_state)
 
 
-def loadMC(file_path):
+def loadMC(file_path: str) -> MC:
 	"""
 	Load a model saved into a text file
 
