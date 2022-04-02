@@ -4,23 +4,23 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from random import sample
 from tools import randomProbabilities
-from models.MCGT import *
-from learning.BW_MCGT import BW_MCGT
+from models.MC import *
+from learning.BW_MC import BW_MC
 import spot
 
 class BW_LTL:
 	def __init__(self) -> None:
 		pass
 	
-	def learn(self,formula: str,traces: list,alphabet: list,output_file="output_model.txt",epsilon=0.01,verbose=False,pp='',nb_states=None) -> MCGT:
+	def learn(self,formula: str,traces: list,alphabet: list,output_file="output_model.txt",epsilon=0.01,verbose=False,pp='',nb_states=None) -> MC:
 		self.generateInitialModel(formula,nb_states,alphabet)
-		bw = BW_MCGT(self.initial_model)
+		bw = BW_MC(self.initial_model)
 		output_model = bw.learn(traces,output_file,epsilon,verbose,pp)
 		return output_model
 	
 	def generateInitialModel(self,formula: str,nb_states: int, alphabet: list) -> None:
 		hoa = spot.translate(formula, 'Buchi', 'deterministic', 'state-based').to_str("hoa")
-		self.initial_model = HOAtoMCGT(hoa,alphabet)
+		self.initial_model = HOAtoMC(hoa,alphabet)
 		self.initial_model.pprint()
 		
 		if nb_states != None:
@@ -52,7 +52,7 @@ class BW_LTL:
 			next_states = self.initial_model.states[chosen].next_matrix[1][:]
 			next_obs    = self.initial_model.states[chosen].next_matrix[2][:]
 			next_proba  = randomProbabilities(len(next_states))
-			new_state   = MCGT_state([next_proba,next_states,next_obs])
+			new_state   = MC_state([next_proba,next_states,next_obs])
 			self.initial_model.states.append(new_state)
 			self.initial_model.initial_state.append(self.initial_model.initial_state[chosen]/2)
 			#split edges
@@ -68,7 +68,7 @@ class BW_LTL:
 			
 			to_add -= 1
 	
-def HOAtoMCGT(hoa,alphabet) -> MCGT:
+def HOAtoMC(hoa,alphabet) -> MC:
 	hoa = hoa.split("\n")
 	states = []
 	i = 0
@@ -92,8 +92,8 @@ def HOAtoMCGT(hoa,alphabet) -> MCGT:
 				next_matrix[2].append(l)
 			i += 1
 		next_matrix[0] = randomProbabilities(len(next_matrix[1]))
-		states.append(MCGT_state(next_matrix))
-	return MCGT(states,initial_state)
+		states.append(MC_state(next_matrix))
+	return MC(states,initial_state)
 
 def _transitionLabels(l,alphabet,alphabet_LTL) -> list:
 	l = l.replace(" ","")
