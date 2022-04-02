@@ -14,7 +14,7 @@ class BW:
 		self.h = initial_model
 		self.hhat = initial_model
 		self.nb_states = len(self.h.states)
-		#OVERRIDED self.alphabet  
+		#OVERRIDED self.alphabet
 
 	def h_tau(self,s1,s2,obs):
 		return self.h.tau(s1,s2,obs)
