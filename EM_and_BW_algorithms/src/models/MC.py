@@ -102,7 +102,7 @@ class MC(Model):
 		super().__init__(states,initial_state,name)
 
 
-def HMMtoMC(h: HMM) -> MC:
+def HMMtoMC(h) -> MC:
 	"""
 	Translate a given HMM <h> to a MC
 

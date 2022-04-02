@@ -90,7 +90,7 @@ def modelCOHMM_random(nb_states,random_initial_state=False,min_mu=0.0,max_mu=2.0
 		init = randomProbabilities(nb_states)
 	else:
 		init = 0
-	return coHMM(states,init,"coHMM_random_"+str(nb_states)+"states")
+	return coHMM(states,init,"coHMM_random_"+str(nb_states)+"_states")
 
 def modelCOHMM_nox(nb_states=5,random_initial_state=True,min_mu=-0.2,max_mu=0.5,min_std=0.05,max_std=4.5,self_loop_prob=0.8):
 	m = modelCOHMM_random(nb_states,random_initial_state,min_mu,max_mu,min_std,max_std)
@@ -178,7 +178,7 @@ def modelMC_equiprobable(nb_states,alphabet):
 	states = []
 	for i in range(nb_states):
 		states.append(MC_state([[1/len(obs)]*len(obs),s,obs]))
-	return MC(states,0,"MCGT_equiprobable_"+str(nb_states)+"states")
+	return MC(states,0,"MCGT_equiprobable_"+str(nb_states)+"_states")
 
 def modelMC_random(nb_states,alphabet,random_initial_state=False):
 	s = []
@@ -194,7 +194,7 @@ def modelMC_random(nb_states,alphabet,random_initial_state=False):
 		init = randomProbabilities(nb_states)
 	else:
 		init = 0
-	return MC(states,init,"MCGT_random_"+str(nb_states)+"states")
+	return MC(states,init,"MCGT_random_"+str(nb_states)+"_states")
 
 # ---- CTMC----------------------------
 
@@ -208,7 +208,7 @@ def modelCTMC_random(nb_states, alphabet):
 	states = []
 	for i in range(nb_states):
 		states.append(CTMC_state([[random() for j in s],s,obs]))
-	return CTMC(states,0,"CTMC_random_"+str(nb_states)+"states")
+	return CTMC(states,0,"CTMC_random_"+str(nb_states)+"_states")
 
 # ---- coMC ---------------------------
 def modelCOMC_random(nb_states,random_initial_state=False,min_mu=0.0,max_mu=2.0,min_std=0.5,max_std=2.0):
@@ -225,7 +225,7 @@ def modelCOMC_random(nb_states,random_initial_state=False,min_mu=0.0,max_mu=2.0,
 		init = randomProbabilities(nb_states)
 	else:
 		init = 0
-	return coMC(states,init,"coMC_random_"+str(nb_states)+"states")
+	return coMC(states,init,"coMC_random_"+str(nb_states)+"_states")
 
 def modelCOMC1():
 	s0 = coMC_state([[0.2,0.8],[0,1]],{0:[0.0,1.0],1:[1.0,1.0]})
@@ -246,7 +246,7 @@ def modelMDP_random(nb_states,alphabet,actions):
 		for act in actions:
 			dic[act] = [randomProbabilities(len(obs)),s,obs]
 		states.append(MDP_state(dic))
-	return MDP(states,0,"MDP_random_"+str(nb_states)+"states")
+	return MDP(states,0,"MDP_random_"+str(nb_states)+"_states")
 
 def modelMDP1_fullyobservable():
 	m_s0 = MDP_state({'a': [[1.0],[1],['1']], 'b': [[1.0],[2],['2']]})
