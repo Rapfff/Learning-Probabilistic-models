@@ -139,7 +139,7 @@ def mergeSets(s1,s2):
 			s1[1][s1[0].index(s2[0][i])] += s2[1][i]
 	return s1
 
-def generateSet(model,set_size,param,scheduler=None,distribution=None,min_size=None):
+def generateSet(model,set_size,param,scheduler=None,distribution=None,min_size=None,timed=False):
 	"""
 	If distribution=='geo' then the sequence length will be distributed by a geometric law 
 	such that the expected length is min_size+(1/param).
@@ -159,8 +159,11 @@ def generateSet(model,set_size,param,scheduler=None,distribution=None,min_size=N
 
 		if scheduler:
 			trace = model.run(curr_size,scheduler)
+		elif timed:
+			trace = model.run(curr_size,timed)
 		else:
 			trace = model.run(curr_size)
+
 
 		if not trace in seq:
 			seq.append(trace)

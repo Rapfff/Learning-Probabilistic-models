@@ -9,33 +9,63 @@ from tools import resolveRandom
 
 
 class CTMC_state:
-	def __init__(self, next_matrix: list) -> None:
-		self.next_matrix = next_matrix
+	def __init__(self, lambda_matrix: list) -> None:
+		#lambda should contain the parameters not the expectations !!!
+		self.lambda_matrix = lambda_matrix
+
+	def tau(self, s: int, obs: str) -> float:
+		for i in range(len(self.lambda_matrix[0])):
+			if self.lambda_matrix[1][i] == s and self.lambda_matrix[2][i] == obs:
+				return self.lambda_matrix[0][i]/self.e()
+		return 0.0
+
+	def observations(self):
+		return list(set(self.lambda_matrix[2]))
+
+	def e(self) -> float:
+		return sum(self.lambda_matrix[0])
+
+	def expected_time(self) -> float:
+		return 1/self.e()
 
 	def next(self) -> list:
 		exps = []
-		for exp_lambda in self.next_matrix[0]:
-			exps.append(exponential(exp_lambda))
+		for exp_lambda in self.lambda_matrix[0]:
+			exps.append(exponential(1/exp_lambda))
 		next_index = exps.index(min(exps))
-		return [min(exps), self.next_matrix[1][next_index], self.next_matrix[2][next_index]]
+		return [min(exps), self.lambda_matrix[1][next_index], self.lambda_matrix[2][next_index]]
 
-	def pprint(self,i) -> None:
+	def pprint(self,i: int) -> None:
 		print("\n----STATE s",i,"----",sep='')
-		for j in range(len(self.next_matrix[0])):
-			print("s",i," - (",self.next_matrix[2][j],") -> s",self.next_matrix[1][j]," : 1/lambda = ",1/self.next_matrix[0][j],sep='')
+		print("Exepected waiting time:",self.expected_time())
+		
+		den = sum(self.lambda_matrix[0])
+		for j in range(len(self.lambda_matrix[0])):
+			if self.lambda_matrix[0][j]/den > 0.0001:
+				print("s",i," - (",self.lambda_matrix[2][j],") -> s",self.lambda_matrix[1][j]," : lambda = ",self.lambda_matrix[0][j],sep='')
 	
+	def pprint_untimed(self,i: int) -> None:
+		print("\n----STATE s",i,"----",sep='')
+		
+		den = sum(self.lambda_matrix[0])
+		for j in range(len(self.lambda_matrix[0])):
+			p = self.lambda_matrix[0][j]/den
+			if p > 0.0001:
+				print("s",i," - (",self.lambda_matrix[2][j],") -> s",self.lambda_matrix[1][j]," : ",p,sep='')
+		
+
 	def __str__(self) -> str:
-		if len(self.next_matrix[0]) == 0: #end state
+		if len(self.lambda_matrix[0]) == 0: #end state
 			return "-\n"
 		else:
 			res = ""
-			for proba in self.next_matrix[0]:
+			for proba in self.lambda_matrix[0]:
 				res += str(proba)+' '
 			res += '\n'
-			for state in self.next_matrix[1]:
+			for state in self.lambda_matrix[1]:
 				res += str(state)+' '
 			res += '\n'
-			for obs in self.next_matrix[2]:
+			for obs in self.lambda_matrix[2]:
 				res += str(obs)+' '
 			res += '\n'
 			return res
@@ -52,14 +82,40 @@ class CTMC:
 		self.states = states
 		self.name = name
 
+	def tau(self, s1: int, s2: int, obs: str) -> float:
+		return self.states[s1].tau(s2,obs)
 
-	def run(self,number_steps: int) -> list:
+	def e(self,s: int) -> float:
+		return self.states[s].e()
+
+	def pi(self, s: int) -> float:
+		return self.initial_state[s]
+
+	def observations(self):
+		"""
+		Return the alphabet of the model
+
+		:return: the alphabet of the model
+		:rtype: list of string
+		"""
+		res = []
+		for s in self.states:
+			res += s.observations()
+		return list(set(res))
+
+	def run(self,number_steps: int, timed: bool = False) -> list:
 		output = []
 		current = resolveRandom(self.initial_state)
-		while len(output) < number_steps:
+		c = 0
+		while c < number_steps:
 			[time_spent, next_state, symbol] = self.states[current].next()
-			output += [time_spent,symbol]
+			
+			if timed:
+				output.append(time_spent)
+
+			output.append(symbol)
 			current = next_state
+			c += 1
 		return output
 
 	def pprint(self) -> None:
@@ -67,6 +123,13 @@ class CTMC:
 		print(self.initial_state)
 		for i in range(len(self.states)):
 			self.states[i].pprint(i)
+		print()
+
+	def pprint_untimed(self) -> None:
+		print(self.name)
+		print(self.initial_state)
+		for i in range(len(self.states)):
+			self.states[i].pprint_untimed(i)
 		print()
 	
 	def save(self,file_path: str) -> None:
@@ -84,6 +147,7 @@ class CTMC:
 		for s in self.states:
 			f.write(str(s))
 		f.close()
+
 
 def loadCTMC(file_path: str) -> CTMC:
 	"""

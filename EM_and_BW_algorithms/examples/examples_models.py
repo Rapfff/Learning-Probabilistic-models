@@ -105,7 +105,7 @@ def modelCOHMM1():
 	s1 = coHMM_state([[1.0],[0]],[0.5,1.5])
 	return coHMM([s0,s1],0,"coHMM1")
 
-# ---- MCGT ---------------------------
+# ---- MC -----------------------------
 
 def modelMC1():
 	g_s0 = MC_state([[0.15,0.15,0.2,0.2,0.15,0.15],[1,1,2,2,3,3],['x','y','x','y','x','y']])
@@ -198,7 +198,7 @@ def modelMC_random(nb_states,alphabet,random_initial_state=False):
 
 # ---- CTMC----------------------------
 
-def modelCTMC_random(nb_states, alphabet):
+def modelCTMC_random(nb_states: int, alphabet: list) -> CTMC:
 	#lambda between 0 and 1
 	s = []
 	for i in range(nb_states):
@@ -209,6 +209,22 @@ def modelCTMC_random(nb_states, alphabet):
 	for i in range(nb_states):
 		states.append(CTMC_state([[random() for j in s],s,obs]))
 	return CTMC(states,0,"CTMC_random_"+str(nb_states)+"_states")
+
+def modelCTMC_REBER():
+	g_s0 = CTMC_state([[1.0],[1],['B']])
+	g_s1 = CTMC_state([[0.5,0.5],[2,3],['T','P']])
+	g_s2 = CTMC_state([[0.3,0.2],[2,4],['S','X']])
+	g_s3 = CTMC_state([[0.175,0.075],[3,5],['T','V']])
+	g_s4 = CTMC_state([[0.05,0.05],[3,6],['X','S']])
+	g_s5 = CTMC_state([[0.0625,0.0625],[4,6],['P','V']])
+	g_s6 = CTMC_state([[0.02],[6],['E']])
+	return CTMC([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5,g_s6],0,"CTMC_REBER")
+
+
+def modelCTMC1():
+	s0 = CTMC_state([[0.05,0.45,0.5],[0,1,1],['a','a','b']])
+	s1 = CTMC_state([[0.005,0.005],[0,1],['a','b']])
+	return CTMC([s0,s1],0,"CTMC_REBER")
 
 # ---- coMC ---------------------------
 def modelCOMC_random(nb_states,random_initial_state=False,min_mu=0.0,max_mu=2.0,min_std=0.5,max_std=2.0):

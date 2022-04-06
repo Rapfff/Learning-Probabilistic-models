@@ -6,6 +6,7 @@ from models.MC import *
 from learning.BW import *
 from multiprocessing import cpu_count, Pool
 from tools import correct_proba
+from math import log
 
 class BW_MC(BW):
 	def __init__(self,initial_model):
