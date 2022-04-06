@@ -1,6 +1,6 @@
 from src.tools import generateSet
 
-from src.learning.BW_MCGT import BW_MCGT
+from src.learning.BW_MC import BW_MC
 from examples.examples_models import modelMC_REBER, modelMC_random
 
 print("\nMC")
@@ -9,7 +9,7 @@ s = generateSet(m,100,10)
 
 m2 = modelMC_random(7,m.observations(),True)
 print(m2.initial_state)
-algo = BW_MCGT(m2)
+algo = BW_MC(m2)
 
 m3 = algo.learn(s)
 
