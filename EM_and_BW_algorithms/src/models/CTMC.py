@@ -5,7 +5,8 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from numpy.random import exponential
 from ast import literal_eval
-from tools import resolveRandom
+from tools import resolveRandom, correct_proba
+from models.MC import MC, MC_state
 
 
 class CTMC_state:
@@ -36,7 +37,7 @@ class CTMC_state:
 		return [min(exps), self.lambda_matrix[1][next_index], self.lambda_matrix[2][next_index]]
 
 	def pprint(self,i: int) -> None:
-		print("\n----STATE s",i,"----",sep='')
+		print("----STATE s",i,"----",sep='')
 		print("Exepected waiting time:",self.expected_time())
 		
 		den = sum(self.lambda_matrix[0])
@@ -45,7 +46,7 @@ class CTMC_state:
 				print("s",i," - (",self.lambda_matrix[2][j],") -> s",self.lambda_matrix[1][j]," : lambda = ",self.lambda_matrix[0][j],sep='')
 	
 	def pprint_untimed(self,i: int) -> None:
-		print("\n----STATE s",i,"----",sep='')
+		print("----STATE s",i,"----",sep='')
 		
 		den = sum(self.lambda_matrix[0])
 		for j in range(len(self.lambda_matrix[0])):
@@ -148,6 +149,22 @@ class CTMC:
 			f.write(str(s))
 		f.close()
 
+	def toMC(self, name: str="unknown_MC") -> MC:
+		new_states = []
+
+		for i in range(len(self.states)):
+			s = self.states[i]
+			den = sum(s.lambda_matrix[0]) 
+			p = [s.lambda_matrix[0][j]/den for j in range(len(s.lambda_matrix[0]))]
+			p = correct_proba(p)
+			ss = s.lambda_matrix[1]
+			o = s.lambda_matrix[2]
+
+			new_states.append(MC_state([p,ss,o]))
+
+		return MC(new_states,self.initial_state,name)
+
+
 
 def loadCTMC(file_path: str) -> CTMC:
 	"""
@@ -178,3 +195,29 @@ def loadCTMC(file_path: str) -> CTMC:
 		l = f.readline()
 
 	return CTMC(states,initial_state,name)
+
+
+def parallelComposition(m1: CTMC, m2: CTMC, name: str='unknown_composition') -> CTMC:
+	
+	def computeFinalStateIndex(i1: int, i2: int, max1: int) -> int:
+		return max1 * i1 + i2
+
+	new_states = []
+	initial_state = []
+	max1 = len(m1.states)
+
+	for i1 in range(len(m1.states)):
+		s1 = m1.states[i1]
+		
+		for i2 in range(len(m2.states)):
+			s2 = m2.states[i2]
+			p = s1.lambda_matrix[0] + s2.lambda_matrix[0]
+			s = [computeFinalStateIndex(s1.lambda_matrix[1][i],i2,max1) for i in range(len(s1.lambda_matrix[1]))]
+			s+= [computeFinalStateIndex(i1,s2.lambda_matrix[1][i],max1) for i in range(len(s2.lambda_matrix[1]))]
+			o = s1.lambda_matrix[2] + s2.lambda_matrix[2]
+
+			initial_state.append(m1.initial_state[i1]*m2.initial_state[i2])
+			new_states.append(CTMC_state([p,s,o]))
+
+	return CTMC(new_states,initial_state,name)
+

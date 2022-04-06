@@ -106,6 +106,9 @@ class BW_CTMC:
 			return [den, num, proba_seq, times, num_init]
 		return False
 
+	def _newProbabilities(self,tau,den,len_list_sta,s1):
+		return [tau[i]/den for i in range(len_list_sta)]
+
 	def generateHhat(self,traces):
 		den = []
 		for s in range(self.nb_states):
@@ -141,7 +144,7 @@ class BW_CTMC:
 		list_obs = self.h.observations()*self.nb_states
 		new_states = []
 		for s in range(self.nb_states):
-			l = [ [tau[s][i]/den[s] for i in range(len(list_sta))] , list_sta, list_obs ]
+			l = [self._newProbabilities(tau[s],den[s],len(list_sta),s), list_sta, list_obs]
 			new_states.append(CTMC_state(l))
 
 		initial_state = [num_init[s]/sum(traces[1]) for s in range(self.nb_states)]
