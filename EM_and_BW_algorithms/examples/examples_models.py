@@ -198,16 +198,23 @@ def modelMC_random(nb_states,alphabet,random_initial_state=False):
 
 # ---- CTMC----------------------------
 
-def modelCTMC_random(nb_states: int, alphabet: list) -> CTMC:
+def modelCTMC_random(nb_states: int, alphabet: list, self_loop: bool = True) -> CTMC:
 	#lambda between 0 and 1
 	s = []
-	for i in range(nb_states):
-		s += [i] * len(alphabet)
-	obs = alphabet*nb_states
-	
+	for j in range(nb_states):
+		s.append([])
+		for i in range(nb_states):
+			if self_loop or i != j:
+				s[j] += [i] * len(alphabet)
+	if self_loop:
+		obs = alphabet*nb_states
+	else:
+		obs = alphabet*(nb_states-1)
+
 	states = []
 	for i in range(nb_states):
-		states.append(CTMC_state([[random() for j in s],s,obs]))
+		states.append(CTMC_state([[random() for j in s[i]],s[i],obs]))
+
 	return CTMC(states,0,"CTMC_random_"+str(nb_states)+"_states")
 
 def modelCTMC_REBER():

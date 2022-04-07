@@ -118,6 +118,10 @@ class CTMC:
 			current = next_state
 			c += 1
 		return output
+	
+	def logLikelihood(self,traces):
+		#non-timed traces
+		return self.toMC().logLikelihood(traces)
 
 	def pprint(self) -> None:
 		print(self.name)

@@ -73,6 +73,10 @@ class BW_CTMC:
 
 	def processWork(self,sequence: list, times: int):
 		times_seq, obs_seq = self.splitTime(sequence)
+		if times_seq == None:
+			timed = False
+		else:
+			timed = True
 
 		alpha_matrix = self.computeAlphas(obs_seq)
 		beta_matrix  = self.computeBetas(obs_seq)
@@ -87,18 +91,18 @@ class BW_CTMC:
 				num.append([0.0 for i in range(self.nb_states*len(self.h.observations()))])
 				
 				for t in range(len(obs_seq)):
-					if times_seq != None: # timed
+					if timed:
 						den[-1] += times_seq[t]*alpha_matrix[s][t]*beta_matrix[s][t]*times/proba_seq
-					else: # non-timed
+					else:
 						den[-1] += alpha_matrix[s][t]*beta_matrix[s][t]*times/proba_seq
 					
 					observation = obs_seq[t]
 					for ss in range(self.nb_states):
 						p = self.h_tau(s,ss,observation)
 						if p != 0.0:
-							if times_seq != None: # timed
+							if timed:
 								num[-1][ss*len(self.h.observations())+self.h.observations().index(observation)] += alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
-							else: # non-timed
+							else:
 								num[-1][ss*len(self.h.observations())+self.h.observations().index(observation)] += self.h_e(s)*alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
 							
 			####################
@@ -106,8 +110,8 @@ class BW_CTMC:
 			return [den, num, proba_seq, times, num_init]
 		return False
 
-	def _newProbabilities(self,tau,den,len_list_sta,s1):
-		return [tau[i]/den for i in range(len_list_sta)]
+	def _newProbabilities(self,tau,den,s1):
+		return [i/den for i in tau]
 
 	def generateHhat(self,traces):
 		den = []
@@ -144,7 +148,7 @@ class BW_CTMC:
 		list_obs = self.h.observations()*self.nb_states
 		new_states = []
 		for s in range(self.nb_states):
-			l = [self._newProbabilities(tau[s],den[s],len(list_sta),s), list_sta, list_obs]
+			l = [self._newProbabilities(tau[s],den[s],s), list_sta, list_obs]
 			new_states.append(CTMC_state(l))
 
 		initial_state = [num_init[s]/sum(traces[1]) for s in range(self.nb_states)]
