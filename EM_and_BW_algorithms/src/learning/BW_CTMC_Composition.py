@@ -13,8 +13,6 @@ class BW_CTMC_Composition(BW_CTMC):
 		self.nb_states_1 = len(h1.states)
 		self.nb_states_2 = len(h2.states)
 		super().__init__(parallelComposition(h1,h2))
-		self.to_update   = [self._getTransitionsToUpdate(i) for i in range(self.nb_states)]
-		self.len_to_update = (self.nb_states_2-1)*len(self.alphabet)
 
 	def _getStateInComposition(self,s1,s2):
 		return s1*self.nb_states_2+s2
@@ -28,22 +26,18 @@ class BW_CTMC_Composition(BW_CTMC):
 	def _getObs(self,i: int) -> str:
 		return self.alphabet[i%len(self.alphabet)]
 
-	def _getTransitionsToUpdate(self,s):
+	def _getTransitionSmallModel(self,s,model=2):
 		s1 = self._getState1(s)
 		s2 = self._getState2(s)
 		res = []
-		for ss2 in [j for j in range(self.nb_states_2) if j != s2]:
-			for o in self.alphabet:
-				res.append((self._getStateInComposition(s1,ss2),o))
-		return res
-	
-	def _toKeep(self,s):
-		s1 = self._getState1(s)
-		s2 = self._getState2(s)
-		res = []
-		for ss1 in [j for j in range(self.nb_states_1) if j != s1]:
-			for o in self.alphabet:
-				res.append((self._getStateInComposition(ss1,s2),o))
+		if model == 2:
+			for ss2 in [j for j in range(self.nb_states_2) if j != s2]:
+				for o in self.alphabet:
+					res.append((self._getStateInComposition(s1,ss2),o))
+		else:
+			for ss1 in [j for j in range(self.nb_states_1) if j != s1]:
+				for o in self.alphabet:
+					res.append((self._getStateInComposition(ss1,s2),o))
 		return res
 	
 	def processWork(self,sequence: list, times: int):
@@ -121,7 +115,7 @@ class BW_CTMC_Composition(BW_CTMC):
 		new_states = []
 		for s in range(self.nb_states):
 			l = [self._newProbabilities(tau[s],den[s],s), list_sta[s], list_obs]
-			for k in self._toKeep(s):
+			for k in self.to_keep[s]:
 				l[0].append(self.h_tau(s,k[0],k[1]))
 				l[1].append(k[0])
 				l[2].append(k[1])
@@ -130,4 +124,34 @@ class BW_CTMC_Composition(BW_CTMC):
 		initial_state = [num_init[s]/sum(traces[1]) for s in range(self.nb_states)]
 
 		return [CTMC(new_states,initial_state),currentloglikelihood]
-		
+
+	
+	def learn(self,traces,output_file="output_model.txt",epsilon=0.01,verbose=False,pp=''):
+		"""
+		Given a set of sequences of pairs action-observation,
+		it adapts the parameters of h in order to maximize the probability to get 
+		these sequences of observations.
+		traces = [[trace1,trace2,...],[number_of_trace1,number_of_trace2,...]]
+		trace = [obs1,obs2,...,obsx]
+		"""
+		counter = 0
+		prevloglikelihood = 10
+		nb_traces = sum(traces[1])
+		while True:
+			if verbose:
+				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces)
+			self.to_update = [self._getTransitionSmallModel(s,2+counter%2) for s in range(self.nb_states)]
+			self.len_to_update = len(self.to_update[0])
+			self.to_keep = [self._getTransitionSmallModel(s,1+counter%2) for s in range(self.nb_states)]
+			
+			self.hhat, currentloglikelihood = self.generateHhat(traces)
+			
+			counter += 1
+			self.h = self.hhat
+			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
+				break
+			else:
+				prevloglikelihood = currentloglikelihood
+				
+		self.h.save(output_file)
+		return self.h

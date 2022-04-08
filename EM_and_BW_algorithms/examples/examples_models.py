@@ -10,6 +10,7 @@ from src.models.coMC import *
 from src.models.coHMM import *
 from src.tools import randomProbabilities
 from random import random, uniform
+from math import sqrt
 
 # ---- HMM ----------------------------
 
@@ -150,6 +151,50 @@ def modelMC_game():
 	s_win  = MC_state([[1.0],[2],["Win"]])
 	return MC([s_dice,s_cards,s_win],0,"MCGT_games")
 
+def modelMC_map():
+	size = 9
+	initial = 4
+	actions= {'n':-3,'s':3,'e':1,'w':-1}
+	materials = ['S','M','G',
+				 'M','G','C',
+				 'G','S','M']
+	error_probs = {'C':0.0, 'G': 0.2, 'M':0.4, 'S':0.25}
+	states = []
+	for s in range(size):
+		p = []
+		ss = []
+		o = []
+		for l in actions.keys():
+			dest = s+actions[l]
+			if (dest<0 or
+			    dest>=size or
+				(l == 'e' and dest//sqrt(size) != s//sqrt(size)) or
+				(l == 'e' and dest//sqrt(size) != s//sqrt(size))):
+				p.append(1.0/4)
+				ss.append(s)
+				o.append(l)
+			else:
+				errors_cells = []	
+				if (l == 'e' or l == 'w'):
+					if dest-int(sqrt(size)) >= 0:
+						errors_cells.append(dest-int(sqrt(size)))
+					if dest+int(sqrt(size)) < size:
+						errors_cells.append(dest+int(sqrt(size)))
+				if (l == 'n' or l == 's'):
+					if dest%int(sqrt(size)) > 0:
+						errors_cells.append(dest-1)
+					if dest%int(sqrt(size)) < 2:
+						errors_cells.append(dest+1)
+				p.append((1-error_probs[materials[dest]])/4)
+				ss.append(dest)
+				o.append(l)
+				p += [(error_probs[materials[dest]]/len(errors_cells))/4 for i in errors_cells]
+				ss+= errors_cells
+				o += [l]*len(errors_cells)
+		states.append(MC_state([p,ss,o]))
+	
+	return MC(states,initial,name="map")
+	
 def modelMC_REBER():
 	g_s0 = MC_state([[1.0],[1],['B']])
 	g_s1 = MC_state([[0.5,0.5],[2,3],['T','P']])

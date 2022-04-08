@@ -35,9 +35,9 @@ class BW_MC(BW):
 					observation = sequence[t]
 					for ss in range(self.nb_states):
 						p = 0.0
-						for i in range(len(self.h.states[s].next_matrix[0])):
-							if self.h.states[s].next_matrix[1][i] == ss and self.h.states[s].next_matrix[2][i] == observation:
-								p = self.h.states[s].next_matrix[0][i]
+						for i in range(len(self.h.states[s].transition_matrix[0])):
+							if self.h.states[s].transition_matrix[1][i] == ss and self.h.states[s].transition_matrix[2][i] == observation:
+								p = self.h.states[s].transition_matrix[0][i]
 								break
 						if p != 0.0:
 							num[-1][ss*len(self.h.observations())+self.h.observations().index(observation)] += alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
