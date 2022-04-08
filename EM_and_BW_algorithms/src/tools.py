@@ -94,7 +94,7 @@ def resolveRandom(m: list) -> int:
 
 def correct_proba(ll: list,accuracy:int = 6,times:int =1) -> list:
 	"""
-	Given a list of float it adapts it such that the sum is equal to 1.0.
+	Given a list of float it normalizes it such that the sum is equal to 1.0.
 
 	:param ll: list of probabilities to normalize
 	:type: list of float
@@ -120,8 +120,16 @@ def correct_proba(ll: list,accuracy:int = 6,times:int =1) -> list:
 	else:
 		return res
 
-def randomProbabilities(size):
-	"""return of list l of length <size> of probailities s.t. sum(l) = 1.0"""
+def randomProbabilities(size: int) -> list:
+	"""
+	Return of list l of length <size> of probailities s.t. sum(l) = 1.0
+
+	:param size: size of the output list
+	:type: int
+
+	:return: list of probabilities
+	:rtype: list of float
+	"""
 	rand = []
 	for i in range(size-1):
 		rand.append(random())
@@ -130,7 +138,10 @@ def randomProbabilities(size):
 	rand.append(1.0)
 	return [rand[i]-rand[i-1] for i in range(1,len(rand))]
 
-def mergeSets(s1,s2):
+def mergeSets(s1: list, s2: list) -> list:
+	"""
+	Merges two sets (training set / test set)
+	"""
 	for i in range(len(s2[0])):
 		if not s2[0][i] in s1[0]:
 			s1[0].append(s2[0][i])
@@ -139,12 +150,35 @@ def mergeSets(s1,s2):
 			s1[1][s1[0].index(s2[0][i])] += s2[1][i]
 	return s1
 
-def generateSet(model,set_size,param,scheduler=None,distribution=None,min_size=None,timed=False):
+def generateSet(model,set_size: int,param,scheduler=None,distribution=None,min_size=None,timed: bool=False) -> list:
 	"""
-	If distribution=='geo' then the sequence length will be distributed by a geometric law 
-	such that the expected length is min_size+(1/param).
-	if distribution==None param can be an int, in this case all the seq will have the same len (param),
-					   or param can be a list of int
+	Given a model it generates a set (training set / test set) containing <set_size> traces.
+
+	:param model: the model that will generate the traces.
+	:type model: Model subclass or MDP or CTMC.
+
+	:param set_size: number of traces in the output set.
+	:type size: int
+
+	:param param: the parameter(s) for the distribution. See "distribution".
+	:type param: can be a list, an int or a float.
+
+	:param scheduler: scheduler used to generate the sequence. Only if the model is an MDP.
+	:type scheduler: FiniteMemoryScheduler
+
+	:param distribution: If distribution=='geo' then the sequence length will be distributed by a geometric law
+	such that the expected length is min_size+(1/param). If distribution==None param can be an int,
+	in this case all the seq will have the same len (param), or param can be a list of int.
+	:type distribution: str or None
+
+	:param min_size: see "distribution".
+	:type min_size: int
+
+	:param timed: generate timed or non-timed traces. Only if the model is a CTMC.
+	:type timed: bool
+
+	:return: a set (training set / test set)
+	:rtype: list
 	"""
 	seq = []
 	val = []
@@ -215,7 +249,7 @@ def getActionsObservationsFromSequences(sequences):
 
 	return [actions,observations]
 
-def setFromList(l):
+def setFromList(l: list):
 	res = [[],[]]
 	for s in l:
 		s = list(s)
