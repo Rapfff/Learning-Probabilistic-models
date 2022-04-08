@@ -8,7 +8,7 @@ from time import time
 from  datetime import datetime
 from math import log
 
-NB_PROCESS = 11
+NB_PROCESS = cpu_count()-1
 
 class BW_CTMC:
 	def __init__(self,h: CTMC) -> None:

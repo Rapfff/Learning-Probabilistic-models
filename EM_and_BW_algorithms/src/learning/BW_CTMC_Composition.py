@@ -5,7 +5,6 @@ sys.path.append(parentdir)
 from models.CTMC import *
 from learning.BW_CTMC import *
 
-NB_PROCESS = 11
 
 class BW_CTMC_Composition(BW_CTMC):
 	def __init__(self,h1: CTMC, h2: CTMC) -> None:
