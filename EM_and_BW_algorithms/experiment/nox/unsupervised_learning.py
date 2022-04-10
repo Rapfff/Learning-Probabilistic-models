@@ -14,6 +14,8 @@ import numpy as np
 from pyts.approximation import SymbolicFourierApproximation
 from random import shuffle
 import pandas as pd
+from datetime import datetime
+from statistics import mean, stdev
 
 MANUAL_SCORING_WINDOW_SEC = 30
 
@@ -30,8 +32,8 @@ def file_paths_from_psg_number(nb):
 		nb = '0'+str(nb)
 	else:
 		nb = str(nb)
-	edf_file = "/datasets/10x50_psg/edf_recordings/psg"+nb+"/edf_data_export.edf"
-	hypno_file = "/datasets/10x50_psg/raw_event_exports/01/psg"+nb+"/xls_hypnogram.xls"
+	edf_file = "/datasets/10x100/psg/edf_recordings/psg"+nb+"/edf_data_export.edf"
+	hypno_file = "/datasets/10x100/psg/raw_event_exports/01/psg"+nb+"/xls_hypnogram.xls"
 	return [edf_file, hypno_file]
 
 def read_EDF_signal(r,size,signal_id):
@@ -144,17 +146,23 @@ shuffle(psgs)
 training_psgs = psgs[:44]
 test_psgs = psgs[44:]
 
+running_times = []
+
 for signal_index in range(len(list_signals)):
 	signal_id = list_signals[signal_index]
 	signal_name = signals_name[signal_index]
+	
 	write_set(training_psgs,signal_id,"training_set",n_coefs,n_bins)
 	write_set(test_psgs,signal_id,"test_set",n_coefs,n_bins)
 	tr = loadSet("training_set.txt")
 	ts = loadSet("test_set.txt")
+	
 	rm = modelHMM_random(NB_STATES,alphabet,random_initial_state=True)
 	algo = BW_HMM(rm)
+	starting_time = datetime.now()
 	out = algo.learn(tr, output_file="model_"+signal_name, verbose=True)
-
+	running_time.append((datetime.now()-starting_time).total_seconds())
+	
 	corr_matrix = evaluation(out, signal_id, test_psgs)
 	string  = signal_name+'\n'
 	string += " "*8+'|  Wake  |   N1   |   N2   |   N3   |  REM   '
@@ -170,3 +178,4 @@ for signal_index in range(len(list_signals)):
 	f.write(string)
 	f.close()
 
+print("Average learning time",mean(running_time))
