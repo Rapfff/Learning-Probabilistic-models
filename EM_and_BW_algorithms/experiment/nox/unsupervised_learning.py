@@ -71,7 +71,6 @@ def read_files(psg_number: int, signal_id: int):
 		c += 1
 		if data[-1][0] == 0.0 and data[-1][1] == 1.0:
 			print(psg_number,c*WINDOW_SIZE_SEC,length)
-	print(psg_number,c)
 	#data.append(read_EDF_signal(r,int((exp_duration-c*WINDOW_SIZE_SEC)*frequency),signal_id))
 	return data
 
@@ -83,7 +82,7 @@ def write_set(psg_numbers: list,signal_id,name,n_coefs=4,n_bins=6):
 	new_data = []
 	
 	for psg_number in psg_numbers:
-		print("PSG number:",psg_number)
+		print("PSG:",psg_number, "Signal:",signal_id)
 		data = read_files(psg_number,signal_id)
 		transformer = SymbolicFourierApproximation(n_coefs=n_coefs,n_bins=n_bins)
 		data = transformer.fit_transform(data)
@@ -131,7 +130,7 @@ def evaluation(m: HMM, signal_id, psg_numbers: list) -> list:
 
 
 
-n_bins  = 5 # nb of letters
+n_bins  = 4 # nb of letters
 alphabet = list("abcdefghijklmnopqrstuvwxyz")[:n_bins]
 n_coefs = 5 # 5 because delta, theta, alpha, beta1, beta2 activity
 
@@ -145,6 +144,8 @@ psgs.remove(21)
 shuffle(psgs)
 training_psgs = psgs[:44]
 test_psgs = psgs[44:]
+
+running_times = []
 
 for signal_index in range(len(list_signals)):
 	signal_id = list_signals[signal_index]
