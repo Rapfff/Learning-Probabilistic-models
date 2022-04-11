@@ -226,8 +226,7 @@ def getAlphabetFromSequences(sequences):
 		return list(set(sequences))
 	else:
 		observations = []
-		for seq in range(len(sequences)):
-			sequence_obs = sequences[seq]
+		for sequence_obs in sequences:
 			for x in sequence_obs:
 				if x not in observations:
 					observations.append(x)

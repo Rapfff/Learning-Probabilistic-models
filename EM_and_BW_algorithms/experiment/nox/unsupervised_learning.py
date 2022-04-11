@@ -5,7 +5,7 @@ parentdir = os.path.dirname(parentdir)
 sys.path.append(parentdir)
 
 from experiment.nox.edfreader import EDFreader
-from src.tools import saveSet, loadSet, setFromList
+from src.tools import saveSet, loadSet, setFromList, getAlphabetFromSequences
 from src.learning.BW_HMM import BW_HMM
 from src.learning.BW import BW
 from src.models.HMM import loadHMM, HMM
@@ -132,7 +132,7 @@ def evaluation(m: HMM, signal_id, psg_numbers: list) -> list:
 
 
 n_bins  = 5 # nb of letters
-alphabet = list("abcdefghijklmnopqrstuvwxyz")[:n_bins]
+# alphabet = list("abcdefghijklmnopqrstuvwxyz")[:n_bins]
 n_coefs = 4 # 5 because delta, theta, alpha, beta1, beta2 activity
 
 list_signals = [     20,     24,     30,    34,      44,     48,     67,     71] 
@@ -156,7 +156,7 @@ for signal_index in range(len(list_signals)):
 	write_set(test_psgs,signal_id,"test_set",n_coefs,n_bins)
 	tr = loadSet("training_set.txt")
 	ts = loadSet("test_set.txt")
-	
+	alphabet = list(set(getAlphabetFromSequences(tr)+getAlphabetFromSequences(ts)))
 	rm = modelHMM_random(NB_STATES,alphabet,random_initial_state=True)
 	algo = BW_HMM(rm)
 	starting_time = datetime.now()
