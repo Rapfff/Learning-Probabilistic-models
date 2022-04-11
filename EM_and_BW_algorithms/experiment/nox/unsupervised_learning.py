@@ -38,7 +38,7 @@ def file_paths_from_psg_number(nb):
 
 def read_EDF_signal(r,size,signal_id):
 	window = np.arange(size,dtype=np.float_)
-	r.readSamples(signal_id,window,WINDOW_SIZE_SEC)
+	r.readSamples(signal_id,window,size)
 	return [i for i in window]
 
 def find_starting_point(r,frequency,hypno_file):
