@@ -73,7 +73,7 @@ def read_files(psg_number: int, signal_id: int):
 	return data
 
 
-def write_set(psg_numbers: list,signal_id,name,n_coefs=4,n_bins=6,shuffling=True):
+def write_set(psg_numbers: list,signal_id,name,n_coefs=4,n_bins=6):
 	"""name is the name of the output files,
 	fraction_test is a float between ]0,1[ corresponding to the fraction of sequences in the test set """
 	
@@ -93,8 +93,6 @@ def write_set(psg_numbers: list,signal_id,name,n_coefs=4,n_bins=6,shuffling=True
 		new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
 	
 	data = new_data
-	if shuffling:
-		shuffle(data)
 
 	data = setFromList(data)
 
@@ -112,7 +110,7 @@ def evaluation(m: HMM, signal_id, psg_numbers: list) -> list:
 	for psg_number in psg_numbers:
 		h = pd.read_excel(file_paths_from_psg_number(psg_number)[1])
 		h = list(h["Event"])[1:]
-		g = write_set([psg_number],signal_id,False,shuffling=False)
+		g = write_set([psg_number],signal_id,False)
 
 		for seq in range(len(g[0])):
 			alphas = bw.computeAlphas(g[0][seq])
@@ -136,8 +134,10 @@ n_bins  = 5 # nb of letters
 alphabet = list("abcdefghijklmnopqrstuvwxyz")[:n_bins]
 n_coefs = 5 # 5 because delta, theta, alpha, beta1, beta2 activity
 
-list_signals = [     20,     24,     30,    34,      44,     48,     67,     71] 
-signals_name = ["C3-M2","C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
+#list_signals = [     20,     24,     30,    34,      44,     48,     67,     71] 
+#signals_name = ["C3-M2","C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
+list_signals = [ 44] 
+signals_name = ["F3-M2"]
 
 
 # size alphabet = n_bins**n_coefs
