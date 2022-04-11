@@ -85,7 +85,7 @@ def write_set(psg_numbers: list,signal_id,name,n_coefs=4,n_bins=6):
 		for x in range(len(data)):
 			for y in range(len(data[x])):
 				if type(data[x][y]) != float:
-					print(x,y,data[x][y])
+					print(x,y,data[x][y],type(data[x][y]))
 		transformer = SymbolicFourierApproximation(n_coefs=n_coefs,n_bins=n_bins)
 		data = transformer.fit_transform(data)
 		print(len(data))
