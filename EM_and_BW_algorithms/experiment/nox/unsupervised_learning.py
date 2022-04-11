@@ -82,9 +82,11 @@ def write_set(psg_numbers: list,signal_id,name,n_coefs=4,n_bins=6):
 	for psg_number in psg_numbers:
 		print("PSG number:",psg_number)
 		data = read_files(psg_number,signal_id)
+		for x in range(len(data)):
+			for y in range(len(data[x])):
+				if type(data[x][y]) != float:
+					print(x,y,data[x][y])
 		transformer = SymbolicFourierApproximation(n_coefs=n_coefs,n_bins=n_bins)
-		print(len(data))
-		print(len(data[0]))
 		data = transformer.fit_transform(data)
 		print(len(data))
 		print(len(data[0]))
@@ -138,7 +140,7 @@ n_coefs = 5 # 5 because delta, theta, alpha, beta1, beta2 activity
 
 #list_signals = [     20,     24,     30,    34,      44,     48,     67,     71] 
 #signals_name = ["C3-M2","C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
-list_signals = [ 44] 
+list_signals = [44] 
 signals_name = ["F3-M2"]
 
 
