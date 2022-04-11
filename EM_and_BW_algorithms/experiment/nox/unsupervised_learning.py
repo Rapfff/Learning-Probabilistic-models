@@ -82,18 +82,19 @@ def write_set(psg_numbers: list,signal_id,name,n_coefs=4,n_bins=6):
 	fraction_test is a float between ]0,1[ corresponding to the fraction of sequences in the test set """
 	
 	new_data = []
+	transformer = SymbolicFourierApproximation(n_coefs=n_coefs,n_bins=n_bins)
 	
 	for psg_number in psg_numbers:
 		print("PSG:",psg_number, "Signal:",signal_id)
 		data = read_files(psg_number,signal_id)
-		transformer = SymbolicFourierApproximation(n_coefs=n_coefs,n_bins=n_bins)
-		data = transformer.fit_transform(data)
-
-		data = [''.join(i) for i in data]
-		for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
-			new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
-		new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
-	
+		try:
+			data = transformer.fit_transform(data)		
+			data = [''.join(i) for i in data]
+			for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
+				new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
+			new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
+		except ValueError:
+			print("error with",psg_number,"-",signal_id)
 	data = new_data
 
 	data = setFromList(data)
@@ -132,7 +133,7 @@ def evaluation(m: HMM, signal_id, psg_numbers: list) -> list:
 
 
 
-n_bins  = 5 # nb of letters
+n_bins  = 4 # nb of letters
 alphabet = list("abcdefghijklmnopqrstuvwxyz")[:n_bins]
 n_coefs = 5 # 5 because delta, theta, alpha, beta1, beta2 activity
 
