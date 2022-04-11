@@ -69,7 +69,7 @@ def read_files(psg_number: int, signal_id: int):
 		data.append(read_EDF_signal(r,int(WINDOW_SIZE_SEC*frequency),signal_id))
 		c += 1
 	
-	data.append(read_EDF_signal(r,int((exp_duration-c*WINDOW_SIZE_SEC)*frequency),signal_id))
+	#data.append(read_EDF_signal(r,int((exp_duration-c*WINDOW_SIZE_SEC)*frequency),signal_id))
 	return data
 
 
