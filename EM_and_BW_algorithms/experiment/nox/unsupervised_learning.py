@@ -82,16 +82,8 @@ def write_set(psg_numbers: list,signal_id,name,n_coefs=4,n_bins=6):
 	for psg_number in psg_numbers:
 		print("PSG number:",psg_number)
 		data = read_files(psg_number,signal_id)
-		print(len(data))
-		print(len(data[0]))
-		for x in range(len(data)):
-			for y in range(len(data[x])):
-				if type(data[x][y]) == list:
-					print(x,y,data[x][y],type(data[x][y]))
 		transformer = SymbolicFourierApproximation(n_coefs=n_coefs,n_bins=n_bins)
 		data = transformer.fit_transform(data)
-		print(len(data))
-		print(len(data[0]))
 
 		data = [''.join(i) for i in data]
 		for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
@@ -140,11 +132,8 @@ n_bins  = 5 # nb of letters
 alphabet = list("abcdefghijklmnopqrstuvwxyz")[:n_bins]
 n_coefs = 5 # 5 because delta, theta, alpha, beta1, beta2 activity
 
-#list_signals = [     20,     24,     30,    34,      44,     48,     67,     71] 
-#signals_name = ["C3-M2","C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
-list_signals = [44] 
-signals_name = ["F3-M2"]
-
+list_signals = [     20,     24,     30,    34,      44,     48,     67,     71] 
+signals_name = ["C3-M2","C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
 
 # size alphabet = n_bins**n_coefs
 # nb possible sequences = (size alphabet)**NB_WINDOWS_BY_SEQ 
@@ -153,9 +142,26 @@ psgs.remove(21)
 shuffle(psgs)
 training_psgs = psgs[:44]
 test_psgs = psgs[44:]
-training_psgs = [23,33]
-running_times = []
 
+data23 = read_files(23,44)
+data33 = read_files(33,44)
+print("-----------0----------")
+print(data23[0])
+print()
+print(data33[0])
+print("-----------1----------")
+print(data23[1])
+print()
+print(data33[1])
+print("-----------2----------")
+print(data23[2])
+print()
+print(data33[2])
+input()
+transformer = SymbolicFourierApproximation(n_coefs=n_coefs,n_bins=n_bins)
+data = transformer.fit_transform(data23)
+data = transformer.fit_transform(data33)
+input()
 for signal_index in range(len(list_signals)):
 	signal_id = list_signals[signal_index]
 	signal_name = signals_name[signal_index]
