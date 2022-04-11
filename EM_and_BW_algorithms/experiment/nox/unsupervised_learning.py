@@ -140,11 +140,11 @@ signals_name = ["C3-M2","C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
 
 # size alphabet = n_bins**n_coefs
 # nb possible sequences = (size alphabet)**NB_WINDOWS_BY_SEQ 
-psgs = list(range(1,101))
+psgs = list(range(1,51))
 psgs.remove(21)
 shuffle(psgs)
-training_psgs = psgs[:88]
-test_psgs = psgs[88:]
+training_psgs = psgs[:44]
+test_psgs = psgs[44:]
 
 for signal_index in range(len(list_signals)):
 	signal_id = list_signals[signal_index]
