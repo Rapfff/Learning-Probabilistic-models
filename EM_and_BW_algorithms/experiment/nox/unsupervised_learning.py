@@ -82,6 +82,8 @@ def write_set(psg_numbers: list,signal_id,name,n_coefs=4,n_bins=6):
 	for psg_number in psg_numbers:
 		print("PSG number:",psg_number)
 		data = read_files(psg_number,signal_id)
+		print(len(data))
+		print(len(data[0]))
 		for x in range(len(data)):
 			for y in range(len(data[x])):
 				if type(data[x][y]) == list:
@@ -151,7 +153,7 @@ psgs.remove(21)
 shuffle(psgs)
 training_psgs = psgs[:44]
 test_psgs = psgs[44:]
-
+training_psgs = [23,33]
 running_times = []
 
 for signal_index in range(len(list_signals)):
