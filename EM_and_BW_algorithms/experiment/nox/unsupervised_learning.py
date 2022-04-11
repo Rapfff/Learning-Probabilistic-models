@@ -153,10 +153,10 @@ for signal_index in range(len(list_signals)):
 	signal_name = signals_name[signal_index]
 	
 	write_set(training_psgs,signal_id,"training_set",n_coefs,n_bins)
-	write_set(test_psgs,signal_id,"test_set",n_coefs,n_bins)
+	#write_set(test_psgs,signal_id,"test_set",n_coefs,n_bins)
 	tr = loadSet("training_set.txt")
-	ts = loadSet("test_set.txt")
-	alphabet = list(set(getAlphabetFromSequences(tr)+getAlphabetFromSequences(ts)))
+	#ts = loadSet("test_set.txt")
+	alphabet = list(set(getAlphabetFromSequences(tr)))
 	rm = modelHMM_random(NB_STATES,alphabet,random_initial_state=True)
 	algo = BW_HMM(rm)
 	starting_time = datetime.now()
