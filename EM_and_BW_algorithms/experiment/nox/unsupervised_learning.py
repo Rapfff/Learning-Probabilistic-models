@@ -82,6 +82,7 @@ def write_set(psg_numbers: list,signal_id,name,n_coefs=4,n_bins=6,shuffling=True
 	for psg_number in psg_numbers:
 		print("PSG number:",psg_number)
 		data = read_files(psg_number,signal_id)
+		print(data[0])
 		transformer = SymbolicFourierApproximation(n_coefs=n_coefs,n_bins=n_bins)
 		data = transformer.fit_transform(data)
 
@@ -161,7 +162,7 @@ for signal_index in range(len(list_signals)):
 	algo = BW_HMM(rm)
 	starting_time = datetime.now()
 	out = algo.learn(tr, output_file="model_"+signal_name, verbose=True)
-	running_time.append((datetime.now()-starting_time).total_seconds())
+	running_times.append((datetime.now()-starting_time).total_seconds())
 	
 	corr_matrix = evaluation(out, signal_id, test_psgs)
 	string  = signal_name+'\n'
@@ -178,4 +179,4 @@ for signal_index in range(len(list_signals)):
 	f.write(string)
 	f.close()
 
-print("Average learning time",mean(running_time))
+print("Average learning time",mean(running_times))
