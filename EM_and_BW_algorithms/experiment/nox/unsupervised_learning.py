@@ -39,7 +39,7 @@ def file_paths_from_psg_number(nb):
 def read_EDF_signal(r,size,signal_id):
 	window = np.arange(size,dtype=np.float_)
 	r.readSamples(signal_id,window,size)
-	return [i for i in window]
+	return window
 
 def find_starting_point(r,frequency,hypno_file):
 	start_time_edf   = [r.getStartTimeHour(),r.getStartTimeMinute(),r.getStartTimeSecond()]
@@ -68,6 +68,8 @@ def read_files(psg_number: int, signal_id: int):
 	while (c+1)*WINDOW_SIZE_SEC < exp_duration:
 		data.append(read_EDF_signal(r,int(WINDOW_SIZE_SEC*frequency),signal_id))
 		c += 1
+		if data[-1][0] == 0.0 and data[-1][1] == 1.0:
+			print(psg_number,c*frequency*WINDOW_SIZE_SEC,length)
 	
 	#data.append(read_EDF_signal(r,int((exp_duration-c*WINDOW_SIZE_SEC)*frequency),signal_id))
 	return data
@@ -150,9 +152,12 @@ print(data23[-1])
 print()
 print(data33[-1])
 input()
+print("----------- SFA----------")
 transformer = SymbolicFourierApproximation(n_coefs=n_coefs,n_bins=n_bins)
 data = transformer.fit_transform(data23)
+print(data[0],'\n',data[-1])
 data = transformer.fit_transform(data33)
+print(data[0],'\n',data[-1])
 input()
 for signal_index in range(len(list_signals)):
 	signal_id = list_signals[signal_index]
