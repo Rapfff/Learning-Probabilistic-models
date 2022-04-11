@@ -47,7 +47,6 @@ def find_starting_ending_point(r,frequency,hypno_file):
 	h = pd.read_excel(hypno_file)
 	start = h["Start Time"][1]
 	end   = h["End Time"].values[-1]
-	end.hour = 24+end.hour if end.hour < start.hour else end.hour
 	duration   = (end-start).total_seconds()
 	
 	diff = (start.hour - start_time_edf[0])*60*60 + (start.minute - start_time_edf[1])*60 + (start.second - start_time_edf[2])
