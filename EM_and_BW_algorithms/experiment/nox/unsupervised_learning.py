@@ -72,8 +72,6 @@ def read_files(psg_number: int, signal_id: int):
 		if data[-1][0] == 0.0 and data[-1][1] == 1.0:
 			print(psg_number,c*WINDOW_SIZE_SEC,length)
 	data.append(read_EDF_signal(r,int((duration-c*WINDOW_SIZE_SEC)*frequency),signal_id))
-	print(data[-1])
-	print(data[-2])
 	return data
 
 
@@ -144,7 +142,6 @@ signals_name = ["C3-M2","C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
 # nb possible sequences = (size alphabet)**NB_WINDOWS_BY_SEQ 
 psgs = list(range(1,51))
 psgs.remove(21)
-psgs.remove(35)
 shuffle(psgs)
 training_psgs = psgs[:44]
 test_psgs = psgs[44:]
