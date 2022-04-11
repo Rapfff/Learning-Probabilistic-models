@@ -71,7 +71,9 @@ def read_files(psg_number: int, signal_id: int):
 		c += 1
 		if data[-1][0] == 0.0 and data[-1][1] == 1.0:
 			print(psg_number,c*WINDOW_SIZE_SEC,length)
-	#data.append(read_EDF_signal(r,int((exp_duration-c*WINDOW_SIZE_SEC)*frequency),signal_id))
+	data.append(read_EDF_signal(r,int((duration-c*WINDOW_SIZE_SEC)*frequency),signal_id))
+	print(data[-1])
+	print(data[-2])
 	return data
 
 
