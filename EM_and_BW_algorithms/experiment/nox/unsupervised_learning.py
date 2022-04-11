@@ -15,7 +15,8 @@ from pyts.approximation import SymbolicFourierApproximation
 from random import shuffle
 import pandas as pd
 from datetime import datetime
-from statistics import mean, stdev
+from statistics import mean
+from itertools import product
 
 MANUAL_SCORING_WINDOW_SEC = 30
 
@@ -145,24 +146,20 @@ psgs.remove(21)
 shuffle(psgs)
 training_psgs = psgs[:44]
 test_psgs = psgs[44:]
-
+alphabet = [''.join(j) for j in list(product(*[[chr(i) for i in range(97,97+n_bins)]]*n_coefs))]
 running_times = []
 
 for signal_index in range(len(list_signals)):
 	signal_id = list_signals[signal_index]
 	signal_name = signals_name[signal_index]
 	
-	write_set(training_psgs,signal_id,"training_set",n_coefs,n_bins)
-	#write_set(test_psgs,signal_id,"test_set",n_coefs,n_bins)
-	tr = loadSet("training_set.txt")
-	#ts = loadSet("test_set.txt")
-	alphabet = list(set(getAlphabetFromSequences(tr)))
+	tr = write_set(training_psgs,signal_id,False,n_coefs,n_bins)
 	rm = modelHMM_random(NB_STATES,alphabet,random_initial_state=True)
 	algo = BW_HMM(rm)
 	starting_time = datetime.now()
 	out = algo.learn(tr, output_file="model_"+signal_name, verbose=True)
 	running_times.append((datetime.now()-starting_time).total_seconds())
-	
+	print("STOP")
 	corr_matrix = evaluation(out, signal_id, test_psgs)
 	string  = signal_name+'\n'
 	string += " "*8+'|  Wake  |   N1   |   N2   |   N3   |  REM   '
@@ -177,5 +174,7 @@ for signal_index in range(len(list_signals)):
 	f = open("report_"+signal_name+".txt",'w')
 	f.write(string)
 	f.close()
+	print(string)
+	input()
 
 print("Average learning time",mean(running_times))
