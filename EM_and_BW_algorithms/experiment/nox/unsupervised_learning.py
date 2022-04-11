@@ -83,10 +83,11 @@ def write_set(psg_numbers: list,signal_id,name,n_coefs=4,n_bins=6):
 		print("PSG number:",psg_number)
 		data = read_files(psg_number,signal_id)
 		transformer = SymbolicFourierApproximation(n_coefs=n_coefs,n_bins=n_bins)
-		print(data[0:5])
 		print(len(data))
 		print(len(data[0]))
 		data = transformer.fit_transform(data)
+		print(len(data))
+		print(len(data[0]))
 
 		data = [''.join(i) for i in data]
 		for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
