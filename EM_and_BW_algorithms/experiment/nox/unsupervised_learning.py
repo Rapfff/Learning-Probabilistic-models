@@ -140,26 +140,12 @@ signals_name = ["C3-M2","C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
 
 # size alphabet = n_bins**n_coefs
 # nb possible sequences = (size alphabet)**NB_WINDOWS_BY_SEQ 
-psgs = list(range(1,51))
+psgs = list(range(1,101))
 psgs.remove(21)
 shuffle(psgs)
-training_psgs = psgs[:44]
-test_psgs = psgs[44:]
+training_psgs = psgs[:88]
+test_psgs = psgs[88:]
 
-data23 = read_files(23,44)
-data33 = read_files(33,44)
-print("----------- -1 ----------")
-print(data23[-1])
-print()
-print(data33[-1])
-input()
-print("----------- SFA----------")
-transformer = SymbolicFourierApproximation(n_coefs=n_coefs,n_bins=n_bins)
-data = transformer.fit_transform(data23)
-print(data[0],'\n',data[-1])
-data = transformer.fit_transform(data33)
-print(data[0],'\n',data[-1])
-input()
 for signal_index in range(len(list_signals)):
 	signal_id = list_signals[signal_index]
 	signal_name = signals_name[signal_index]
