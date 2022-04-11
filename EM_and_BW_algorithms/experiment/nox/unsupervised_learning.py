@@ -131,9 +131,9 @@ def evaluation(m: HMM, signal_id, psg_numbers: list) -> list:
 
 
 
-n_bins  = 4 # nb of letters
+n_bins  = 5 # nb of letters
 alphabet = list("abcdefghijklmnopqrstuvwxyz")[:n_bins]
-n_coefs = 5 # 5 because delta, theta, alpha, beta1, beta2 activity
+n_coefs = 4 # 5 because delta, theta, alpha, beta1, beta2 activity
 
 list_signals = [     20,     24,     30,    34,      44,     48,     67,     71] 
 signals_name = ["C3-M2","C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
