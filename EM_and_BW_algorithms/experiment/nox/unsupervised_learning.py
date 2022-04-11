@@ -130,7 +130,7 @@ def evaluation(m: HMM, signal_id, psg_numbers: list) -> list:
 
 
 
-n_bins  = 4 # nb of letters
+n_bins  = 5 # nb of letters
 alphabet = list("abcdefghijklmnopqrstuvwxyz")[:n_bins]
 n_coefs = 5 # 5 because delta, theta, alpha, beta1, beta2 activity
 
@@ -141,6 +141,7 @@ signals_name = ["C3-M2","C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
 # nb possible sequences = (size alphabet)**NB_WINDOWS_BY_SEQ 
 psgs = list(range(1,51))
 psgs.remove(21)
+psgs.remove(35)
 shuffle(psgs)
 training_psgs = psgs[:44]
 test_psgs = psgs[44:]
