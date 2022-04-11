@@ -41,16 +41,17 @@ def read_EDF_signal(r,size,signal_id):
 	r.readSamples(signal_id,window,size)
 	return window
 
-def find_starting_point(r,frequency,hypno_file):
+def find_starting_ending_point(r,frequency,hypno_file):
 	start_time_edf   = [r.getStartTimeHour(),r.getStartTimeMinute(),r.getStartTimeSecond()]
 	
 	h = pd.read_excel(hypno_file)
-	h = h["Start Time"][1]
-	start_time_event = [h.hour,h.minute,h.second]
+	start = h["Start Time"][1]
+	end   = h["End Time"].values[-1]
+	duration   = (end.hour-start.hour)*60*60 + (end.minute-start.minute)*60 + (end.second-start.second)
 	
-	diff = (start_time_event[0] - start_time_edf[0])*60*60 + (start_time_event[1] - start_time_edf[1])*60 + (start_time_event[2] - start_time_edf[2])
+	diff = (start.hour - start_time_edf[0])*60*60 + (start.minute - start_time_edf[1])*60 + (start.second - start_time_edf[2])
 	begining = int(diff*frequency)
-	return begining
+	return (begining,duration)
 
 def read_files(psg_number: int, signal_id: int):
 	edf_file , hypno_file = file_paths_from_psg_number(psg_number)
@@ -60,17 +61,17 @@ def read_files(psg_number: int, signal_id: int):
 	frequency = r.getSampleFrequency(signal_id)
 	exp_duration = length/frequency #in seconds
 
-	begining = find_starting_point(r,frequency,hypno_file)
+	begining, duration = find_starting_ending_point(r,frequency,hypno_file)
 	
 	r.fseek(signal_id,begining,EDFreader.EDFSEEK_SET)
 	data = []
 	c = 0
-	while (c+1)*WINDOW_SIZE_SEC < exp_duration:
+	while (c+1)*WINDOW_SIZE_SEC < duration:
 		data.append(read_EDF_signal(r,int(WINDOW_SIZE_SEC*frequency),signal_id))
 		c += 1
 		if data[-1][0] == 0.0 and data[-1][1] == 1.0:
-			print(psg_number,c*frequency*WINDOW_SIZE_SEC,length)
-	
+			print(psg_number,c*WINDOW_SIZE_SEC,length)
+	print(psg_number,c)
 	#data.append(read_EDF_signal(r,int((exp_duration-c*WINDOW_SIZE_SEC)*frequency),signal_id))
 	return data
 
