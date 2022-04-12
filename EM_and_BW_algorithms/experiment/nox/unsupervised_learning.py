@@ -20,8 +20,8 @@ from itertools import product
 
 MANUAL_SCORING_WINDOW_SEC = 30
 
-WINDOW_SIZE_SEC = 30 #nb of sec as input to DFA
-NB_WINDOWS_BY_SEQ = 180 #nb of sec by sequence = WINDOW_SIZE_SEC_MAX*NB_WINDOWS_BY_SEQ
+WINDOW_SIZE_SEC = 1 #nb of sec as input to DFA
+NB_WINDOWS_BY_SEQ = 30 #nb of sec by sequence = WINDOW_SIZE_SEC_MAX*NB_WINDOWS_BY_SEQ
 
 NB_STATES = 5
 
@@ -60,7 +60,6 @@ def read_files(psg_number: int, signal_id: int):
 	r = EDFreader(edf_file)
 	length = r.getTotalSamples(signal_id)
 	frequency = r.getSampleFrequency(signal_id)
-	exp_duration = length/frequency #in seconds
 
 	begining, duration = find_starting_ending_point(r,frequency,hypno_file)
 	
@@ -79,10 +78,8 @@ def read_files(psg_number: int, signal_id: int):
 def write_set(psg_numbers: list,signal_id,name,n_coefs=4,n_bins=6):
 	"""name is the name of the output files,
 	fraction_test is a float between ]0,1[ corresponding to the fraction of sequences in the test set """
-	
 	new_data = []
 	transformer = SymbolicFourierApproximation(n_coefs=n_coefs,n_bins=n_bins)
-	
 	for psg_number in psg_numbers:
 		print("PSG:",psg_number, "Signal:",signal_id)
 		data = read_files(psg_number,signal_id)
@@ -93,11 +90,9 @@ def write_set(psg_numbers: list,signal_id,name,n_coefs=4,n_bins=6):
 				new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
 			new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
 		except ValueError:
-			print("error with",psg_number,"-",signal_id)
+			print("ERROR with",psg_number,"-",signal_id)
 	data = new_data
-
 	data = setFromList(data)
-
 	if name != False:
 		saveSet(data, name+".txt")
 	return data
@@ -112,7 +107,7 @@ def evaluation(m: HMM, signal_id, psg_numbers: list) -> list:
 	for psg_number in psg_numbers:
 		h = pd.read_excel(file_paths_from_psg_number(psg_number)[1])
 		h = list(h["Event"])[1:]
-		g = write_set([psg_number],signal_id,False)
+		g = write_set([psg_number],signal_id,"test_set")
 
 		for seq in range(len(g[0])):
 			alphas = bw.computeAlphas(g[0][seq])
@@ -142,10 +137,9 @@ signals_name = ["C3-M2","C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
 # size alphabet = n_bins**n_coefs
 # nb possible sequences = (size alphabet)**NB_WINDOWS_BY_SEQ 
 psgs = list(range(1,51))
-psgs.remove(21)
 shuffle(psgs)
-training_psgs = psgs[:44]
-test_psgs = psgs[44:]
+training_psgs = psgs[:45]
+test_psgs = psgs[45:]
 alphabet = [''.join(j) for j in list(product(*[[chr(i) for i in range(97,97+n_bins)]]*n_coefs))]
 running_times = []
 
@@ -153,13 +147,12 @@ for signal_index in range(len(list_signals)):
 	signal_id = list_signals[signal_index]
 	signal_name = signals_name[signal_index]
 	
-	tr = write_set(training_psgs,signal_id,False,n_coefs,n_bins)
+	tr = write_set(training_psgs,signal_id,"training_set",n_coefs,n_bins)
 	rm = modelHMM_random(NB_STATES,alphabet,random_initial_state=True)
 	algo = BW_HMM(rm)
 	starting_time = datetime.now()
-	out = algo.learn(tr, output_file="model_"+signal_name, verbose=True)
+	out = algo.learn(tr, output_file="model_"+signal_name+".txt", verbose=True)
 	running_times.append((datetime.now()-starting_time).total_seconds())
-	print("STOP")
 	corr_matrix = evaluation(out, signal_id, test_psgs)
 	string  = signal_name+'\n'
 	string += " "*8+'|  Wake  |   N1   |   N2   |   N3   |  REM   '
