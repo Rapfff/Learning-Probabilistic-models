@@ -20,8 +20,8 @@ from itertools import product
 
 MANUAL_SCORING_WINDOW_SEC = 30
 
-WINDOW_SIZE_SEC = 1 #nb of sec as input to DFA
-NB_WINDOWS_BY_SEQ = 30 #nb of sec by sequence = WINDOW_SIZE_SEC_MAX*NB_WINDOWS_BY_SEQ
+WINDOW_SIZE_SEC = 10 #nb of sec as input to DFA
+NB_WINDOWS_BY_SEQ = 30*6 #nb of sec by sequence = WINDOW_SIZE_SEC_MAX*NB_WINDOWS_BY_SEQ
 
 NB_STATES = 5
 
@@ -168,6 +168,4 @@ for signal_index in range(len(list_signals)):
 	f.write(string)
 	f.close()
 	print(string)
-	input()
-
 print("Average learning time",mean(running_times))
