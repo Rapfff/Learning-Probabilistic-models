@@ -1,0 +1,38 @@
+Model: REBER
+Average running time composition: 8.48332935
+Std running time composition: 4.907503711656781
+
+Average running time classical big: 11.6118763
+Std running time classical big: 5.655978469835084
+
+Average running time classical small: 1.607036
+Std running time classical small: 0.664590960427936
+
+Average loglikelihood composition: -3.4691002650499376
+Std loglikelihood composition: 0.20981171611115454
+
+Average loglikelihood classical big: -3.3251972575837683
+Std loglikelihood classical big: 0.0016644958264842497
+
+Average loglikelihood classical small: -3.8816466910803054
+Std loglikelihood classical small: 0.47656525628773905
+
+
+Model: MAP
+Average running time composition: 1622.087253
+Std running time composition: 225.34867324429544
+
+Average running time classical big: 11960.9171213
+Std running time classical big: 1818.01039252921
+
+Average running time classical small: 558.1869424
+Std running time classical small: 68.25776678192965
+
+Average loglikelihood composition: -9.975067450011556
+Std loglikelihood composition: 0.024363305224358124
+
+Average loglikelihood classical big: -10.219097359438559
+Std loglikelihood classical big: 0.07669936877824357
+
+Average loglikelihood classical small: -9.806275143639475
+Std loglikelihood classical small: 0.019835871885118456
