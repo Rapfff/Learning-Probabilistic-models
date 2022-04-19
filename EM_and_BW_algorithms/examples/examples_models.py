@@ -276,7 +276,21 @@ def modelCTMC_REBER():
 def modelCTMC1():
 	s0 = CTMC_state([[0.05,0.45,0.5],[0,1,1],['a','a','b']])
 	s1 = CTMC_state([[0.005,0.005],[0,1],['a','b']])
-	return CTMC([s0,s1],0,"CTMC_REBER")
+	return CTMC([s0,s1],0,"CTMC1")
+
+def modelCTMC2():
+	s0 = CTMC_state([[0.15,0.25,0.1,0.25,0.25],[1,1,2,2,3],list('brgrr')])
+	s1 = CTMC_state([[0.2,0.15,0.1,0.1,0.2,0.1,0.15],[0,2,2,2,3,3,3],list('brgbrgb')])
+	s2 = CTMC_state([[0.3,0.2,0.2,0.3],[1,3,3,3],list('brgb')])
+	s3 = CTMC_state([[0.2,0.1,0.1,0.1,0.1,0.1,0.1,0.2],[0,0,0,1,1,1,2,2],list('rgbrgbgb')])
+	return CTMC([s0,s1,s2,s3],0,"CTMC2")
+
+def modelCTMC3():
+	s0 = CTMC_state([[0.2,0.1,0.1,0.1,0.1,0.3,0.05,0.05],[1,1,1,2,2,2,3,3],list('rgbrgbgb')])
+	s1 = CTMC_state([[0.2,0.1,0.1,0.25,0.3,0.05],[0,0,0,2,3,3],list('rgbggb')])
+	s2 = CTMC_state([[0.05,0.1,0.2,0.25,0.4],[0,0,1,3,3],list('rgrgb')])
+	s3 = CTMC_state([[0.25,0.2,0.15,0.15,0.25],[0,0,0,1,1],list('rgbrg')])
+	return CTMC([s0,s1,s2,s3],0,"CTMC3")
 
 # ---- coMC ---------------------------
 def modelCOMC_random(nb_states,random_initial_state=False,min_mu=0.0,max_mu=2.0,min_std=0.5,max_std=2.0):

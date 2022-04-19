@@ -1,4 +1,5 @@
 import os, sys
+from turtle import update
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
@@ -124,8 +125,43 @@ class BW_CTMC_Composition(BW_CTMC):
 
 		return [CTMC(new_states,initial_state),currentloglikelihood]
 
+	def decompose(self):
+		states1 = []
+		init1 = []
+		states2 = []
+		init2 = []
+		for s1 in range(self.nb_states_1):
+			lambdas = []
+			dests = []
+			observations = []
+			current_state = s1*self.nb_states_2
+			for l,d,o in zip(self.h.states[current_state].lambda_matrix[0],
+							 self.h.states[current_state].lambda_matrix[1],
+							 self.h.states[current_state].lambda_matrix[2]):
+				if d % self.nb_states_2 == 0:
+					lambdas.append(l)
+					dests.append(self._getState1(d))
+					observations.append(o)
+			states1.append(CTMC_state([lambdas,dests,observations]))
+			init1.append(sum([self.h.initial_state[s1*self.nb_states_2+i] for i in range(self.nb_states_2 )]))
+		for s2 in range(self.nb_states_2):
+			lambdas = []
+			dests = []
+			observations = []
+			current_state = s2
+			for l,d,o in zip(self.h.states[current_state].lambda_matrix[0],
+							 self.h.states[current_state].lambda_matrix[1],
+							 self.h.states[current_state].lambda_matrix[2]):
+				if d < self.nb_states_2:
+					lambdas.append(l)
+					dests.append(self._getState2(d))
+					observations.append(o)
+			states2.append(CTMC_state([lambdas,dests,observations]))
+			init2.append(sum([self.h.initial_state[i*self.nb_states_2+s2] for i in range(self.nb_states_1 )]))
+		return (CTMC(states1,init1),CTMC(states2,init2))
 	
-	def learn(self,traces,output_file="output_model.txt",epsilon=0.01,verbose=False,pp=''):
+
+	def learn(self,traces,epsilon=0.01,verbose=False,pp='',fixed=None):
 		"""
 		Given a set of sequences of pairs action-observation,
 		it adapts the parameters of h in order to maximize the probability to get 
@@ -133,15 +169,22 @@ class BW_CTMC_Composition(BW_CTMC):
 		traces = [[trace1,trace2,...],[number_of_trace1,number_of_trace2,...]]
 		trace = [obs1,obs2,...,obsx]
 		"""
+		if fixed:
+			to_keep   = fixed
+			to_update = 1 + fixed%2
+
 		counter = 0
 		prevloglikelihood = 10
 		nb_traces = sum(traces[1])
 		while True:
 			if verbose:
 				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces)
-			self.to_update = [self._getTransitionSmallModel(s,2+counter%2) for s in range(self.nb_states)]
+			if not fixed:
+				to_update = 1 +(counter+1)%2
+				to_keep   = 1 + counter%2
+			self.to_update = [self._getTransitionSmallModel(s,to_update) for s in range(self.nb_states)]
 			self.len_to_update = len(self.to_update[0])
-			self.to_keep = [self._getTransitionSmallModel(s,1+counter%2) for s in range(self.nb_states)]
+			self.to_keep = [self._getTransitionSmallModel(s,to_keep) for s in range(self.nb_states)]
 			
 			self.hhat, currentloglikelihood = self.generateHhat(traces)
 			
@@ -151,6 +194,5 @@ class BW_CTMC_Composition(BW_CTMC):
 				break
 			else:
 				prevloglikelihood = currentloglikelihood
-				
-		self.h.save(output_file)
-		return self.h
+	
+		return self.decompose()
