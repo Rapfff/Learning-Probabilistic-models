@@ -110,7 +110,7 @@ class BW_CTMC:
 			return [den, num, proba_seq, times, num_init]
 		return False
 
-	def _newProbabilities(self,tau,den,s1):
+	def _newProbabilities(self,tau,den):
 		return [i/den for i in tau]
 
 	def generateHhat(self,traces):

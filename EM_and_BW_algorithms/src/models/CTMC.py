@@ -15,9 +15,12 @@ class CTMC_state:
 		self.lambda_matrix = lambda_matrix
 
 	def tau(self, s: int, obs: str) -> float:
+		return self.l(s,obs)/self.e()
+	
+	def l(self,s: int, obs: str) -> float:
 		for i in range(len(self.lambda_matrix[0])):
 			if self.lambda_matrix[1][i] == s and self.lambda_matrix[2][i] == obs:
-				return self.lambda_matrix[0][i]/self.e()
+				return self.lambda_matrix[0][i]
 		return 0.0
 
 	def observations(self):
