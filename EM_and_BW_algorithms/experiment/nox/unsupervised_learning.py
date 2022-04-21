@@ -84,17 +84,16 @@ def write_set(psg_numbers: list,signal_id,name,n_coefs=4,n_bins=6):
 		print("PSG:",psg_number, "Signal:",signal_id)
 		data = read_files(psg_number,signal_id)
 		try:
-			print(data)
 			data = transformer.fit_transform(data)
-			print(data)
-			input()
 			data = [''.join(i) for i in data]
+			print(data)
 			for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
 				new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
 			new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
 		except ValueError:
 			print("ERROR with",psg_number,"-",signal_id)
 	data = new_data
+	print(data)
 	data = setFromList(data)
 	if name != False:
 		saveSet(data, name+".txt")
