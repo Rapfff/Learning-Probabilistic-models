@@ -84,7 +84,10 @@ def write_set(psg_numbers: list,signal_id,name,n_coefs=4,n_bins=6):
 		print("PSG:",psg_number, "Signal:",signal_id)
 		data = read_files(psg_number,signal_id)
 		try:
-			data = transformer.fit_transform(data)		
+			print(data)
+			data = transformer.fit_transform(data)
+			print(data)
+			input()
 			data = [''.join(i) for i in data]
 			for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
 				new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
@@ -134,6 +137,7 @@ n_coefs = 4 # 5 because delta, theta, alpha, beta1, beta2 activity
 list_signals = [     20] #,     24,     30,    34,      44,     48,     67,     71] 
 signals_name = ["C3-M2"] #,"C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
 
+write_set([7],20,signals_name[0],n_coefs,n_bins)
 # size alphabet = n_bins**n_coefs
 # nb possible sequences = (size alphabet)**NB_WINDOWS_BY_SEQ 
 psgs = list(range(1,51))
