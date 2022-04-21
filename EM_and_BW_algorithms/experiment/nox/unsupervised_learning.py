@@ -21,7 +21,7 @@ from itertools import product
 MANUAL_SCORING_WINDOW_SEC = 30
 
 WINDOW_SIZE_SEC = 10 #nb of sec as input to DFA
-NB_WINDOWS_BY_SEQ = 30*6 #nb of sec by sequence = WINDOW_SIZE_SEC_MAX*NB_WINDOWS_BY_SEQ
+NB_WINDOWS_BY_SEQ = 2*6 #nb of sec by sequence = WINDOW_SIZE_SEC_MAX*NB_WINDOWS_BY_SEQ
 
 NB_STATES = 5
 
@@ -136,11 +136,10 @@ n_coefs = 4 # 5 because delta, theta, alpha, beta1, beta2 activity
 list_signals = [     20] #,     24,     30,    34,      44,     48,     67,     71] 
 signals_name = ["C3-M2"] #,"C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
 
-write_set([7],20,signals_name[0],n_coefs,n_bins)
 # size alphabet = n_bins**n_coefs
 # nb possible sequences = (size alphabet)**NB_WINDOWS_BY_SEQ 
 psgs = list(range(1,51))
-shuffle(psgs)
+#shuffle(psgs)
 training_psgs = psgs[:45]
 test_psgs = psgs[45:]
 alphabet = [''.join(j) for j in list(product(*[[chr(i) for i in range(97,97+n_bins)]]*n_coefs))]
