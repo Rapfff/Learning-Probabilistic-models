@@ -9,7 +9,7 @@ from src.models.MDP import *
 from src.models.coMC import *
 from src.models.coHMM import *
 from src.tools import randomProbabilities
-from random import random, uniform
+from random import randint, uniform
 from math import sqrt
 
 # ---- HMM ----------------------------
@@ -243,7 +243,7 @@ def modelMC_random(nb_states,alphabet,random_initial_state=False):
 
 # ---- CTMC----------------------------
 
-def modelCTMC_random(nb_states: int, alphabet: list, self_loop: bool = True) -> CTMC:
+def modelCTMC_random(nb_states: int, alphabet: list, min_waiting_time : int, max_waiting_time: int, self_loop: bool = True) -> CTMC:
 	#lambda between 0 and 1
 	s = []
 	for j in range(nb_states):
@@ -258,7 +258,8 @@ def modelCTMC_random(nb_states: int, alphabet: list, self_loop: bool = True) -> 
 
 	states = []
 	for i in range(nb_states):
-		states.append(CTMC_state([[random() for j in s[i]],s[i],obs]))
+		av_waiting_time = randint(min_waiting_time,max_waiting_time)
+		states.append(CTMC_state([[p/av_waiting_time for p in randomProbabilities(len(obs))],s[i],obs]))
 
 	return CTMC(states,0,"CTMC_random_"+str(nb_states)+"_states")
 
@@ -279,17 +280,17 @@ def modelCTMC1():
 	return CTMC([s0,s1],0,"CTMC1")
 
 def modelCTMC2():
-	s0 = CTMC_state([[0.15,0.25,0.1,0.25,0.25],[1,1,2,2,3],list('brgrr')])
-	s1 = CTMC_state([[0.2,0.15,0.1,0.1,0.2,0.1,0.15],[0,2,2,2,3,3,3],list('brgbrgb')])
-	s2 = CTMC_state([[0.3,0.2,0.2,0.3],[1,3,3,3],list('brgb')])
-	s3 = CTMC_state([[0.2,0.1,0.1,0.1,0.1,0.1,0.1,0.2],[0,0,0,1,1,1,2,2],list('rgbrgbgb')])
+	s0 = CTMC_state([[0.3/5,0.5/5,0.2/5],[1,2,3],list('rgr')])
+	s1 = CTMC_state([[0.08,0.25,0.6,0.07],[0,2,2,3],list('rrgb')])
+	s2 = CTMC_state([[0.5/4,0.2/4,0.3/4],[1,3,3],list('bgr')])
+	s3 = CTMC_state([[0.95/2,0.04/2,0.01/2],[0,0,2],list('rgr')])
 	return CTMC([s0,s1,s2,s3],0,"CTMC2")
 
 def modelCTMC3():
-	s0 = CTMC_state([[0.2,0.1,0.1,0.1,0.1,0.3,0.05,0.05],[1,1,1,2,2,2,3,3],list('rgbrgbgb')])
-	s1 = CTMC_state([[0.2,0.1,0.1,0.25,0.3,0.05],[0,0,0,2,3,3],list('rgbggb')])
-	s2 = CTMC_state([[0.05,0.1,0.2,0.25,0.4],[0,0,1,3,3],list('rgrgb')])
-	s3 = CTMC_state([[0.25,0.2,0.15,0.15,0.25],[0,0,0,1,1],list('rgbrg')])
+	s0 = CTMC_state([[0.65/4,0.35/4],[1,3],list('gb')])
+	s1 = CTMC_state([[0.6/3,0.1/3,0.3/3],[0,3,3],list('ggb')])
+	s2 = CTMC_state([[0.25/5,0.6/5,0.15/5],[0,0,1],list('rgb')])
+	s3 = CTMC_state([[1.0/10],[2],list('b')])
 	return CTMC([s0,s1,s2,s3],0,"CTMC3")
 
 # ---- coMC ---------------------------

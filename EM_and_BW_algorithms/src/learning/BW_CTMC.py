@@ -88,23 +88,23 @@ class BW_CTMC:
 			num = []
 			for s in range(self.nb_states):
 				den.append(0.0)
-				num.append([0.0 for i in range(self.nb_states*len(self.h.observations()))])
+				num.append([0.0 for i in range(self.nb_states*len(self.alphabet))])
 				
 				for t in range(len(obs_seq)):
 					if timed:
-						den[-1] += times_seq[t]*alpha_matrix[s][t]*beta_matrix[s][t]*times/proba_seq
+						den[-1] += times_seq[t]*alpha_matrix[s][t]*beta_matrix[s][t]
 					else:
-						den[-1] += alpha_matrix[s][t]*beta_matrix[s][t]*times/proba_seq
+						den[-1] += alpha_matrix[s][t]*beta_matrix[s][t]
+					
 					
 					observation = obs_seq[t]
 					for ss in range(self.nb_states):
-						p = self.h_tau(s,ss,observation)
-						if p != 0.0:
-							if timed:
-								num[-1][ss*len(self.h.observations())+self.h.observations().index(observation)] += alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
-							else:
-								num[-1][ss*len(self.h.observations())+self.h.observations().index(observation)] += self.h_e(s)*alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
-							
+						if timed:
+							num[-1][ss*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[s][t]*self.h.l(s,ss,observation)*beta_matrix[ss][t+1]*times/(proba_seq*self.h.e(s))
+						else:
+							num[-1][ss*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[s][t]*self.h.l(s,ss,observation)*beta_matrix[ss][t+1]*times/proba_seq
+				
+				den[-1] *= times/proba_seq			
 			####################
 			num_init = [alpha_matrix[s][0]*beta_matrix[s][0]*times/proba_seq for s in range(self.nb_states)]
 			return [den, num, proba_seq, times, num_init]
@@ -119,7 +119,7 @@ class BW_CTMC:
 			den.append(0.0)
 		tau = []
 		for s in range(self.nb_states):
-			tau.append([0 for i in range(self.nb_states*len(self.h.observations()))])
+			tau.append([0 for i in range(self.nb_states*len(self.alphabet))])
 		
 		p = Pool(processes = NB_PROCESS)
 		tasks = []
@@ -138,17 +138,17 @@ class BW_CTMC:
 		for s in range(self.nb_states):
 			den[s] = sum([i[0][s] for i in temp])
 				
-			for x in range(self.nb_states*len(self.h.observations())):
+			for x in range(self.nb_states*len(self.alphabet)):
 				tau[s][x] = sum([i[1][s][x] for i in temp])
 
 		list_sta = []
 		for i in range(self.nb_states):
-			for o in self.h.observations():
+			for o in self.alphabet:
 				list_sta.append(i)
-		list_obs = self.h.observations()*self.nb_states
+		list_obs = self.alphabet*self.nb_states
 		new_states = []
 		for s in range(self.nb_states):
-			l = [self._newProbabilities(tau[s],den[s],s), list_sta, list_obs]
+			l = [self._newProbabilities(tau[s],den[s]), list_sta, list_obs]
 			new_states.append(CTMC_state(l))
 
 		initial_state = [num_init[s]/sum(traces[1]) for s in range(self.nb_states)]

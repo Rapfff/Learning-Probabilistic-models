@@ -10,23 +10,21 @@ from learning.BW_CTMC import *
 class BW_CTMC_Composition(BW_CTMC):
 	def __init__(self,h1: CTMC, h2: CTMC) -> None:
 		# h1 and h2 don't have any self-loop
-		self.h1 = h1
-		self.h2 = h2
-		self.nb_states_1 = len(h1.states)
-		self.nb_states_2 = len(h2.states)
+		self.hs = [None,h1,h2]
+		self.nb_states_hs = [None,len(h1.states),len(h2.states)]
 		super().__init__(parallelComposition(h1,h2))
 
-	def _getStateInComposition(self,s,model,s2=0):
+	def _getStateInComposition(self,s:int,model:int,s2:int=0):
 		if model == 1:
-			return s*self.nb_states_2+s2
+			return s*self.nb_states_hs[2]+s2
 		else:
-			return s2*self.nb_states_2+s
+			return s2*self.nb_states_hs[2]+s
 
 	def _getState1(self,s):
-		return s//self.nb_states_2
+		return s//self.nb_states_hs[2]
 
 	def _getState2(self,s):
-		return s%self.nb_states_1
+		return s%self.nb_states_hs[1]
 	
 	def _getStates(self,s,model):
 		if model == 1:
@@ -39,25 +37,18 @@ class BW_CTMC_Composition(BW_CTMC):
 		Return all the states in the composition that correspond to state
 		s in model 1
 		"""
-		return [s*self.nb_states_2+i for i in range(self.nb_states_2)]
+		return [s*self.nb_states_hs[2]+i for i in range(self.nb_states_hs[2])]
 
 	def _getStates2(self,s):
 		"""
 		Return all the states in the composition that correspond to state
 		s in model 2
 		"""
-		return [i*self.nb_states_2+s for i in range(self.nb_states_1)]
+		return [i*self.nb_states_hs[2]+s for i in range(self.nb_states_hs[1])]
 
-	def _getObs(self,i: int) -> str:
-		return self.alphabet[i%len(self.alphabet)]
-
-	def processWork(self,sequence: list, times: int, to_update: int):
-		if to_update == 1:
-			nb_states = self.nb_states_1
-			nb_states_other = self.nb_states_2
-		else:
-			nb_states = self.nb_states_2
-			nb_states_other = self.nb_states_1
+	def processWork_old(self,sequence: list, times: int, to_update: int):
+		nb_states = self.nb_states_hs[to_update]
+		nb_states_other = self.nb_states_hs[to_update%2 + 1]
 
 		times_seq, obs_seq = self.splitTime(sequence)
 		if times_seq == None:
@@ -67,7 +58,7 @@ class BW_CTMC_Composition(BW_CTMC):
 
 		alpha_matrix = self.computeAlphas(obs_seq)
 		beta_matrix  = self.computeBetas(obs_seq)
-		proba_seq = sum([alpha_matrix[s][-1] for s in range(self.nb_states)])
+		proba_seq = sum([alpha_matrix[s][-1] for s in range(nb_states)])
 		if proba_seq != 0.0:
 			####################
 			den = []
@@ -100,11 +91,52 @@ class BW_CTMC_Composition(BW_CTMC):
 			return [den, num, proba_seq, times, num_init]
 		return False
 
+	def processWork(self,sequence: list, times: int, to_update: int):
+		other = to_update%2 + 1
+		nb_states = self.nb_states_hs[to_update]
+		nb_states_other = self.nb_states_hs[other]
+
+		times_seq, obs_seq = self.splitTime(sequence)
+		if times_seq == None:
+			timed = False
+		else:
+			timed = True
+
+		alpha_matrix = self.computeAlphas(obs_seq)
+		beta_matrix  = self.computeBetas(obs_seq)
+		proba_seq = sum([alpha_matrix[s][-1] for s in range(self.nb_states)])
+		if proba_seq <= 0.0:
+			return False
+
+		den = []
+		num = []
+		num_init = []
+		for v in range(nb_states):
+			den.append(0.0)
+			num_init.append(0.0)
+			num.append([0.0 for i in range(nb_states*len(self.alphabet))])
+			ev = self.hs[to_update].e(v)
+			for u in range(nb_states_other):
+				eu = self.hs[other].e(u)
+				e = ev+eu
+				for t in range(len(sequence)):
+					observation = sequence[t]
+					den[-1] += alpha_matrix[self._getStateInComposition(v,to_update,u)][t]*beta_matrix[self._getStateInComposition(v,to_update,u)][t]
+					for vv in [i for i in range(nb_states) if i != v]:
+						num[-1][vv*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[self._getStateInComposition(v,to_update,u)][t]*self.hs[to_update].l(v,vv,observation)*beta_matrix[self._getStateInComposition(vv,to_update,u)][t+1]
+				num[-1] = [i/e for i in num[-1]]
+				den[-1] /= e
+				num_init[-1] += alpha_matrix[self._getStateInComposition(v,to_update,u)][0]*beta_matrix[self._getStateInComposition(v,to_update,u)][0]
+			num[-1]  = [i*times/proba_seq for i in num[-1]]
+			den[-1] *= times/proba_seq
+			num_init[-1] *= times/proba_seq
+		return [den, num, proba_seq, times, num_init]
+
 	def generateHhat(self,traces: list, to_update: int) -> list:
 		if to_update == 1:
-			nb_states = self.nb_states_1
+			nb_states = self.nb_states_hs[1]
 		else:
-			nb_states = self.nb_states_2
+			nb_states = self.nb_states_hs[2]
 
 		den = []
 		for s in range(nb_states):
@@ -115,11 +147,12 @@ class BW_CTMC_Composition(BW_CTMC):
 		
 		p = Pool(processes = NB_PROCESS)
 		tasks = []
-		
 		for seq in range(len(traces[0])):
 			tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq], to_update,]))
-		
 		temp = [res.get() for res in tasks if res.get() != False]
+		#temp = []
+		#for seq,times in zip(traces[0],traces[1]):
+		#	temp.append(self.processWork(seq,times,to_update))
 		currentloglikelihood = sum([log(i[2])*i[3] for i in temp])
 
 		num_init = [0.0 for s in range(nb_states)]
@@ -170,7 +203,6 @@ class BW_CTMC_Composition(BW_CTMC):
 		trace = [obs1,obs2,...,obsx]
 		"""
 		if fixed:
-			to_keep   = fixed
 			to_update = 1 + fixed%2
 
 		counter = 0
@@ -180,20 +212,20 @@ class BW_CTMC_Composition(BW_CTMC):
 			
 			if not fixed:
 				to_update = 1 +(counter+1)%2
-				to_keep   = 1 + counter%2
 			if verbose:
 				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces,to_update)
 			hhat, currentloglikelihood = self.generateHhat(traces,to_update)
-			if to_keep == 1:
-				self.h2 = hhat
+			if to_update == 2:
+				self.hs[2] = hhat
 			else:
-				self.h1 = hhat
+				self.hs[1] = hhat
 			
 			counter += 1
 			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
 				break
 			else:
 				prevloglikelihood = currentloglikelihood
-				self.h = parallelComposition(self.h1,self.h2)
+				self.h = parallelComposition(self.hs[1],self.hs[2])
+				
 	
-		return self.h1, self.h2
+		return self.hs[1], self.hs[2]

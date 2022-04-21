@@ -91,6 +91,9 @@ class CTMC:
 
 	def e(self,s: int) -> float:
 		return self.states[s].e()
+	
+	def l(self, s1:int, s2:int, obs:str):
+		return self.states[s1].l(s2,obs)
 
 	def pi(self, s: int) -> float:
 		return self.initial_state[s]
