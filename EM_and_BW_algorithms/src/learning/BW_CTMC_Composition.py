@@ -46,50 +46,6 @@ class BW_CTMC_Composition(BW_CTMC):
 		"""
 		return [i*self.nb_states_hs[2]+s for i in range(self.nb_states_hs[1])]
 
-	def processWork_old(self,sequence: list, times: int, to_update: int):
-		nb_states = self.nb_states_hs[to_update]
-		nb_states_other = self.nb_states_hs[to_update%2 + 1]
-
-		times_seq, obs_seq = self.splitTime(sequence)
-		if times_seq == None:
-			timed = False
-		else:
-			timed = True
-
-		alpha_matrix = self.computeAlphas(obs_seq)
-		beta_matrix  = self.computeBetas(obs_seq)
-		proba_seq = sum([alpha_matrix[s][-1] for s in range(nb_states)])
-		if proba_seq != 0.0:
-			####################
-			den = []
-			num = []
-			for s in range(nb_states):
-				den.append(0.0)
-				num.append([0.0 for i in range(nb_states*len(self.alphabet))])
-
-				e = 0.0
-				for o in self.alphabet:
-					for sss in [i for i in range(nb_states) if i != s]:
-						e += self.h.states[self._getStateInComposition(s,to_update)].l(self._getStateInComposition(sss,to_update),o)
-				
-				for t in range(len(obs_seq)):
-					val = sum([alpha_matrix[sprime][t]*beta_matrix[sprime][t] for sprime in self._getStates(s,to_update)])*times/proba_seq
-					if timed:
-						val *= times_seq[t]
-					den[-1] += val
-					
-					observation = obs_seq[t]
-					for ss in [i for i in range(nb_states) if i != s]:
-						l = self.h.states[self._getStateInComposition(s,to_update)].l(self._getStateInComposition(ss,to_update),observation)
-						for i in range(nb_states_other):
-							val = alpha_matrix[self._getStateInComposition(s,to_update,i)][t]*l*beta_matrix[self._getStateInComposition(s,to_update,i)][t+1]*times/proba_seq
-							if timed:
-								val /= e
-							num[-1][ss*len(self.alphabet)+self.alphabet.index(observation)] += val
-			####################
-			num_init = [sum([alpha_matrix[sprime][0]*beta_matrix[sprime][0] for sprime in self._getStates(s,to_update)])*times/proba_seq for s in range(nb_states)]
-			return [den, num, proba_seq, times, num_init]
-		return False
 
 	def processWork(self,sequence: list, times: int, to_update: int):
 		other = to_update%2 + 1
@@ -115,21 +71,34 @@ class BW_CTMC_Composition(BW_CTMC):
 			den.append(0.0)
 			num_init.append(0.0)
 			num.append([0.0 for i in range(nb_states*len(self.alphabet))])
+			
 			ev = self.hs[to_update].e(v)
+			
 			for u in range(nb_states_other):
 				eu = self.hs[other].e(u)
-				e = ev+eu
-				for t in range(len(sequence)):
-					observation = sequence[t]
-					den[-1] += alpha_matrix[self._getStateInComposition(v,to_update,u)][t]*beta_matrix[self._getStateInComposition(v,to_update,u)][t]
+				e  = ev+eu
+				uv = self._getStateInComposition(v,to_update,u)
+				
+				for t in range(len(obs_seq)):
+					observation = obs_seq[t]
+					if not timed:
+						den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]
+					else:
+						den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]*times_seq[t]
+
 					for vv in [i for i in range(nb_states) if i != v]:
-						num[-1][vv*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[self._getStateInComposition(v,to_update,u)][t]*self.hs[to_update].l(v,vv,observation)*beta_matrix[self._getStateInComposition(vv,to_update,u)][t+1]
+						uvv = self._getStateInComposition(vv,to_update,u)
+						num[-1][vv*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[uv][t]*self.hs[to_update].l(v,vv,observation)*beta_matrix[uvv][t+1]
+				
 				num[-1] = [i/e for i in num[-1]]
-				den[-1] /= e
-				num_init[-1] += alpha_matrix[self._getStateInComposition(v,to_update,u)][0]*beta_matrix[self._getStateInComposition(v,to_update,u)][0]
+				if not timed:
+					den[-1] /= e
+				num_init[-1] += alpha_matrix[uv][0]*beta_matrix[uv][0]
+			
 			num[-1]  = [i*times/proba_seq for i in num[-1]]
 			den[-1] *= times/proba_seq
 			num_init[-1] *= times/proba_seq
+		
 		return [den, num, proba_seq, times, num_init]
 
 	def generateHhat(self,traces: list, to_update: int) -> list:
@@ -150,9 +119,6 @@ class BW_CTMC_Composition(BW_CTMC):
 		for seq in range(len(traces[0])):
 			tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq], to_update,]))
 		temp = [res.get() for res in tasks if res.get() != False]
-		#temp = []
-		#for seq,times in zip(traces[0],traces[1]):
-		#	temp.append(self.processWork(seq,times,to_update))
 		currentloglikelihood = sum([log(i[2])*i[3] for i in temp])
 
 		num_init = [0.0 for s in range(nb_states)]
@@ -193,25 +159,11 @@ class BW_CTMC_Composition(BW_CTMC):
 
 		return [CTMC(new_states,initial_state),currentloglikelihood]
 
-
-	def learn(self,traces,epsilon=0.01,verbose=False,pp='',fixed=None):
-		"""
-		Given a set of sequences of pairs action-observation,
-		it adapts the parameters of h in order to maximize the probability to get 
-		these sequences of observations.
-		traces = [[trace1,trace2,...],[number_of_trace1,number_of_trace2,...]]
-		trace = [obs1,obs2,...,obsx]
-		"""
-		if fixed:
-			to_update = 1 + fixed%2
-
+	def _learnOneModel(self,traces,to_update,epsilon=0.01,verbose=False,pp='') -> int:
 		counter = 0
 		prevloglikelihood = 10
 		nb_traces = sum(traces[1])
 		while True:
-			
-			if not fixed:
-				to_update = 1 +(counter+1)%2
 			if verbose:
 				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces,to_update)
 			hhat, currentloglikelihood = self.generateHhat(traces,to_update)
@@ -226,6 +178,25 @@ class BW_CTMC_Composition(BW_CTMC):
 			else:
 				prevloglikelihood = currentloglikelihood
 				self.h = parallelComposition(self.hs[1],self.hs[2])
-				
-	
+		return counter
+
+	def learn(self,traces,epsilon=0.01,verbose=False,pp='',to_update=None,limit_min_iteration=10):
+		"""
+		Given a set of sequences of pairs action-observation,
+		it adapts the parameters of h in order to maximize the probability to get 
+		these sequences of observations.
+		traces = [[trace1,trace2,...],[number_of_trace1,number_of_trace2,...]]
+		trace = [obs1,obs2,...,obsx]
+		"""
+		if to_update:
+			self._learnOneModel(traces,to_update,epsilon,verbose,pp)
+
+		else:
+			counter = limit_min_iteration + 1
+			to_update = 1
+			while counter > limit_min_iteration:
+				to_update = 1 +(to_update)%2
+				print(datetime.now(),":","Updating model",to_update,"...",end=" ")
+				counter = self._learnOneModel(traces,to_update,epsilon,verbose,pp)
+				print(counter,"iterations.")
 		return self.hs[1], self.hs[2]
