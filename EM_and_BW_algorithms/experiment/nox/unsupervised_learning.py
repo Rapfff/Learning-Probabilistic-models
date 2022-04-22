@@ -138,8 +138,8 @@ signals_name = ["C3-M2"] #,"C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M
 # nb possible sequences = (size alphabet)**NB_WINDOWS_BY_SEQ 
 psgs = list(range(1,51))
 #shuffle(psgs)
-training_psgs = psgs[:45]
-test_psgs = psgs[45:]
+training_psgs = psgs[:25]
+test_psgs = psgs[25:30]
 alphabet = [''.join(j) for j in list(product(*[[chr(i) for i in range(97,97+n_bins)]]*n_coefs))]
 running_times = []
 
