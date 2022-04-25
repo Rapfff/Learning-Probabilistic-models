@@ -180,7 +180,7 @@ class BW_CTMC_Composition(BW_CTMC):
 				self.h = parallelComposition(self.hs[1],self.hs[2])
 		return counter
 
-	def learn(self,traces,epsilon=0.01,verbose=False,pp='',to_update=None,limit_min_iteration=10):
+	def learn(self,traces,output_file=None,epsilon=0.01,verbose=False,pp='',to_update=None,limit_min_iteration=10):
 		"""
 		Given a set of sequences of pairs action-observation,
 		it adapts the parameters of h in order to maximize the probability to get 
@@ -196,7 +196,12 @@ class BW_CTMC_Composition(BW_CTMC):
 			to_update = 1
 			while counter > limit_min_iteration:
 				to_update = 1 +(to_update)%2
-				print(datetime.now(),":","Updating model",to_update,"...",end=" ")
+				if verbose:
+					print(datetime.now(),":","Updating model",to_update,"...")
 				counter = self._learnOneModel(traces,to_update,epsilon,verbose,pp)
-				print(counter,"iterations.")
+				if verbose:
+					print(counter,"iterations.")
+		if output_file:
+			self.hs[1].save(output_file+"_1.txt")
+			self.hs[2].save(output_file+"_2.txt")
 		return self.hs[1], self.hs[2]
