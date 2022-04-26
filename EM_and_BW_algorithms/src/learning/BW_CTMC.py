@@ -17,7 +17,6 @@ class BW_CTMC:
 		alphabet is a list of the possible observations (list of strings)
 		"""
 		self.h = h
-		self.hhat = h
 		self.alphabet = self.h.observations()
 		self.nb_states = len(self.h.states)
 
@@ -169,10 +168,10 @@ class BW_CTMC:
 		while True:
 			if verbose:
 				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces)
-			self.hhat, currentloglikelihood = self.generateHhat(traces)
+			hhat, currentloglikelihood = self.generateHhat(traces)
 			
 			counter += 1
-			self.h = self.hhat
+			self.h = hhat
 			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
 				break
 			else:

@@ -13,8 +13,8 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 
 def generateTestSets(nb_seq=1000,len_seq=10):
-    untimed_test_set_composition = generateSet(original_model,nb_seq,len_seq,timed=False)
-    untimed_test_set_2 = generateSet(original2,nb_seq,len_seq,timed=False)
+    untimed_test_set_composition = generateSet(original_model,nb_seq,len_seq,timed=True)
+    untimed_test_set_2 = generateSet(original2,nb_seq,len_seq,timed=True)
     return untimed_test_set_composition, untimed_test_set_2
 
 def generateTrainingSets(nb_seq=1000,len_seq=10):
@@ -48,9 +48,9 @@ dots_model2_model2 = []
 original1 = modelCTMC2()
 original2 = modelCTMC3()
 original_model = parallelComposition(original1,original2)
-untimed_test_set_composition, untimed_test_set_2 = generateTestSets()
-quality_original = original_model.logLikelihood(untimed_test_set_composition)
-quality_original2= original2.logLikelihood(untimed_test_set_2)
+timed_test_set_composition, timed_test_set_2 = generateTestSets()
+quality_original = original_model.logLikelihood(timed_test_set_composition)
+quality_original2= original2.logLikelihood(timed_test_set_2)
 
 duration_tot = timedelta()
 for exp in range(1,NB_EXPERIMENTS+1):
@@ -59,31 +59,33 @@ for exp in range(1,NB_EXPERIMENTS+1):
     timed_training_set, untimed_training_set = generateTrainingSets(1000,10)
     random1, random2 = generateRandomModels()
 
+
     print("Composition,",end=" ")
     s = datetime.now()
-    timed_model1, timed_model2 = BW_CTMC_Composition(random1,random2).learn(timed_training_set,output_file="output/compo_"+str(exp),epsilon=0.1,limit_min_iteration=5)
+    timed_model1, timed_model2 = BW_CTMC_Composition(random1,random2).learn(timed_training_set,output_file="output/compo_"+str(exp))
     s = (datetime.now()-s).total_seconds()
     timed_model = parallelComposition(timed_model1,timed_model2)
-    ll = abs(quality_original-timed_model.logLikelihood(untimed_test_set_composition))
+    ll = abs(quality_original-timed_model.logLikelihood(timed_test_set_composition))
     dots_compo_compo.append((s,ll))
-    ll = max(abs(quality_original2-timed_model2.logLikelihood(untimed_test_set_2)),abs(quality_original2-timed_model1.logLikelihood(untimed_test_set_2)))
+    ll = max(abs(quality_original2-timed_model2.logLikelihood(timed_test_set_2)),abs(quality_original2-timed_model1.logLikelihood(timed_test_set_2)))
     dots_compo_model2.append((s,ll))
     
     print("Simple,",end=" ")
     s = datetime.now()
-    simple = BW_CTMC(parallelComposition(random1,random2)).learn(timed_training_set,epsilon=0.1,output_file="output/simple_"+str(exp)+".txt")
+    simple = BW_CTMC(parallelComposition(random1,random2)).learn(timed_training_set,output_file="output/simple_"+str(exp)+".txt")
     s = (datetime.now()-s).total_seconds()
-    ll = abs(quality_original-simple.logLikelihood(untimed_test_set_composition))
+    ll = abs(quality_original-simple.logLikelihood(timed_test_set_composition))
     dots_simple_compo.append((s,ll))
 
     print("Model2")
     s = datetime.now()
-    _, untimed_model2 = BW_CTMC_Composition(original1,random2).learn(untimed_training_set,output_file="output/model2_"+str(exp),epsilon=0.1,to_update=2)
+    _, untimed_model2 = BW_CTMC_Composition(original1,random2).learn(untimed_training_set,output_file="output/model2_"+str(exp),to_update=2)
     s = (datetime.now()-s).total_seconds()
-    ll = abs(quality_original-parallelComposition(_,untimed_model2).logLikelihood(untimed_test_set_composition))
+    ll = abs(quality_original-parallelComposition(_,untimed_model2).logLikelihood(timed_test_set_composition))
     dots_model2_compo.append((s,ll))
-    ll = abs(quality_original2-untimed_model2.logLikelihood(untimed_test_set_2))
+    ll = abs(quality_original2-untimed_model2.logLikelihood(timed_test_set_2))
     dots_model2_model2.append((s,ll))
+
 
     duration_tot += datetime.now()-start_exp
     print(datetime.now(),". Expected ETA:",datetime.now()+(NB_EXPERIMENTS-exp)*duration_tot/exp)

@@ -1,3 +1,4 @@
+from inspect import trace
 import os, sys
 from turtle import update
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -46,23 +47,10 @@ class BW_CTMC_Composition(BW_CTMC):
 		"""
 		return [i*self.nb_states_hs[2]+s for i in range(self.nb_states_hs[1])]
 
-
-	def processWork(self,sequence: list, times: int, to_update: int):
+	def _oneSequence(self,obs_seq,times_seq,times,timed,alpha_matrix,beta_matrix,to_update,proba_seq) -> list:
 		other = to_update%2 + 1
 		nb_states = self.nb_states_hs[to_update]
 		nb_states_other = self.nb_states_hs[other]
-
-		times_seq, obs_seq = self.splitTime(sequence)
-		if times_seq == None:
-			timed = False
-		else:
-			timed = True
-
-		alpha_matrix = self.computeAlphas(obs_seq)
-		beta_matrix  = self.computeBetas(obs_seq)
-		proba_seq = sum([alpha_matrix[s][-1] for s in range(self.nb_states)])
-		if proba_seq <= 0.0:
-			return False
 
 		den = []
 		num = []
@@ -82,55 +70,61 @@ class BW_CTMC_Composition(BW_CTMC):
 				for t in range(len(obs_seq)):
 					observation = obs_seq[t]
 					if not timed:
-						den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]
+						den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]/e
 					else:
 						den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]*times_seq[t]
 
 					for vv in [i for i in range(nb_states) if i != v]:
 						uvv = self._getStateInComposition(vv,to_update,u)
-						num[-1][vv*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[uv][t]*self.hs[to_update].l(v,vv,observation)*beta_matrix[uvv][t+1]
+						num[-1][vv*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[uv][t]*beta_matrix[uvv][t+1]*self.hs[to_update].l(v,vv,observation)/e
 				
-				num[-1] = [i/e for i in num[-1]]
-				if not timed:
-					den[-1] /= e
 				num_init[-1] += alpha_matrix[uv][0]*beta_matrix[uv][0]
 			
 			num[-1]  = [i*times/proba_seq for i in num[-1]]
 			den[-1] *= times/proba_seq
 			num_init[-1] *= times/proba_seq
-		
-		return [den, num, proba_seq, times, num_init]
+		return [den, num, num_init]
 
-	def generateHhat(self,traces: list, to_update: int) -> list:
-		if to_update == 1:
-			nb_states = self.nb_states_hs[1]
+	def processWork(self,sequence: list, times: int, to_update: int):
+		times_seq, obs_seq = self.splitTime(sequence)
+		if times_seq == None:
+			timed = False
 		else:
-			nb_states = self.nb_states_hs[2]
+			timed = True
+		
+		alpha_matrix = self.computeAlphas(obs_seq)
+		beta_matrix  = self.computeBetas(obs_seq)
+		proba_seq = sum([alpha_matrix[s][-1] for s in range(self.nb_states)])
+		if proba_seq <= 0.0:
+			return False
 
-		den = []
-		for s in range(nb_states):
-			den.append(0.0)
+		if to_update:
+			res = self._oneSequence(obs_seq,times_seq,times,timed,alpha_matrix,beta_matrix,to_update,proba_seq)
+		else:
+			res1 = self._oneSequence(obs_seq,times_seq,times,timed,alpha_matrix,beta_matrix,1,proba_seq)
+			res2 = self._oneSequence(obs_seq,times_seq,times,timed,alpha_matrix,beta_matrix,2,proba_seq)
+		
+		if timed:
+			proba_seq = self.h.proba_one_timed_seq(sequence)
+		if to_update:
+			return [res, proba_seq, times]
+		else:
+			return [res1, res2, proba_seq, times]
+
+	def _generateModel(self,nb_states,temp,nb_traces):
+		#temp = [[den1,num1,num_init1],[den2,num2,num_init2]...]
+		den = [0.0 for s in range(nb_states)]
+		num_init = [0.0 for s in range(nb_states)]
 		tau = []
 		for s in range(nb_states):
 			tau.append([0 for i in range(nb_states*len(self.alphabet))])
 		
-		p = Pool(processes = NB_PROCESS)
-		tasks = []
-		for seq in range(len(traces[0])):
-			tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq], to_update,]))
-		temp = [res.get() for res in tasks if res.get() != False]
-		currentloglikelihood = sum([log(i[2])*i[3] for i in temp])
-
-		num_init = [0.0 for s in range(nb_states)]
 		for i in temp:
 			for s in range(nb_states):
-				num_init[s] += i[4][s]
-
-		for s in range(nb_states):
-			den[s] = sum([i[0][s] for i in temp])
-				
-			for x in range(nb_states*len(self.alphabet)):
-				tau[s][x] = sum([i[1][s][x] for i in temp])
+				num_init[s] += i[2][s]
+				den[s] += i[0][s]
+				for x in range(nb_states*len(self.alphabet)):
+					tau[s][x] += i[1][s][x]
 
 		list_sta = []
 		for i in range(nb_states):
@@ -155,32 +149,39 @@ class BW_CTMC_Composition(BW_CTMC):
 					
 			new_states.append(CTMC_state(l))
 
-		initial_state = [num_init[s]/sum(traces[1]) for s in range(nb_states)]
+		initial_state = [num_init[s]/nb_traces for s in range(nb_states)]
 
-		return [CTMC(new_states,initial_state),currentloglikelihood]
+		return CTMC(new_states,initial_state)
 
-	def _learnOneModel(self,traces,to_update,epsilon=0.01,verbose=False,pp='') -> int:
-		counter = 0
-		prevloglikelihood = 10
+	def generateHhat(self,traces: list, to_update: int) -> list:
+		p = Pool(processes = NB_PROCESS)
+		tasks = []
+		
+		# temp = []
+		# for seq in range(len(traces[0])):
+		# 	temp.append(self.processWork(traces[0][seq], traces[1][seq], to_update))
+		
+		for seq in range(len(traces[0])):
+			tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq], to_update,]))
+		temp = [res.get() for res in tasks if res.get() != False]
+		
 		nb_traces = sum(traces[1])
-		while True:
-			if verbose:
-				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces,to_update)
-			hhat, currentloglikelihood = self.generateHhat(traces,to_update)
-			if to_update == 2:
-				self.hs[2] = hhat
-			else:
-				self.hs[1] = hhat
-			
-			counter += 1
-			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
-				break
-			else:
-				prevloglikelihood = currentloglikelihood
-				self.h = parallelComposition(self.hs[1],self.hs[2])
-		return counter
+		if to_update == 1:
+			self.hs[1] = self._generateModel(self.nb_states_hs[1],[i[0] for i in temp],nb_traces)
+		elif to_update == 2:
+			self.hs[2] = self._generateModel(self.nb_states_hs[2],[i[0] for i in temp],nb_traces)
+		else:
+			self.hs[1] = self._generateModel(self.nb_states_hs[1],[i[0] for i in temp],nb_traces)
+			self.hs[2] = self._generateModel(self.nb_states_hs[2],[i[1] for i in temp],nb_traces)
 
-	def learn(self,traces,output_file=None,epsilon=0.01,verbose=False,pp='',to_update=None,limit_min_iteration=10):
+		if to_update:
+			currentloglikelihood = sum([log(i[1])*i[2] for i in temp])
+		else:
+			currentloglikelihood = sum([log(i[2])*i[3] for i in temp])
+
+		return [parallelComposition(self.hs[1],self.hs[2]),currentloglikelihood]
+
+	def learn(self,traces,output_file=None,epsilon=0.01,verbose=False,pp='',to_update=None):
 		"""
 		Given a set of sequences of pairs action-observation,
 		it adapts the parameters of h in order to maximize the probability to get 
@@ -188,19 +189,20 @@ class BW_CTMC_Composition(BW_CTMC):
 		traces = [[trace1,trace2,...],[number_of_trace1,number_of_trace2,...]]
 		trace = [obs1,obs2,...,obsx]
 		"""
-		if to_update:
-			self._learnOneModel(traces,to_update,epsilon,verbose,pp)
-
-		else:
-			counter = limit_min_iteration + 1
-			to_update = 1
-			while counter > limit_min_iteration:
-				to_update = 1 +(to_update)%2
-				if verbose:
-					print(datetime.now(),":","Updating model",to_update,"...")
-				counter = self._learnOneModel(traces,to_update,epsilon,verbose,pp)
-				if verbose:
-					print(counter,"iterations.")
+		counter = 0
+		prevloglikelihood = 10
+		nb_traces = sum(traces[1])
+		while True:
+			if verbose:
+				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces)
+			hhat, currentloglikelihood = self.generateHhat(traces,to_update)
+			
+			counter += 1
+			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
+				break
+			else:
+				prevloglikelihood = currentloglikelihood
+				self.h = hhat
 		if output_file:
 			self.hs[1].save(output_file+"_1.txt")
 			self.hs[2].save(output_file+"_2.txt")

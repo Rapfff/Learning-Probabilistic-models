@@ -7,6 +7,7 @@ from numpy.random import exponential
 from ast import literal_eval
 from tools import resolveRandom, correct_proba
 from models.MC import MC, MC_state
+from math import exp, log
 
 
 class CTMC_state:
@@ -125,9 +126,26 @@ class CTMC:
 			c += 1
 		return output
 	
-	def logLikelihood(self,traces):
-		#non-timed traces
-		return self.toMC().logLikelihood(traces)
+	def proba_one_timed_seq(self,sequence) -> float:
+		alpha_matrix = [[self.initial_state[i]] for i in range(len(self.states))]
+		for k in range(0,len(sequence),2):
+			for s in range(len(self.states)):
+				summ = 0.0
+				for ss in range(len(self.states)):
+					p = self.l(ss,s,sequence[k+1])*exp(-self.e(ss)*sequence[k])
+					summ += alpha_matrix[ss][k//2]*p
+				alpha_matrix[s].append(summ)
+		return sum([alpha_matrix[s][-1] for s in range(len(self.states))])
+
+	def logLikelihood(self,traces) -> float:
+		if type(traces[0][0][0]) == str: # non-timed traces
+			res = self.toMC().logLikelihood(traces)
+		else: # timed traces
+			res = 0.0
+			for sequence, times in zip(traces[0],traces[1]):
+				res += log(self.proba_one_timed_seq(sequence))*times
+		return res
+
 
 	def pprint(self) -> None:
 		print(self.name)
