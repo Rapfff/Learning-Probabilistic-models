@@ -144,7 +144,7 @@ class CTMC:
 			res = 0.0
 			for sequence, times in zip(traces[0],traces[1]):
 				res += log(self.proba_one_timed_seq(sequence))*times
-		return res
+		return res/sum(traces[1])
 
 
 	def pprint(self) -> None:
@@ -225,7 +225,7 @@ def loadCTMC(file_path: str) -> CTMC:
 	return CTMC(states,initial_state,name)
 
 
-def parallelComposition(m1: CTMC, m2: CTMC, name: str='unknown_composition') -> CTMC:
+def parallelComposition(m1: CTMC, m2: CTMC, name: str='unknown_composition', disjoint: bool=False) -> CTMC:
 	
 	def computeFinalStateIndex(i1: int, i2: int, max1: int) -> int:
 		return max1 * i1 + i2
@@ -242,8 +242,11 @@ def parallelComposition(m1: CTMC, m2: CTMC, name: str='unknown_composition') -> 
 			p = s1.lambda_matrix[0] + s2.lambda_matrix[0]
 			s = [computeFinalStateIndex(s1.lambda_matrix[1][i],i2,max1) for i in range(len(s1.lambda_matrix[1]))]
 			s+= [computeFinalStateIndex(i1,s2.lambda_matrix[1][i],max1) for i in range(len(s2.lambda_matrix[1]))]
-			o = s1.lambda_matrix[2] + s2.lambda_matrix[2]
-
+			if not disjoint:
+				o = s1.lambda_matrix[2] + s2.lambda_matrix[2]
+			else:
+				o = [i+'1' for i in s1.lambda_matrix[2]] + [i+'2' for i in s2.lambda_matrix[2]]
+				
 			initial_state.append(m1.initial_state[i1]*m2.initial_state[i2])
 			new_states.append(CTMC_state([p,s,o]))
 

@@ -81,33 +81,32 @@ class BW_CTMC:
 		beta_matrix  = self.computeBetas(obs_seq)
 		
 		proba_seq = sum([alpha_matrix[s][-1] for s in range(self.nb_states)])
-		if proba_seq != 0.0:
-			####################
-			den = []
-			num = []
-			for s in range(self.nb_states):
-				den.append(0.0)
-				num.append([0.0 for i in range(self.nb_states*len(self.alphabet))])
+		if proba_seq == 0.0:
+			return False
+		####################
+		den = []
+		num = []
+		num_init = []
+		for s in range(self.nb_states):
+			den.append(0.0)
+			num.append([0.0 for i in range(self.nb_states*len(self.alphabet))])
+			
+			for t in range(len(obs_seq)):
+				if timed:
+					den[-1] += times_seq[t]*alpha_matrix[s][t]*beta_matrix[s][t]
+				else:
+					den[-1] += alpha_matrix[s][t]*beta_matrix[s][t]/self.h.e(s)
 				
-				for t in range(len(obs_seq)):
-					if timed:
-						den[-1] += times_seq[t]*alpha_matrix[s][t]*beta_matrix[s][t]
-					else:
-						den[-1] += alpha_matrix[s][t]*beta_matrix[s][t]
-					
-					
-					observation = obs_seq[t]
-					for ss in range(self.nb_states):
-						if timed:
-							num[-1][ss*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[s][t]*self.h.l(s,ss,observation)*beta_matrix[ss][t+1]*times/(proba_seq*self.h.e(s))
-						else:
-							num[-1][ss*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[s][t]*self.h.l(s,ss,observation)*beta_matrix[ss][t+1]*times/proba_seq
 				
-				den[-1] *= times/proba_seq			
-			####################
-			num_init = [alpha_matrix[s][0]*beta_matrix[s][0]*times/proba_seq for s in range(self.nb_states)]
-			return [den, num, proba_seq, times, num_init]
-		return False
+				observation = obs_seq[t]
+				for ss in range(self.nb_states):
+					num[-1][ss*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[s][t]*self.h.l(s,ss,observation)*beta_matrix[ss][t+1]/self.h.e(s)
+					
+			num[-1]  = [i*times/proba_seq for i in num[-1]]
+			den[-1] *= times/proba_seq
+			num_init.append(alpha_matrix[s][0]*beta_matrix[s][0]*times/proba_seq)
+		####################
+		return [den, num, proba_seq, times, num_init]
 
 	def _newProbabilities(self,tau,den):
 		return [i/den for i in tau]

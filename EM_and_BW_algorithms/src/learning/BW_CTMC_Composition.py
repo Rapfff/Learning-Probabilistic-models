@@ -1,6 +1,4 @@
-from inspect import trace
 import os, sys
-from turtle import update
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
@@ -21,32 +19,6 @@ class BW_CTMC_Composition(BW_CTMC):
 		else:
 			return s2*self.nb_states_hs[2]+s
 
-	def _getState1(self,s):
-		return s//self.nb_states_hs[2]
-
-	def _getState2(self,s):
-		return s%self.nb_states_hs[1]
-	
-	def _getStates(self,s,model):
-		if model == 1:
-			return self._getStates1(s)
-		else:
-			return self._getStates2(s)
-
-	def _getStates1(self,s):
-		"""
-		Return all the states in the composition that correspond to state
-		s in model 1
-		"""
-		return [s*self.nb_states_hs[2]+i for i in range(self.nb_states_hs[2])]
-
-	def _getStates2(self,s):
-		"""
-		Return all the states in the composition that correspond to state
-		s in model 2
-		"""
-		return [i*self.nb_states_hs[2]+s for i in range(self.nb_states_hs[1])]
-
 	def _oneSequence(self,obs_seq,times_seq,times,timed,alpha_matrix,beta_matrix,to_update,proba_seq) -> list:
 		other = to_update%2 + 1
 		nb_states = self.nb_states_hs[to_update]
@@ -63,20 +35,19 @@ class BW_CTMC_Composition(BW_CTMC):
 			ev = self.hs[to_update].e(v)
 			
 			for u in range(nb_states_other):
-				eu = self.hs[other].e(u)
-				e  = ev+eu
 				uv = self._getStateInComposition(v,to_update,u)
 				
 				for t in range(len(obs_seq)):
 					observation = obs_seq[t]
-					if not timed:
-						den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]/e
-					else:
-						den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]*times_seq[t]
+					if observation in self.alphabets[to_update]:
+						if not timed:
+							den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]
+						else:
+							den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]
 
-					for vv in [i for i in range(nb_states) if i != v]:
-						uvv = self._getStateInComposition(vv,to_update,u)
-						num[-1][vv*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[uv][t]*beta_matrix[uvv][t+1]*self.hs[to_update].l(v,vv,observation)/e
+						for vv in [i for i in range(nb_states) if i != v]:
+							uvv = self._getStateInComposition(vv,to_update,u)
+							num[-1][vv*len(self.alphabets[to_update])+self.alphabets[to_update].index(observation)] += alpha_matrix[uv][t]*beta_matrix[uvv][t+1]*self.hs[to_update].l(v,vv,observation)/ev
 				
 				num_init[-1] += alpha_matrix[uv][0]*beta_matrix[uv][0]
 			
@@ -92,61 +63,66 @@ class BW_CTMC_Composition(BW_CTMC):
 		else:
 			timed = True
 		
-		alpha_matrix = self.computeAlphas(obs_seq)
-		beta_matrix  = self.computeBetas(obs_seq)
+		if self.disjoints_alphabet:
+			obs_seqs = self._splitSequenceObs(obs_seq)
+			bw = BW_CTMC(self.hs[1])
+			alphas1 = bw.computeAlphas(obs_seqs[1])
+			betas1  = bw.computeBetas( obs_seqs[1])
+			bw = BW_CTMC(self.hs[2])
+			alphas2 = bw.computeAlphas(obs_seqs[2])
+			betas2  = bw.computeBetas( obs_seqs[2])
+			alpha_matrix = []
+			beta_matrix = []
+			for s1 in range(self.nb_states_hs[1]):
+				for s2 in range(self.nb_states_hs[2]):
+					alpha_matrix.append([alphas1[s1][obs_seqs[0][t]]*alphas2[s2][t-obs_seqs[0][t]] for t in range(len(obs_seq)+1)])
+					beta_matrix.append( [ betas1[s1][obs_seqs[0][t]]* betas2[s2][t-obs_seqs[0][t]] for t in range(len(obs_seq)+1)])
+		else:
+			alpha_matrix = self.computeAlphas(obs_seq)
+			beta_matrix  = self.computeBetas(obs_seq)
+
 		proba_seq = sum([alpha_matrix[s][-1] for s in range(self.nb_states)])
 		if proba_seq <= 0.0:
 			return False
 
 		if to_update:
-			res = self._oneSequence(obs_seq,times_seq,times,timed,alpha_matrix,beta_matrix,to_update,proba_seq)
+			res1 = self._oneSequence(obs_seq,times_seq,times,timed,alpha_matrix,beta_matrix,to_update,proba_seq)
+			res2 = None
 		else:
 			res1 = self._oneSequence(obs_seq,times_seq,times,timed,alpha_matrix,beta_matrix,1,proba_seq)
 			res2 = self._oneSequence(obs_seq,times_seq,times,timed,alpha_matrix,beta_matrix,2,proba_seq)
-		
+	
 		if timed:
 			proba_seq = self.h.proba_one_timed_seq(sequence)
-		if to_update:
-			return [res, proba_seq, times]
-		else:
-			return [res1, res2, proba_seq, times]
+		
+		return [res1, res2, proba_seq, times]
 
-	def _generateModel(self,nb_states,temp,nb_traces):
+	def _generateModel(self,temp,nb_traces,to_update):
 		#temp = [[den1,num1,num_init1],[den2,num2,num_init2]...]
+		nb_states = self.nb_states_hs[to_update]
+		alphabet = self.alphabets[to_update]
 		den = [0.0 for s in range(nb_states)]
 		num_init = [0.0 for s in range(nb_states)]
 		tau = []
 		for s in range(nb_states):
-			tau.append([0 for i in range(nb_states*len(self.alphabet))])
+			tau.append([0 for i in range(nb_states*len(alphabet))])
 		
 		for i in temp:
 			for s in range(nb_states):
 				num_init[s] += i[2][s]
 				den[s] += i[0][s]
-				for x in range(nb_states*len(self.alphabet)):
+				for x in range(nb_states*len(alphabet)):
 					tau[s][x] += i[1][s][x]
 
 		list_sta = []
 		for i in range(nb_states):
-			for o in self.alphabet:
+			for o in alphabet:
 				list_sta.append(i)
-		list_obs = self.alphabet*nb_states
+		list_obs = alphabet*nb_states
 		new_states = []
 		for s in range(nb_states):
 			l = [self._newProbabilities(tau[s],den[s]), list_sta, list_obs]
-			i = 0
-			while i < len(l[0]):
-				if l[0][i] == 0.0:
-					l[0] = l[0][:i]+l[0][i+1:]
-					l[1] = l[1][:i]+l[1][i+1:]
-					l[2] = l[2][:i]+l[2][i+1:]
-					i -= 1
-				i += 1
-			if l[0][-1] == 0.0:
-				l[0] = l[0][:-1]
-				l[1] = l[1][:-1]
-				l[2] = l[2][:-1]
-					
+			l = _removeZeros(l)					
 			new_states.append(CTMC_state(l))
 
 		initial_state = [num_init[s]/nb_traces for s in range(nb_states)]
@@ -167,17 +143,14 @@ class BW_CTMC_Composition(BW_CTMC):
 		
 		nb_traces = sum(traces[1])
 		if to_update == 1:
-			self.hs[1] = self._generateModel(self.nb_states_hs[1],[i[0] for i in temp],nb_traces)
+			self.hs[1] = self._generateModel([i[0] for i in temp],nb_traces,1)
 		elif to_update == 2:
-			self.hs[2] = self._generateModel(self.nb_states_hs[2],[i[0] for i in temp],nb_traces)
+			self.hs[2] = self._generateModel([i[0] for i in temp],nb_traces,2)
 		else:
-			self.hs[1] = self._generateModel(self.nb_states_hs[1],[i[0] for i in temp],nb_traces)
-			self.hs[2] = self._generateModel(self.nb_states_hs[2],[i[1] for i in temp],nb_traces)
+			self.hs[1] = self._generateModel([i[0] for i in temp],nb_traces,1)
+			self.hs[2] = self._generateModel([i[1] for i in temp],nb_traces,2)
 
-		if to_update:
-			currentloglikelihood = sum([log(i[1])*i[2] for i in temp])
-		else:
-			currentloglikelihood = sum([log(i[2])*i[3] for i in temp])
+		currentloglikelihood = sum([log(i[2])*i[3] for i in temp])
 
 		return [parallelComposition(self.hs[1],self.hs[2]),currentloglikelihood]
 
@@ -192,6 +165,8 @@ class BW_CTMC_Composition(BW_CTMC):
 		counter = 0
 		prevloglikelihood = 10
 		nb_traces = sum(traces[1])
+		self.alphabets = [None,self.hs[1].observations(),self.hs[2].observations()]
+		self.disjoints_alphabet = len(set(self.alphabets[1]).intersection(set(self.alphabets[2]))) == 0
 		while True:
 			if verbose:
 				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces)
@@ -207,3 +182,33 @@ class BW_CTMC_Composition(BW_CTMC):
 			self.hs[1].save(output_file+"_1.txt")
 			self.hs[2].save(output_file+"_2.txt")
 		return self.hs[1], self.hs[2]
+
+	def _splitSequenceObs(self,seq):
+		res0 = [0]
+		res1 = []
+		res2 = []
+		for t in seq:
+			res0.append(res0[-1])
+			if t in self.alphabets[1]:
+				res1.append(t)
+				res0[-1] += 1
+			elif t in self.alphabets[2]:
+				res2.append(t)
+			else:
+				input("ERR0R: "+t+" is not in any alphabet")
+		return (res0,res1,res2)
+
+def _removeZeros(l):
+	i = 0
+	while i < len(l[0]):
+		if l[0][i] == 0.0:
+			l[0] = l[0][:i]+l[0][i+1:]
+			l[1] = l[1][:i]+l[1][i+1:]
+			l[2] = l[2][:i]+l[2][i+1:]
+			i -= 1
+		i += 1
+	if l[0][-1] == 0.0:
+		l[0] = l[0][:-1]
+		l[1] = l[1][:-1]
+		l[2] = l[2][:-1]
+	return l

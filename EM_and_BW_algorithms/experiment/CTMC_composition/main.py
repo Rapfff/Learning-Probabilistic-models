@@ -11,17 +11,14 @@ from src.models.CTMC import parallelComposition
 from src.tools import generateSet
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
+from ast import literal_eval
 
 def generateTestSets(nb_seq=1000,len_seq=10):
     untimed_test_set_composition = generateSet(original_model,nb_seq,len_seq,timed=True)
     untimed_test_set_2 = generateSet(original2,nb_seq,len_seq,timed=True)
     return untimed_test_set_composition, untimed_test_set_2
 
-def generateTrainingSets(nb_seq=1000,len_seq=10):
-    original1 = modelCTMC2()
-    original2 = modelCTMC3()
-    original_model = parallelComposition(original1,original2)
-    
+def generateTrainingSets(nb_seq=1000,len_seq=10):    
     timed_training_set = generateSet(original_model,nb_seq,len_seq,timed=True)
     
     untimed_training_set = [[],[]]
@@ -34,10 +31,37 @@ def generateTrainingSets(nb_seq=1000,len_seq=10):
             untimed_training_set[1].append(times)
     return timed_training_set, untimed_training_set
 
-def generateRandomModels():
-    return modelCTMC_random(4,list("rgb"),1,5,False), modelCTMC_random(4,list("rgb"),1,5,False)
+def generateRandomModels(disjoint=False):
+    if not disjoint:
+        return modelCTMC_random(4,list("rgb"),1,5,False), modelCTMC_random(4,list("rgb"),1,5,False)
+    else:
+        return modelCTMC_random(4,['r1','g1','b1'],1,5,False), modelCTMC_random(4,['r2','g2','b2'],1,5,False)
 
-NB_EXPERIMENTS = 5
+
+
+original1 = modelCTMC2()
+original2 = modelCTMC3()
+original_model = parallelComposition(original1,original2,disjoint=True)
+timed_test_set_composition, timed_test_set_2 = generateTestSets()
+timed_training_set, untimed_training_set = generateTrainingSets(1,5)
+print(untimed_training_set)
+random1, random2 = generateRandomModels(disjoint=True)
+
+s = datetime.now()
+timed_model1, timed_model2 = BW_CTMC_Composition(random1,random2).learn(timed_training_set,verbose=True)
+s = (datetime.now()-s).total_seconds()
+
+timed_model = parallelComposition(timed_model1,timed_model2)
+quality_original = original_model.logLikelihood(timed_test_set_composition)
+quality_original2= original2.logLikelihood(timed_test_set_2)
+ll = abs(quality_original-timed_model.logLikelihood(timed_test_set_composition))
+print(s,ll)
+ll = max(abs(quality_original2-timed_model2.logLikelihood(timed_test_set_2)),abs(quality_original2-timed_model1.logLikelihood(timed_test_set_2)))
+print(s,ll)
+input()
+
+
+NB_EXPERIMENTS = 100
 
 dots_compo_compo  = []
 dots_compo_model2  = []
@@ -98,18 +122,32 @@ f.write(str(dots_simple_compo)+'\n')
 f.write(str(dots_model2_compo)+'\n')
 f.write(str(dots_model2_model2)+'\n')
 f.close()
-fig, axs = plt.subplots(1, 2)
-axs[0].scatter([i[0] for i in dots_compo_compo],  [i[1] for i in dots_compo_compo],  c='r', alpha=0.5, label="Composition")
-axs[0].scatter([i[0] for i in dots_simple_compo], [i[1] for i in dots_simple_compo], c='g', alpha=0.5, label="Simple")
-axs[0].scatter([i[0] for i in dots_model2_compo], [i[1] for i in dots_model2_compo], c='b', alpha=0.5, label="Second model only")
-axs[1].scatter([i[0] for i in dots_compo_model2], [i[1] for i in dots_compo_model2], c='r', alpha=0.5, label="Composition")
-axs[1].scatter([i[0] for i in dots_model2_model2],[i[1] for i in dots_model2_model2],c='b', alpha=0.5, label="Second model only")
-axs[0].set_xlabel("Running time (s)")
-axs[1].set_xlabel("Running time (s)")
-axs[0].set_ylabel("Absolute difference of the loglikelihoods")
-axs[1].set_ylabel("Absolute difference of the loglikelihoods")
-axs[0].set_title("Composition")
-axs[1].set_title("Second model only")
-axs[0].legend()
-axs[1].legend()
+
+f = open("output/summary.txt",'r')
+dots_compo_compo = literal_eval(f.readline()[:-1])
+dots_compo_model2 = literal_eval(f.readline()[:-1])
+dots_simple_compo = literal_eval(f.readline()[:-1])
+dots_model2_compo = literal_eval(f.readline()[:-1])
+dots_model2_model2 = literal_eval(f.readline()[:-1])
+f.close()
+
+
+fig, ax = plt.subplots(figsize=(5,5))
+ax.scatter([i[0] for i in dots_simple_compo], [i[1] for i in dots_simple_compo], c='g', alpha=0.5, label="Exp. 1: U||V")
+ax.scatter([i[0] for i in dots_compo_compo],  [i[1] for i in dots_compo_compo],  c='r', alpha=0.5, label="Exp. 2: U and V")
+ax.scatter([i[0] for i in dots_model2_compo], [i[1] for i in dots_model2_compo], c='b', alpha=0.5, label="Exp. 3: V")
+ax.set_xlabel("Running time (s)")
+ax.set_ylabel("Average of the absolute differences of the loglikelihoods")
+ax.set_title("Composition")
+ax.legend()
+plt.show()
+
+
+fig, ax = plt.subplots(figsize=(5,5))
+ax.scatter([i[0] for i in dots_compo_model2], [i[1] for i in dots_compo_model2], c='r', alpha=0.5, label="Exp. 2: U and V")
+ax.scatter([i[0] for i in dots_model2_model2],[i[1] for i in dots_model2_model2],c='b', alpha=0.5, label="Exp. 3: V")
+ax.set_xlabel("Running time (s)")
+ax.set_ylabel("Average of the absolute differences of the loglikelihoods")
+ax.set_title("Second component only")
+ax.legend()
 plt.show()
