@@ -59,11 +59,13 @@ for psg_number in psgs:
 			"REM": [[],[],[]]}
 	c = 1
 	while c*MANUAL_SCORING_WINDOW_SEC <= duration:
+		print(c)
 		s = h["Event"][c]
-		vals = read_EDF_signal(r,int(MANUAL_SCORING_WINDOW_SEC*frequency),signal_id)
-		data[s][0].append(pfd(vals))
-		data[s][2].append(hurst(vals))
-		data[s][1].append(dfa(vals))
+		if s in stages:
+			vals = read_EDF_signal(r,int(MANUAL_SCORING_WINDOW_SEC*frequency),signal_id)
+			data[s][0].append(pfd(vals))
+			data[s][2].append(hurst(vals))
+			data[s][1].append(dfa(vals))
 		c += 1
 
 for s in stages:
