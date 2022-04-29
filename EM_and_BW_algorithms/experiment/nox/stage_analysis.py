@@ -1,9 +1,9 @@
 from signal import signal
-from EM_and_BW_algorithms.experiment.nox.unsupervised_learning import MANUAL_SCORING_WINDOW_SEC
 from pyeeg import *
 from edfreader import EDFreader
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 # transformation : pfd, dfa, hurst
 MANUAL_SCORING_WINDOW_SEC = 30
 def file_paths_from_psg_number(nb):
@@ -52,17 +52,23 @@ for psg_number in psgs:
 
 	r.fseek(signal_id,begining,EDFreader.EDFSEEK_SET)
 	stages = ["Wake","N1","N2","N3","REM"]
-	data = {"Wake":[[],[],[],[]],
-			"N1":  [[],[],[],[]],
-			"N2":  [[],[],[],[]],
-			"N3":  [[],[],[],[]],
-			"REM": [[],[],[],[]]}
-	c = 0
-	while (c+1)*MANUAL_SCORING_WINDOW_SEC <= duration:
-		s = h["Event"][c+1]
+	data = {"Wake":[[],[],[]],
+			"N1":  [[],[],[]],
+			"N2":  [[],[],[]],
+			"N3":  [[],[],[]],
+			"REM": [[],[],[]]}
+	c = 1
+	while c*MANUAL_SCORING_WINDOW_SEC <= duration:
+		s = h["Event"][c]
 		vals = read_EDF_signal(r,int(MANUAL_SCORING_WINDOW_SEC*frequency),signal_id)
 		data[s][0].append(pfd(vals))
 		data[s][2].append(hurst(vals))
 		data[s][1].append(dfa(vals))
 		c += 1
-	
+
+for s in stages:
+	fig, axs = plt.subplots(1, 3)
+	axs[0].hist(data[s][0], label='pfd')
+	axs[1].hist(data[s][1], label='dfa')
+	axs[2].hist(data[s][2], label='vals')
+	plt.show()	
