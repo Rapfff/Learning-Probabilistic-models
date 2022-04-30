@@ -93,7 +93,7 @@ class BW_CTMC:
 			
 			for t in range(len(obs_seq)):
 				if timed:
-					den[-1] += times_seq[t]*alpha_matrix[s][t]*beta_matrix[s][t]
+					den[-1] += alpha_matrix[s][t]*beta_matrix[s][t]*times_seq[t]
 				else:
 					den[-1] += alpha_matrix[s][t]*beta_matrix[s][t]/self.h.e(s)
 				

@@ -1,4 +1,6 @@
 import os, sys
+
+from torch import divide
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
@@ -33,21 +35,25 @@ class BW_CTMC_Composition(BW_CTMC):
 			num.append([0.0 for i in range(nb_states*len(self.alphabet))])
 			
 			ev = self.hs[to_update].e(v)
-			
+			divider = ev
+
 			for u in range(nb_states_other):
 				uv = self._getStateInComposition(v,to_update,u)
-				
+				eu = self.hs[other].e(u)
+				if not self.disjoints_alphabet:
+					divider = eu+ev
+
 				for t in range(len(obs_seq)):
 					observation = obs_seq[t]
 					if observation in self.alphabets[to_update]:
-						if not timed:
-							den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]
+						if timed:
+							den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]*times_seq[t]
 						else:
-							den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]
-
+							den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]/(eu+ev)
+						
 						for vv in [i for i in range(nb_states) if i != v]:
 							uvv = self._getStateInComposition(vv,to_update,u)
-							num[-1][vv*len(self.alphabets[to_update])+self.alphabets[to_update].index(observation)] += alpha_matrix[uv][t]*beta_matrix[uvv][t+1]*self.hs[to_update].l(v,vv,observation)/ev
+							num[-1][vv*len(self.alphabets[to_update])+self.alphabets[to_update].index(observation)] += alpha_matrix[uv][t]*beta_matrix[uvv][t+1]*self.hs[to_update].l(v,vv,observation)/divider
 				
 				num_init[-1] += alpha_matrix[uv][0]*beta_matrix[uv][0]
 			
@@ -56,14 +62,10 @@ class BW_CTMC_Composition(BW_CTMC):
 			num_init[-1] *= times/proba_seq
 		return [den, num, num_init]
 
-	def processWork(self,sequence: list, times: int, to_update: int):
-		times_seq, obs_seq = self.splitTime(sequence)
-		if times_seq == None:
-			timed = False
+	def computeAlphasBetas(self,obs_seq):
+		if not self.disjoints_alphabet:
+			return self.computeAlphas(obs_seq), self.computeBetas(obs_seq)
 		else:
-			timed = True
-		
-		if self.disjoints_alphabet:
 			obs_seqs = self._splitSequenceObs(obs_seq)
 			bw = BW_CTMC(self.hs[1])
 			alphas1 = bw.computeAlphas(obs_seqs[1])
@@ -77,9 +79,16 @@ class BW_CTMC_Composition(BW_CTMC):
 				for s2 in range(self.nb_states_hs[2]):
 					alpha_matrix.append([alphas1[s1][obs_seqs[0][t]]*alphas2[s2][t-obs_seqs[0][t]] for t in range(len(obs_seq)+1)])
 					beta_matrix.append( [ betas1[s1][obs_seqs[0][t]]* betas2[s2][t-obs_seqs[0][t]] for t in range(len(obs_seq)+1)])
+			return alpha_matrix, beta_matrix
+
+
+	def processWork(self,sequence: list, times: int, to_update: int):
+		times_seq, obs_seq = self.splitTime(sequence)
+		if times_seq == None:
+			timed = False
 		else:
-			alpha_matrix = self.computeAlphas(obs_seq)
-			beta_matrix  = self.computeBetas(obs_seq)
+			timed = True
+		alpha_matrix, beta_matrix = self.computeAlphasBetas(obs_seq)
 
 		proba_seq = sum([alpha_matrix[s][-1] for s in range(self.nb_states)])
 		if proba_seq <= 0.0:
@@ -171,7 +180,7 @@ class BW_CTMC_Composition(BW_CTMC):
 			if verbose:
 				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces)
 			hhat, currentloglikelihood = self.generateHhat(traces,to_update)
-			
+
 			counter += 1
 			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
 				break
