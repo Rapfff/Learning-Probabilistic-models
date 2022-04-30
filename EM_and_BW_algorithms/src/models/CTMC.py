@@ -135,7 +135,8 @@ class CTMC:
 					p = self.l(ss,s,sequence[k+1])*exp(-self.e(ss)*sequence[k])
 					summ += alpha_matrix[ss][k//2]*p
 				alpha_matrix[s].append(summ)
-		return sum([alpha_matrix[s][-1] for s in range(len(self.states))])
+		res = sum([alpha_matrix[s][-1] for s in range(len(self.states))])
+		return res
 
 	def logLikelihood(self,traces) -> float:
 		if type(traces[0][0][0]) == str: # non-timed traces
@@ -143,7 +144,8 @@ class CTMC:
 		else: # timed traces
 			res = 0.0
 			for sequence, times in zip(traces[0],traces[1]):
-				res += log(self.proba_one_timed_seq(sequence))*times
+				proba_seq = self.proba_one_timed_seq(sequence)
+				res += log(proba_seq)*times
 		return res/sum(traces[1])
 
 

@@ -45,16 +45,15 @@ class BW_CTMC_Composition(BW_CTMC):
 
 				for t in range(len(obs_seq)):
 					observation = obs_seq[t]
+					if timed:
+						den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]*times_seq[t]
+					else:
+						den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]/(eu+ev)
 					if observation in self.alphabets[to_update]:
-						if timed:
-							den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]*times_seq[t]
-						else:
-							den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]/(eu+ev)
-						
 						for vv in [i for i in range(nb_states) if i != v]:
 							uvv = self._getStateInComposition(vv,to_update,u)
 							num[-1][vv*len(self.alphabets[to_update])+self.alphabets[to_update].index(observation)] += alpha_matrix[uv][t]*beta_matrix[uvv][t+1]*self.hs[to_update].l(v,vv,observation)/divider
-				
+			
 				num_init[-1] += alpha_matrix[uv][0]*beta_matrix[uv][0]
 			
 			num[-1]  = [i*times/proba_seq for i in num[-1]]
@@ -178,7 +177,7 @@ class BW_CTMC_Composition(BW_CTMC):
 		self.disjoints_alphabet = len(set(self.alphabets[1]).intersection(set(self.alphabets[2]))) == 0
 		while True:
 			if verbose:
-				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces)
+				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces,end='\r')
 			hhat, currentloglikelihood = self.generateHhat(traces,to_update)
 
 			counter += 1
@@ -190,6 +189,8 @@ class BW_CTMC_Composition(BW_CTMC):
 		if output_file:
 			self.hs[1].save(output_file+"_1.txt")
 			self.hs[2].save(output_file+"_2.txt")
+		if verbose:
+			print()
 		return self.hs[1], self.hs[2]
 
 	def _splitSequenceObs(self,seq):

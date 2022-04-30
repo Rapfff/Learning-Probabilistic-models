@@ -166,7 +166,7 @@ class BW_CTMC:
 		nb_traces = sum(traces[1])
 		while True:
 			if verbose:
-				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces)
+				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces,end='\r')
 			hhat, currentloglikelihood = self.generateHhat(traces)
 			
 			counter += 1
@@ -177,4 +177,6 @@ class BW_CTMC:
 				prevloglikelihood = currentloglikelihood
 				
 		self.h.save(output_file)
+		if verbose:
+			print()
 		return self.h
