@@ -1,0 +1,71 @@
+from .HMM import HMM, HMM_state, HMM_random
+from ..base.BW import *
+from multiprocessing import Pool
+from ..base.tools import correct_proba, getAlphabetFromSequences
+from numpy import log
+
+class BW_HMM(BW):
+	def __init__(self):
+		super().__init__()
+
+	def fit(self, traces, initial_model=None, nb_states=0, random_initial_state=False, output_file="output_model.txt", epsilon=0.01, verbose=False, pp=''):
+		if not initial_model:
+			if nb_states == 0:
+				print("ERROR")
+				return
+			initial_model = HMM_random(nb_states,getAlphabetFromSequences(traces),random_initial_state)
+		return super().fit(traces, initial_model, output_file, epsilon, verbose, pp)
+
+	def _processWork(self,sequence,times):
+		alpha_matrix = self.computeAlphas(sequence)
+		beta_matrix = self.computeBetas(sequence)
+		proba_seq = alpha_matrix.T[-1].sum()
+		if proba_seq != 0.0:
+			####################
+			den = dot(alpha_matrix*beta_matrix,times/proba_seq).sum(axis=1)
+			####################
+			num_a = zeros(shape=(self.nb_states,self.nb_states))
+			num_b = zeros(shape=(self.nb_states,len(self.alphabet)))
+			for s in range(self.nb_states):
+				for ss in range(self.nb_states):
+					p = array([self.h_tau(s,ss,o) for o in sequence])
+					num_a[s,ss] = dot(alpha_matrix[s][:-1]*p*beta_matrix[ss][1:],times/proba_seq).sum()
+					for o, obs in enumerate(self.alphabet):
+						arr_dirak = [1.0 if t == obs else 0.0 for t in sequence]
+						num_b[s,o] = dot(alpha_matrix[s][:-1]*arr_dirak*beta_matrix[s][:-1],times/proba_seq).sum()
+			####################
+			num_init = alpha_matrix.T[0]*beta_matrix.T[0]*times/proba_seq
+			####################
+			return [den, num_a, num_b, proba_seq, times, num_init]
+		return False
+
+	def _generateHhat(self,temp):
+		den = zeros(shape=(self.nb_states,))
+		a   = zeros(shape=(self.nb_states,self.nb_states))
+		b   = zeros(shape=(self.nb_states,len(self.alphabet)))
+		lst_den = array([i[0] for i in temp]).T
+		lst_num_a = array([i[1] for i in temp]).T.reshape(self.nb_states*self.nb_states,len(temp))
+		lst_num_b = array([i[2] for i in temp]).T.reshape(self.nb_states*len(self.alphabet),len(temp))
+		lst_proba=array([i[3] for i in temp])
+		lst_times=array([i[4] for i in temp])
+		lst_init =array([i[5] for i in temp]).T
+		
+		currentloglikelihood = dot(log(lst_proba),lst_times)
+
+		for s in range(self.nb_states):
+			den[s] = lst_den[s].sum()
+			for x in range(self.nb_states):
+				a[s,x] = lst_num_a[x*self.nb_states+s].sum()
+			for x in range(len(self.alphabet)):
+				b[s,x] = lst_num_b[x*self.nb_states+s].sum()
+
+		new_states = []
+		for s in range(self.nb_states):
+			la = [ correct_proba(a[s]/den[s]), list(range(self.nb_states)) ]
+			lb = [ correct_proba(b[s]/den[s]) , self.alphabet ]
+
+			new_states.append(HMM_state(lb,la,s))
+
+		initial_state = [lst_init[s].sum()/lst_init.sum() for s in range(self.nb_states)]
+		
+		return [HMM(new_states,initial_state),currentloglikelihood]
