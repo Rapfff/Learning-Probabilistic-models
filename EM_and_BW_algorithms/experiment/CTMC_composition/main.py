@@ -8,7 +8,7 @@ from examples.examples_models import modelCTMC2, modelCTMC3, modelCTMC_random
 from src.learning.BW_CTMC_Composition import BW_CTMC_Composition
 from src.learning.BW_CTMC import BW_CTMC
 from src.models.CTMC import parallelComposition
-from src.tools import generateSet
+from src.tools import generateSet, saveSet
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 from ast import literal_eval
@@ -61,6 +61,8 @@ original1 = modelCTMC2()
 original2 = modelCTMC3()
 original_model = parallelComposition(original1,original2)
 timed_test_set_composition, timed_test_set_2 = generateTestSets()
+saveSet(timed_test_set_composition,"output/timed_test_set_composition.txt")
+saveSet(timed_test_set_2,"output/timed_test_set_2.txt")
 quality_original = original_model.logLikelihood(timed_test_set_composition)
 quality_original2= original2.logLikelihood(timed_test_set_2)
 
@@ -68,6 +70,9 @@ original1_disjoint = modelCTMC2('1')
 original2_disjoint = modelCTMC3('2')
 original_model_disjoint = parallelComposition(original1_disjoint,original2_disjoint)
 timed_test_set_composition_disjoint, timed_test_set_1_disjoint, timed_test_set_2_disjoint = generateTestSetsDisjoint()
+saveSet(timed_test_set_composition_disjoint,"output/timed_test_set_composition_disjoint.txt")
+saveSet(timed_test_set_1_disjoint,"output/timed_test_set_1_disjoint.txt")
+saveSet(timed_test_set_2_disjoint,"output/timed_test_set_2_disjoint.txt")
 quality_original = original_model_disjoint.logLikelihood(timed_test_set_composition_disjoint)
 quality_original1 = original1_disjoint.logLikelihood(timed_test_set_1_disjoint)
 quality_original2 = original2_disjoint.logLikelihood(timed_test_set_2_disjoint)
