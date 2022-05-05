@@ -16,10 +16,10 @@ def test_HMM():
 	print(model)
 	model.save("test_save.txt")
 	model = ja.loadHMM("test_save.txt")
-	s = model.generateSet(100,10)
-	m3 = ja.BW_HMM().fit(s,nb_states=5)
+	s = model.generateSet(100,1/2,"geo",5)
+	#m3 = ja.BW_HMM().fit(s,nb_states=5)
 
-	print(m3.logLikelihood(s))
+	#print(m3.logLikelihood(s))
 	print(model.logLikelihood(s))
 
 def test_MC():

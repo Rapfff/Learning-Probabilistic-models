@@ -1,6 +1,8 @@
 from math import  log
+
+from scipy.fftpack import diff
 from .tools import resolveRandom
-from numpy import array, append, dot, zeros, hsplit
+from numpy import array, append, dot, zeros, vsplit
 from numpy.random import geometric
 
 class Model_state:
@@ -275,15 +277,15 @@ class Model:
 			being in state ``s`` after seing the ``t-1`` first observation of
 			``sequence``.
 		"""
-		diff_size = len(alpha_matrix[0])-1 - len(sequence)
+		nb_states = len(self.states)
+		diff_size = len(alpha_matrix)-1 - len(sequence)
 		if diff_size < 0: # alpha_matrix too small
-			n = zeros(diff_size * len(alpha_matrix)).reshape(len(alpha_matrix),diff_size)
-			alpha_matrix = append(alpha_matrix,n)
+			n = zeros(-diff_size * nb_states).reshape(-diff_size,nb_states)
+			alpha_matrix = append(alpha_matrix,n,axis=0)
 		elif diff_size > 0: #alpha_matrix too big
-			alpha_matrix = hsplit(alpha_matrix,[len(alpha_matrix)-diff_size,diff_size])[0]
-		
+			alpha_matrix = vsplit(alpha_matrix,[len(alpha_matrix)-diff_size,nb_states])[0]
 		for k in range(common,len(sequence)):
-			for s in range(len(self.states)):
+			for s in range(nb_states):
 				p = array([self.states[ss].tau(s,sequence[k]) for ss in range(len(self.states))])
 				alpha_matrix[k+1,s] = dot(alpha_matrix[k],p)
 		return alpha_matrix
@@ -326,15 +328,17 @@ class Model:
 		sequences_sorted = sequences[0][:]
 		sequences_sorted.sort()
 		loglikelihood = 0.0
-
 		alpha_matrix = self._initAlphaMatrix(len(sequences_sorted[0]))
 		for seq in range(len(sequences_sorted)):
 			sequence = sequences_sorted[seq]
 			times = sequences[1][sequences[0].index(sequence)]
 			common = 0
 			if seq > 0:
-				while sequences_sorted[seq-1][common] == sequence[common]:
+				while common < min(len(sequences_sorted[seq-1]),len(sequence)):
+					if sequences_sorted[seq-1][common] != sequence[common]:
+						break
 					common += 1
+					
 			alpha_matrix = self._updateAlphaMatrix(sequence,common,alpha_matrix)
 
 			if alpha_matrix[-1].sum() > 0:
