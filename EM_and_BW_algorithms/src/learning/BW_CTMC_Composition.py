@@ -59,17 +59,17 @@ class BW_CTMC_Composition(BW_CTMC):
 			num_init[-1] *= times/proba_seq
 		return [den, num, num_init]
 
-	def computeAlphasBetas(self,obs_seq, timed):
+	def computeAlphasBetas(self,obs_seq, times_seq):
 		if not self.disjoints_alphabet:
-			return self.computeAlphas(obs_seq, timed), self.computeBetas(obs_seq, timed)
+			return self.computeAlphas(obs_seq, times_seq), self.computeBetas(obs_seq, times_seq)
 		else:
-			obs_seqs = self._splitSequenceObs(obs_seq)
+			obs_seqs, times_seq = self._splitSequenceObs(obs_seq, times_seq)
 			bw = BW_CTMC(self.hs[1])
-			alphas1 = bw.computeAlphas(obs_seqs[1], timed)
-			betas1  = bw.computeBetas( obs_seqs[1], timed)
+			alphas1 = bw.computeAlphas(obs_seqs[1], times_seq[0])
+			betas1  = bw.computeBetas( obs_seqs[1], times_seq[0])
 			bw = BW_CTMC(self.hs[2])
-			alphas2 = bw.computeAlphas(obs_seqs[2], timed)
-			betas2  = bw.computeBetas( obs_seqs[2], timed)
+			alphas2 = bw.computeAlphas(obs_seqs[2], times_seq[1])
+			betas2  = bw.computeBetas( obs_seqs[2], times_seq[1])
 			alpha_matrix = []
 			beta_matrix = []
 			for s1 in range(self.nb_states_hs[1]):
@@ -85,7 +85,7 @@ class BW_CTMC_Composition(BW_CTMC):
 			timed = False
 		else:
 			timed = True
-		alpha_matrix, beta_matrix = self.computeAlphasBetas(obs_seq,timed)
+		alpha_matrix, beta_matrix = self.computeAlphasBetas(sequence,times_seq)
 
 		proba_seq = sum([alpha_matrix[s][-1] for s in range(self.nb_states)])
 		if proba_seq <= 0.0:
@@ -191,20 +191,26 @@ class BW_CTMC_Composition(BW_CTMC):
 			print()
 		return self.hs[1], self.hs[2]
 
-	def _splitSequenceObs(self,seq):
+	def _splitSequenceObs(self,seq,tseq):
 		res0 = [0]
 		res1 = []
 		res2 = []
-		for t in seq:
+		t1   = []
+		t2   = []
+		for i,o in enumerate(seq):
 			res0.append(res0[-1])
-			if t in self.alphabets[1]:
-				res1.append(t)
+			if o in self.alphabets[1]:
+				res1.append(o)
 				res0[-1] += 1
-			elif t in self.alphabets[2]:
-				res2.append(t)
+				if tseq:
+					t1.append(tseq[i])
+			elif o in self.alphabets[2]:
+				res2.append(o)
+				if tseq:
+					t2.append(tseq[i])
 			else:
-				input("ERR0R: "+t+" is not in any alphabet")
-		return (res0,res1,res2)
+				input("ERR0R: "+o+" is not in any alphabet")
+		return ((res0,res1,res2),(t1,t2))
 
 def _removeZeros(l):
 	i = 0
