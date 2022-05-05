@@ -44,6 +44,14 @@ def generateRandomModels(disjoint=False):
         obs = [['r1','g1','b1'],['r2','g2','b2']]
     return modelCTMC_random(4,obs[0],1,5,False), modelCTMC_random(4,obs[1],1,5,False)
 
+original1 = modelCTMC2()
+original2 = modelCTMC3()
+original_model = parallelComposition(original1,original2)
+timed_training_set, untimed_training_set = generateTrainingSets(1000,10)
+random1, random2 = generateRandomModels()
+simple = BW_CTMC(parallelComposition(random1,random2)).learn(timed_training_set,verbose=True)
+simple = BW_CTMC(parallelComposition(random1,random2)).learn(untimed_training_set,verbose=True)
+input()
 
 NB_EXPERIMENTS = 1
 v=True

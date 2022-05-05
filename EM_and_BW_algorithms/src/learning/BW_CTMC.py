@@ -192,7 +192,7 @@ class BW_CTMC:
 
 		return [CTMC(new_states,initial_state),currentloglikelihood]
 
-	def learn(self,traces,output_file="output_model.txt",epsilon=0.01,verbose=False,pp=''):
+	def learn(self,traces,output_file=None,epsilon=0.01,verbose=False,pp=''):
 		"""
 		Given a set of sequences of pairs action-observation,
 		it adapts the parameters of h in order to maximize the probability to get 
@@ -214,8 +214,8 @@ class BW_CTMC:
 				break
 			else:
 				prevloglikelihood = currentloglikelihood
-				
-		self.h.save(output_file)
+		if output_file:
+			self.h.save(output_file)
 		if verbose:
 			print()
 		return self.h

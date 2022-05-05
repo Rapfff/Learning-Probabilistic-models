@@ -85,7 +85,7 @@ class BW_CTMC_Composition(BW_CTMC):
 			timed = False
 		else:
 			timed = True
-		alpha_matrix, beta_matrix = self.computeAlphasBetas(sequence,times_seq)
+		alpha_matrix, beta_matrix = self.computeAlphasBetas(obs_seq,times_seq)
 
 		proba_seq = sum([alpha_matrix[s][-1] for s in range(self.nb_states)])
 		if proba_seq <= 0.0:
