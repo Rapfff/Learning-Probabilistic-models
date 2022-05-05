@@ -1,6 +1,4 @@
 import os, sys
-
-from torch import divide
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
@@ -61,17 +59,17 @@ class BW_CTMC_Composition(BW_CTMC):
 			num_init[-1] *= times/proba_seq
 		return [den, num, num_init]
 
-	def computeAlphasBetas(self,obs_seq):
+	def computeAlphasBetas(self,obs_seq, timed):
 		if not self.disjoints_alphabet:
-			return self.computeAlphas(obs_seq), self.computeBetas(obs_seq)
+			return self.computeAlphas(obs_seq, timed), self.computeBetas(obs_seq, timed)
 		else:
 			obs_seqs = self._splitSequenceObs(obs_seq)
 			bw = BW_CTMC(self.hs[1])
-			alphas1 = bw.computeAlphas(obs_seqs[1])
-			betas1  = bw.computeBetas( obs_seqs[1])
+			alphas1 = bw.computeAlphas(obs_seqs[1], timed)
+			betas1  = bw.computeBetas( obs_seqs[1], timed)
 			bw = BW_CTMC(self.hs[2])
-			alphas2 = bw.computeAlphas(obs_seqs[2])
-			betas2  = bw.computeBetas( obs_seqs[2])
+			alphas2 = bw.computeAlphas(obs_seqs[2], timed)
+			betas2  = bw.computeBetas( obs_seqs[2], timed)
 			alpha_matrix = []
 			beta_matrix = []
 			for s1 in range(self.nb_states_hs[1]):
@@ -87,7 +85,7 @@ class BW_CTMC_Composition(BW_CTMC):
 			timed = False
 		else:
 			timed = True
-		alpha_matrix, beta_matrix = self.computeAlphasBetas(obs_seq)
+		alpha_matrix, beta_matrix = self.computeAlphasBetas(obs_seq,timed)
 
 		proba_seq = sum([alpha_matrix[s][-1] for s in range(self.nb_states)])
 		if proba_seq <= 0.0:

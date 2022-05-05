@@ -25,8 +25,52 @@ class BW_CTMC:
 
 	def h_e(self,s: int) -> float:
 		return self.h.e(s)
+	
+	def h_l(self, s1: int, s2: int, obs: str) -> float:
+		return self.h.l(s1,s2,obs)
 
-	def computeAlphas(self,sequence: list) -> list:
+	def computeAlphas(self,sequence: list, timed: bool) -> list:
+		if timed:
+			return self.computeAlphas_timed(sequence)
+		else:
+			return self.computeAlphas_nontimed(sequence)
+
+	def computeBetas(self,sequence: list, timed: bool) -> list:
+		if timed:
+			return self.computeBetas_timed(sequence)
+		else:
+			return self.computeBetas_nontimed(sequence)
+
+	def computeAlphas_timed(self,sequence: list) -> list:
+		"""Here we compute all the values alpha(k,t) for a given sequence"""
+		alpha_matrix = []
+		for i in range(self.nb_states):
+			alpha_matrix.append([self.h.pi(i)])
+
+		for k in range(0,len(sequence),2):
+			for s in range(self.nb_states):
+				summ = 0.0
+				for ss in range(self.nb_states):
+					summ += alpha_matrix[ss][k]*self.h_l(ss,s,sequence[k+1])*self.h.lkl(ss,sequence[k])
+				alpha_matrix[s].append(summ)
+		return alpha_matrix
+
+	def computeBetas_timed(self,sequence: list) -> list:
+		"""Here we compute all the values beta(t,k) for a given sequence"""
+		beta_matrix = []
+		for s in range(self.nb_states):
+			beta_matrix.append([1.0])
+		
+		for k in range(len(sequence)-2,-2,-1):
+			for s in range(self.nb_states):
+				summ = 0.0
+				for ss in range(self.nb_states):
+					summ += beta_matrix[ss][1 if ss<s else 0]*self.h_l(s,ss,sequence[k+1])
+				summ *= self.h.lkl(s,sequence[k])
+				beta_matrix[s].insert(0,summ)
+		return beta_matrix
+
+	def computeAlphas_nontimed(self,sequence: list) -> list:
 		"""Here we compute all the values alpha(k,t) for a given sequence"""
 		# sequence is UNTIMED
 		alpha_matrix = []
@@ -37,13 +81,11 @@ class BW_CTMC:
 			for s in range(self.nb_states):
 				summ = 0.0
 				for ss in range(self.nb_states):
-					p = self.h_tau(ss,s,sequence[k])
-					if p > 0.0:
-						summ += alpha_matrix[ss][k]*p
+					summ += alpha_matrix[ss][k]*self.h_tau(ss,s,sequence[k])
 				alpha_matrix[s].append(summ)
 		return alpha_matrix
 
-	def computeBetas(self,sequence: list) -> list:
+	def computeBetas_nontimed(self,sequence: list) -> list:
 		"""Here we compute all the values beta(t,k) for a given sequence"""
 		# sequence is UNTIMED
 		beta_matrix = []
@@ -54,11 +96,8 @@ class BW_CTMC:
 			for s in range(self.nb_states):
 				summ = 0.0
 				for ss in range(self.nb_states):
-					p = self.h_tau(s,ss,sequence[k])
-					if p > 0.0:
-						summ += beta_matrix[ss][1 if ss<s else 0]*p
+					summ += beta_matrix[ss][1 if ss<s else 0]*self.h_tau(s,ss,sequence[k])
 				beta_matrix[s].insert(0,summ)
-
 		return beta_matrix
 
 	def splitTime(self,sequence: list) -> tuple:
@@ -77,8 +116,8 @@ class BW_CTMC:
 		else:
 			timed = True
 
-		alpha_matrix = self.computeAlphas(obs_seq)
-		beta_matrix  = self.computeBetas(obs_seq)
+		alpha_matrix = self.computeAlphas(obs_seq, timed)
+		beta_matrix  = self.computeBetas(obs_seq, timed)
 		
 		proba_seq = sum([alpha_matrix[s][-1] for s in range(self.nb_states)])
 		if proba_seq == 0.0:
@@ -100,7 +139,7 @@ class BW_CTMC:
 				
 				observation = obs_seq[t]
 				for ss in range(self.nb_states):
-					num[-1][ss*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[s][t]*self.h.l(s,ss,observation)*beta_matrix[ss][t+1]/self.h.e(s)
+					num[-1][ss*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[s][t]*self.h_tau(s,ss,observation)*beta_matrix[ss][t+1]
 					
 			num[-1]  = [i*times/proba_seq for i in num[-1]]
 			den[-1] *= times/proba_seq

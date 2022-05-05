@@ -45,7 +45,7 @@ def generateRandomModels(disjoint=False):
     return modelCTMC_random(4,obs[0],1,5,False), modelCTMC_random(4,obs[1],1,5,False)
 
 
-NB_EXPERIMENTS = 100
+NB_EXPERIMENTS = 1
 v=True
 
 dots_compo_compo     = []
@@ -60,6 +60,8 @@ dots_model2_disjoint = []
 original1 = modelCTMC2()
 original2 = modelCTMC3()
 original_model = parallelComposition(original1,original2)
+timed_training_set, untimed_training_set = generateTrainingSets(1000,10)
+saveSet(timed_training_set,"output/timed_training_set.txt")
 timed_test_set_composition, timed_test_set_2 = generateTestSets()
 saveSet(timed_test_set_composition,"output/timed_test_set_composition.txt")
 saveSet(timed_test_set_2,"output/timed_test_set_2.txt")
@@ -82,7 +84,6 @@ duration_tot = timedelta()
 for exp in range(1,NB_EXPERIMENTS+1):
     start_exp = datetime.now()
     print("\nExperiment",exp,'/',NB_EXPERIMENTS,':')
-    timed_training_set, untimed_training_set = generateTrainingSets(1000,10)
     random1, random2 = generateRandomModels()
 
     print("Composition")

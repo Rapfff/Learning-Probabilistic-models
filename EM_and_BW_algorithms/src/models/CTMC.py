@@ -27,6 +27,9 @@ class CTMC_state:
 	def observations(self):
 		return list(set(self.lambda_matrix[2]))
 
+	def lkl(self,t: float) -> float:
+		return exp(-self.e()*t)
+
 	def e(self) -> float:
 		return sum(self.lambda_matrix[0])
 
@@ -95,6 +98,9 @@ class CTMC:
 	
 	def l(self, s1:int, s2:int, obs:str):
 		return self.states[s1].l(s2,obs)
+	
+	def lkl(self, s1: int, t: float) -> float:
+		return self.states[s1].lkl(t)
 
 	def pi(self, s: int) -> float:
 		return self.initial_state[s]
