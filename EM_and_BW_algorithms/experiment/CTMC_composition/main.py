@@ -43,7 +43,7 @@ def generateRandomModels(disjoint=False):
         obs = [['r1','g1','b1'],['r2','g2','b2']]
     return modelCTMC_random(4,obs[0],1,5,False), modelCTMC_random(4,obs[1],1,5,False)
 
-NB_EXPERIMENTS = 10
+NB_EXPERIMENTS = 50
 v=True
 
 dots_compo_compo     = []
