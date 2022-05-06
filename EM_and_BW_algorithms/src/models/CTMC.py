@@ -28,7 +28,7 @@ class CTMC_state:
 		return list(set(self.lambda_matrix[2]))
 
 	def lkl(self,t: float) -> float:
-		return exp(-self.e()*t)
+		return self.e()*exp(-self.e()*t)
 
 	def e(self) -> float:
 		return sum(self.lambda_matrix[0])

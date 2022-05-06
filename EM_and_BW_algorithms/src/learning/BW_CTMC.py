@@ -51,7 +51,7 @@ class BW_CTMC:
 			for s in range(self.nb_states):
 				summ = 0.0
 				for ss in range(self.nb_states):
-					summ += alpha_matrix[ss][k]*self.h_l(ss,s,obs_seq[k])*self.h.lkl(ss,times_seq[k])
+					summ += alpha_matrix[ss][k]*self.h_l(ss,s,obs_seq[k])*exp(-self.h_e(ss)*times_seq[k])
 				alpha_matrix[s].append(summ)
 		return alpha_matrix
 
@@ -66,7 +66,7 @@ class BW_CTMC:
 				summ = 0.0
 				for ss in range(self.nb_states):
 					summ += beta_matrix[ss][1 if ss<s else 0]*self.h_l(s,ss,obs_seq[k])
-				summ *= self.h.lkl(s,times_seq[k])
+				summ *= exp(-self.h_e(s)*times_seq[k])
 				beta_matrix[s].insert(0,summ)
 		return beta_matrix
 
@@ -118,7 +118,6 @@ class BW_CTMC:
 
 		alpha_matrix = self.computeAlphas(obs_seq, times_seq)
 		beta_matrix  = self.computeBetas( obs_seq, times_seq)
-		
 		proba_seq = sum([alpha_matrix[s][-1] for s in range(self.nb_states)])
 		if proba_seq == 0.0:
 			return False
@@ -134,15 +133,17 @@ class BW_CTMC:
 				if timed:
 					den[-1] += alpha_matrix[s][t]*beta_matrix[s][t]*times_seq[t]
 				else:
-					den[-1] += alpha_matrix[s][t]*beta_matrix[s][t]/self.h.e(s)
-				
-				
+					den[-1] += alpha_matrix[s][t]*beta_matrix[s][t]
+
 				observation = obs_seq[t]
 				for ss in range(self.nb_states):
-					num[-1][ss*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[s][t]*self.h_tau(s,ss,observation)*beta_matrix[ss][t+1]
+					if timed:
+						num[-1][ss*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[s][t]*exp(-self.h_e(s)*times_seq[t])*self.h_l(s,ss,observation)*beta_matrix[ss][t+1]
+					else:
+						num[-1][ss*len(self.alphabet)+self.alphabet.index(observation)] += alpha_matrix[s][t]*self.h_l(s,ss,observation)*beta_matrix[ss][t+1]
 					
 			num[-1]  = [i*times/proba_seq for i in num[-1]]
-			den[-1] *= times/proba_seq
+			den[-1] *=    times/proba_seq
 			num_init.append(alpha_matrix[s][0]*beta_matrix[s][0]*times/proba_seq)
 		####################
 		return [den, num, proba_seq, times, num_init]
@@ -151,23 +152,25 @@ class BW_CTMC:
 		return [i/den for i in tau]
 
 	def generateHhat(self,traces):
+		#p = Pool(processes = NB_PROCESS)
+		#tasks = []
+		#for seq in range(len(traces[0])):
+		#	tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq],]))
+		#temp = [res.get() for res in tasks if res.get() != False]
+		temp = []
+		for seq in range(len(traces[0])):
+			temp.append(self.processWork(traces[0][seq], traces[1][seq]))
+			
+		currentloglikelihood = sum([log(i[2])*i[3] for i in temp])
+
 		den = []
 		for s in range(self.nb_states):
 			den.append(0.0)
 		tau = []
 		for s in range(self.nb_states):
 			tau.append([0 for i in range(self.nb_states*len(self.alphabet))])
-		
-		p = Pool(processes = NB_PROCESS)
-		tasks = []
-		
-		for seq in range(len(traces[0])):
-			tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq],]))
-		
-		temp = [res.get() for res in tasks if res.get() != False]
-		currentloglikelihood = sum([log(i[2])*i[3] for i in temp])
-
 		num_init = [0.0 for s in range(self.nb_states)]
+
 		for i in temp:
 			for s in range(self.nb_states):
 				num_init[s] += i[4][s]
@@ -207,7 +210,7 @@ class BW_CTMC:
 			if verbose:
 				print(datetime.now(),pp,counter, prevloglikelihood/nb_traces,end='\r')
 			hhat, currentloglikelihood = self.generateHhat(traces)
-			
+
 			counter += 1
 			self.h = hhat
 			if abs(prevloglikelihood - currentloglikelihood) < epsilon:

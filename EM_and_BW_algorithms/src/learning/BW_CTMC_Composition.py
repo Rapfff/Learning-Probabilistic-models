@@ -46,11 +46,14 @@ class BW_CTMC_Composition(BW_CTMC):
 					if timed:
 						den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]*times_seq[t]
 					else:
-						den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]/(eu+ev)
+						den[-1] += alpha_matrix[uv][t]*beta_matrix[uv][t]
 					if observation in self.alphabets[to_update]:
 						for vv in [i for i in range(nb_states) if i != v]:
 							uvv = self._getStateInComposition(vv,to_update,u)
-							num[-1][vv*len(self.alphabets[to_update])+self.alphabets[to_update].index(observation)] += alpha_matrix[uv][t]*beta_matrix[uvv][t+1]*self.hs[to_update].l(v,vv,observation)/divider
+							if timed:
+								num[-1][vv*len(self.alphabets[to_update])+self.alphabets[to_update].index(observation)] += alpha_matrix[uv][t]*beta_matrix[uvv][t+1]*exp(-divider*times_seq[t])*self.hs[to_update].l(v,vv,observation)
+							else:
+								num[-1][vv*len(self.alphabets[to_update])+self.alphabets[to_update].index(observation)] += alpha_matrix[uv][t]*beta_matrix[uvv][t+1]*self.hs[to_update].l(v,vv,observation)
 			
 				num_init[-1] += alpha_matrix[uv][0]*beta_matrix[uv][0]
 			
@@ -97,9 +100,6 @@ class BW_CTMC_Composition(BW_CTMC):
 		else:
 			res1 = self._oneSequence(obs_seq,times_seq,times,timed,alpha_matrix,beta_matrix,1,proba_seq)
 			res2 = self._oneSequence(obs_seq,times_seq,times,timed,alpha_matrix,beta_matrix,2,proba_seq)
-	
-		if timed:
-			proba_seq = self.h.proba_one_timed_seq(sequence)
 		
 		return [res1, res2, proba_seq, times]
 
@@ -139,13 +139,13 @@ class BW_CTMC_Composition(BW_CTMC):
 		p = Pool(processes = NB_PROCESS)
 		tasks = []
 		
-		# temp = []
-		# for seq in range(len(traces[0])):
-		# 	temp.append(self.processWork(traces[0][seq], traces[1][seq], to_update))
-		
+		temp = []
 		for seq in range(len(traces[0])):
-			tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq], to_update,]))
-		temp = [res.get() for res in tasks if res.get() != False]
+			temp.append(self.processWork(traces[0][seq], traces[1][seq], to_update))
+		
+		#for seq in range(len(traces[0])):
+		#	tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq], to_update,]))
+		#temp = [res.get() for res in tasks if res.get() != False]
 		
 		nb_traces = sum(traces[1])
 		if to_update == 1:
