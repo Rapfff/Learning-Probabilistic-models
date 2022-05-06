@@ -152,15 +152,15 @@ class BW_CTMC:
 		return [i/den for i in tau]
 
 	def generateHhat(self,traces):
-		#p = Pool(processes = NB_PROCESS)
-		#tasks = []
-		#for seq in range(len(traces[0])):
-		#	tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq],]))
-		#temp = [res.get() for res in tasks if res.get() != False]
-		temp = []
+		p = Pool(processes = NB_PROCESS)
+		tasks = []
 		for seq in range(len(traces[0])):
-			temp.append(self.processWork(traces[0][seq], traces[1][seq]))
-			
+			tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq],]))
+		temp = [res.get() for res in tasks if res.get() != False]
+		#temp = []
+		#for seq in range(len(traces[0])):
+		#	temp.append(self.processWork(traces[0][seq], traces[1][seq]))
+
 		currentloglikelihood = sum([log(i[2])*i[3] for i in temp])
 
 		den = []

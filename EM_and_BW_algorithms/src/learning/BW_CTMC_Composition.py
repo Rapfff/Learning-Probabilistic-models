@@ -139,13 +139,13 @@ class BW_CTMC_Composition(BW_CTMC):
 		p = Pool(processes = NB_PROCESS)
 		tasks = []
 		
-		temp = []
-		for seq in range(len(traces[0])):
-			temp.append(self.processWork(traces[0][seq], traces[1][seq], to_update))
-		
+		#temp = []
 		#for seq in range(len(traces[0])):
-		#	tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq], to_update,]))
-		#temp = [res.get() for res in tasks if res.get() != False]
+		#	temp.append(self.processWork(traces[0][seq], traces[1][seq], to_update))
+		
+		for seq in range(len(traces[0])):
+			tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq], to_update,]))
+		temp = [res.get() for res in tasks if res.get() != False]
 		
 		nb_traces = sum(traces[1])
 		if to_update == 1:
