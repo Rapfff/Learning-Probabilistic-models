@@ -6,5 +6,5 @@ This paper was presented at the ICMLA21.\
 
 ## MM algorithm to learn Continuous-time Markov chains Compositionally
 
-The official implementation for the paper "MM algorithm to learn Continuous-time Markov chains Compositionally" by G. Bacci, A. Ingólfsdóttir, K. Larsen and R. Reynouard is available in the branch [MM-algorithm](Rapfff/Learning-Probabilistic-models/tree/MM-algorithm).\
+The official implementation for the paper "MM algorithm to learn Continuous-time Markov chains Compositionally" by G. Bacci, A. Ingólfsdóttir, K. Larsen and R. Reynouard is available in the branch [MM-algorithm](https://github.com/Rapfff/Learning-Probabilistic-models/tree/MM-algorithm).\
 This paper was submetted to QEST 2022.
