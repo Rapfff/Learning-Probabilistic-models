@@ -3,8 +3,8 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from numpy.random import normal
-from tools import resolveRandom, normpdf
-from math import  log
+from tools import resolveRandom
+from math import  exp, sqrt, pi
 from ast import literal_eval
 from models.Model import Model, Model_state
 
@@ -25,7 +25,9 @@ class coHMM_state(Model_state):
 			return 0.0
 
 	def b(self,obs):
-		return normpdf(obs,self.output_parameters)
+		#return normpdf(obs,self.output_parameters)
+		mu, sigma  = self.output_parameters
+		return exp(-0.5*((obs-mu)/sigma)**2)/(sigma*sqrt(2*pi))
 
 	def next_obs(self):
 		mu, sigma  = self.output_parameters

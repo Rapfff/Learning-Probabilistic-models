@@ -53,20 +53,15 @@ class BW_coHMM(BW):
 		den      = [ 0.0 for i in range(self.nb_states)]
 		num_init = [ 0.0 for i in range(self.nb_states)]
 		 
-		p = Pool(processes = NB_PROCESS)
-		tasks = []
+		#p = Pool(processes = NB_PROCESS)
+		#tasks = []
 		temp = []
 		for seq in range(len(traces[0])):
-			tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq],]))
+			#tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq],]))
 			temp.append(self.processWork(traces[0][seq], traces[1][seq]))	
 
-		temp = [res.get() for res in tasks if res.get() != False]
+		#temp = [res.get() for res in tasks if res.get() != False]
 		
-		# We remove the sequences that are very very different
-		list_loglikelihoods = [log(i[4])*i[5] for i in temp]
-		moyenne = mean(list_loglikelihoods)
-		ecarttype = stdev(list_loglikelihoods)
-		temp = [i for i in temp if abs(moyenne-log(i[4]))<ecarttype]
 		#######################################################
 
 		currentloglikelihood = sum([log(i[4])*i[5] for i in temp])
@@ -74,7 +69,6 @@ class BW_coHMM(BW):
 		for s in range(self.nb_states):
 			for x in range(self.nb_states):
 				a[s][x] = sum([i[1][s][x] for i in temp])
-			
 			den[s]      = sum(i[0][s] for i in temp)
 			num_init[s] = sum(i[6][s] for i in temp)
 			mu[s]       = sum(i[2][s] for i in temp)
@@ -89,4 +83,3 @@ class BW_coHMM(BW):
 		initial_state = [num_init[s]/sum(num_init) for s in range(self.nb_states)]
 		
 		return [coHMM(new_states,initial_state),currentloglikelihood]
-
