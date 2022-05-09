@@ -7,6 +7,7 @@ from numpy.random import exponential
 from ast import literal_eval
 from tools import resolveRandom, correct_proba
 from models.MC import MC, MC_state
+from math import exp, log
 
 
 class CTMC_state:
@@ -15,13 +16,19 @@ class CTMC_state:
 		self.lambda_matrix = lambda_matrix
 
 	def tau(self, s: int, obs: str) -> float:
+		return self.l(s,obs)/self.e()
+	
+	def l(self,s: int, obs: str) -> float:
 		for i in range(len(self.lambda_matrix[0])):
 			if self.lambda_matrix[1][i] == s and self.lambda_matrix[2][i] == obs:
-				return self.lambda_matrix[0][i]/self.e()
+				return self.lambda_matrix[0][i]
 		return 0.0
 
 	def observations(self):
 		return list(set(self.lambda_matrix[2]))
+
+	def lkl(self,t: float) -> float:
+		return self.e()*exp(-self.e()*t)
 
 	def e(self) -> float:
 		return sum(self.lambda_matrix[0])
@@ -88,6 +95,12 @@ class CTMC:
 
 	def e(self,s: int) -> float:
 		return self.states[s].e()
+	
+	def l(self, s1:int, s2:int, obs:str):
+		return self.states[s1].l(s2,obs)
+	
+	def lkl(self, s1: int, t: float) -> float:
+		return self.states[s1].lkl(t)
 
 	def pi(self, s: int) -> float:
 		return self.initial_state[s]
@@ -119,9 +132,28 @@ class CTMC:
 			c += 1
 		return output
 	
-	def logLikelihood(self,traces):
-		#non-timed traces
-		return self.toMC().logLikelihood(traces)
+	def proba_one_timed_seq(self,sequence) -> float:
+		alpha_matrix = [[self.initial_state[i]] for i in range(len(self.states))]
+		for k in range(0,len(sequence),2):
+			for s in range(len(self.states)):
+				summ = 0.0
+				for ss in range(len(self.states)):
+					p = self.l(ss,s,sequence[k+1])*exp(-self.e(ss)*sequence[k])
+					summ += alpha_matrix[ss][k//2]*p
+				alpha_matrix[s].append(summ)
+		res = sum([alpha_matrix[s][-1] for s in range(len(self.states))])
+		return res
+
+	def logLikelihood(self,traces) -> float:
+		if type(traces[0][0][0]) == str: # non-timed traces
+			res = self.toMC().logLikelihood(traces)
+		else: # timed traces
+			res = 0.0
+			for sequence, times in zip(traces[0],traces[1]):
+				proba_seq = self.proba_one_timed_seq(sequence)
+				res += log(proba_seq)*times
+		return res/sum(traces[1])
+
 
 	def pprint(self) -> None:
 		print(self.name)
@@ -201,7 +233,7 @@ def loadCTMC(file_path: str) -> CTMC:
 	return CTMC(states,initial_state,name)
 
 
-def parallelComposition(m1: CTMC, m2: CTMC, name: str='unknown_composition') -> CTMC:
+def parallelComposition(m1: CTMC, m2: CTMC, name: str='unknown_composition', disjoint: bool=False) -> CTMC:
 	
 	def computeFinalStateIndex(i1: int, i2: int, max1: int) -> int:
 		return max1 * i1 + i2
@@ -218,8 +250,11 @@ def parallelComposition(m1: CTMC, m2: CTMC, name: str='unknown_composition') -> 
 			p = s1.lambda_matrix[0] + s2.lambda_matrix[0]
 			s = [computeFinalStateIndex(s1.lambda_matrix[1][i],i2,max1) for i in range(len(s1.lambda_matrix[1]))]
 			s+= [computeFinalStateIndex(i1,s2.lambda_matrix[1][i],max1) for i in range(len(s2.lambda_matrix[1]))]
-			o = s1.lambda_matrix[2] + s2.lambda_matrix[2]
-
+			if not disjoint:
+				o = s1.lambda_matrix[2] + s2.lambda_matrix[2]
+			else:
+				o = [i+'1' for i in s1.lambda_matrix[2]] + [i+'2' for i in s2.lambda_matrix[2]]
+				
 			initial_state.append(m1.initial_state[i1]*m2.initial_state[i2])
 			new_states.append(CTMC_state([p,s,o]))
 
