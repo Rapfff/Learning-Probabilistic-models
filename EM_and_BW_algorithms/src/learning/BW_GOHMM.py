@@ -51,15 +51,18 @@ class BW_GOHMM(BW):
 		va       = [ 0.0 for i in range(self.nb_states)]
 		den      = [ 0.0 for i in range(self.nb_states)]
 		num_init = [ 0.0 for i in range(self.nb_states)]
-		 
-		#p = Pool(processes = NB_PROCESS)
-		#tasks = []
-		temp = []
-		for seq in range(len(traces[0])):
-			#tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq],]))
-			temp.append(self.processWork(traces[0][seq], traces[1][seq]))	
 
-		#temp = [res.get() for res in tasks if res.get() != False]
+		if sys.platform != "win32":
+			p = Pool(processes = NB_PROCESS)
+			tasks = []
+			for seq in range(len(traces[0])):
+				tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq],]))
+			temp = [res.get() for res in tasks if res.get() != False]
+		else:
+			temp = []
+			for seq in range(len(traces[0])):
+				temp.append(self.processWork(traces[0][seq], traces[1][seq]))	
+
 		
 		#######################################################
 
