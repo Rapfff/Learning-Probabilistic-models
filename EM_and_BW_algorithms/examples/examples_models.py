@@ -7,7 +7,7 @@ from src.models.MC import *
 from src.models.CTMC import *
 from src.models.MDP import *
 from src.models.coMC import *
-from src.models.coHMM import *
+from src.models.GOHMM import *
 from src.tools import randomProbabilities
 from random import randint, uniform
 from math import sqrt
@@ -78,33 +78,41 @@ def modelHMM_random(number_states, alphabet, random_initial_state=False):
 		init = 0
 	return HMM(states,init)
 
-# ---- coHMM ---------------------------
-def modelCOHMM_random(nb_states,random_initial_state=False,min_mu=0.0,max_mu=2.0,min_std=0.5,max_std=2.0):
+# ---- GOHMM ---------------------------
+def modelGOHMM_random(nb_states,random_initial_state=False,min_mu=0.0,max_mu=2.0,min_std=0.5,max_std=2.0):
 	#mu between -2 and 2
 	#sd between 0 and 2
 	s = [i for i in range(nb_states)]
 	states = []
 	for i in range(nb_states):
 		d = [round(uniform(min_mu,max_mu),3),round(uniform(min_std,max_std),3)]
-		states.append(coHMM_state([randomProbabilities(nb_states),s],d))
+		states.append(GOHMM_state([randomProbabilities(nb_states),s],d))
 	if random_initial_state:
 		init = randomProbabilities(nb_states)
 	else:
 		init = 0
-	return coHMM(states,init,"coHMM_random_"+str(nb_states)+"_states")
+	return GOHMM(states,init,"GOHMM_random_"+str(nb_states)+"_states")
 
-def modelCOHMM_nox(nb_states=5,random_initial_state=True,min_mu=-0.2,max_mu=0.5,min_std=0.05,max_std=4.5,self_loop_prob=0.8):
-	m = modelCOHMM_random(nb_states,random_initial_state,min_mu,max_mu,min_std,max_std)
+def modelGOHMM_nox(nb_states=5,random_initial_state=True,min_mu=-0.2,max_mu=0.5,min_std=0.05,max_std=4.5,self_loop_prob=0.8):
+	m = modelGOHMM_random(nb_states,random_initial_state,min_mu,max_mu,min_std,max_std)
 	for s in range(nb_states):
 		r = 1-m.states[s].next_matrix[0][s]
 		m.states[s].next_matrix[0] = [(m.states[s].next_matrix[0][j]/r)*(1-self_loop_prob) if j != s else self_loop_prob for j in range(nb_states)]
-	m.name = "coHMM_random_nox"
+	m.name = "GOHMM_random_nox"
 	return m
 
-def modelCOHMM1():
-	s0 = coHMM_state([[0.2,0.8],[0,1]],[0.0,1.0])
-	s1 = coHMM_state([[1.0],[0]],[0.5,1.5])
-	return coHMM([s0,s1],0,"coHMM1")
+def modelGOHMM1():
+	s0 = GOHMM_state([[0.2,0.8],[0,1]],[0.0,1.0])
+	s1 = GOHMM_state([[1.0],[0]],[0.5,1.5])
+	return GOHMM([s0,s1],0,"GOHMM1")
+
+def modelGOHMM2():
+	s0 = GOHMM_state([[0.9,0.1],[0,1]],[3.0,5.0])
+	s1 = GOHMM_state([[0.05,0.9,0.04,0.01],[0,1,2,4]],[0.5,1.5])
+	s2 = GOHMM_state([[0.05,0.8,0.14,0.01],[1,2,3,4]],[0.2,0.7])
+	s3 = GOHMM_state([[0.05,0.95],[2,3]],[0.0,0.3])
+	s4 = GOHMM_state([[0.1,0.9],[1,4]],[2.0,4.0])
+	return GOHMM([s0,s1],0,"GOHMM1")
 
 # ---- MC -----------------------------
 
