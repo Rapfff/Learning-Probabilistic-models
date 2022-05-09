@@ -1,8 +1,13 @@
+import os, sys
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir1 = os.path.dirname(currentdir)
+parentdir  = os.path.dirname(parentdir1)
+sys.path.append(parentdir)
 from examples.examples_models import modelCTMC2, modelCTMC3, modelCTMC_random
 from src.learning.BW_CTMC_Composition import BW_CTMC_Composition
 from src.learning.BW_CTMC import BW_CTMC
 from src.models.CTMC import parallelComposition
-from src.tools import generateSet, saveSet, loadSet
+from src.tools import generateSet, loadSet
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 from ast import literal_eval
@@ -41,7 +46,7 @@ def generateRandomModels(disjoint=False):
 NB_EXPERIMENTS = 40
 v=True
 
-folder = "experiment/CTMC_composition/output/"
+folder = "output/"
 
 dots_compo_compo     = []
 dots_compo_model1    = []
