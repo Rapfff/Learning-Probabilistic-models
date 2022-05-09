@@ -1,10 +1,4 @@
 # Learning-Probabilistic-models
-## MM algorithm to learn Continuous-time Markov chains Compositionally
-
-The official implementation for the paper "MM algorithm to learn Continuous-time Markov chains Compositionally" by G. Bacci, A. Ingólfsdóttir, K. Larsen and R. Reynouard is available in the branch [MM-algorithm](https://github.com/Rapfff/Learning-Probabilistic-models/tree/MM-algorithm).\
-This paper was submetted to QEST 2022.\
-The experiment script is in `EM_and_BW_algorithms/main.py`
-
 ## Active Learning of Markov Decision Processes using Baum-Welch algorithm
 
 This repository contains the official implementation for the paper "Active Learning of Markov Decision Processes using Baum-Welch algorithm" by G. Bacci, A. Ingólfsdóttir, K. Larsen and R. Reynouard.\
