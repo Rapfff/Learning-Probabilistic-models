@@ -135,7 +135,7 @@ for signal_id, signal_name in zip(signals_ids, signals_names):
 	rm = modelGOHMM_nox(NB_STATES,random_initial_state=True)
 	algo = BW_GOHMM(rm)
 	starting_time = datetime.now()
-	out = algo.learn(tr, output_file="model_"+signal_name+".txt", verbose=True)
+	out = algo.learn(tr, output_file="model_"+signal_name+".txt")
 	running_times.append((datetime.now()-starting_time).total_seconds())
 	"""
 	corr_matrix = evaluation(out, signal_id, test_psgs)
