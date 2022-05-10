@@ -131,7 +131,6 @@ running_times = []
 
 for signal_id, signal_name in zip(signals_ids, signals_names):
 	tr = write_set(training_psgs,signal_id,"training_set")
-	print(tr[:10])
 	rm = modelGOHMM_nox(NB_STATES,random_initial_state=True)
 	algo = BW_GOHMM(rm)
 	starting_time = datetime.now()
