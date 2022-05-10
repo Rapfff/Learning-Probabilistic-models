@@ -81,13 +81,10 @@ def write_set(psg_numbers: list,signal_id,name):
 	for psg_number in psg_numbers:
 		print("PSG:",psg_number, "Signal:",signal_id)
 		data = read_files(psg_number,signal_id)
-		try:
-			data = [levinson(i)[2][0] for i in data]
-			for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
-				new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
-			new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
-		except ValueError:
-			print("ERROR with",psg_number,"-",signal_id)
+		data = [levinson(i)[2][0] for i in data]
+		for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
+			new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
+		new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
 	data = new_data
 	if name != False:
 		saveSet(data, name+".txt")
