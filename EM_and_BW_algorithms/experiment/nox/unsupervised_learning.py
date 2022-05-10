@@ -14,12 +14,11 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 from statistics import mean
-from levinson import levinson
+from statsmodels.regression.linear_model import yule_walker
 MANUAL_SCORING_WINDOW_SEC = 30
 
-# OFFSET_SEC = 1
-WINDOW_SIZE_SEC = 1 #nb of sec as input to DFA
-NB_WINDOWS_BY_SEQ = 10//WINDOW_SIZE_SEC #nb of sec by sequence = WINDOW_SIZE_SEC*NB_WINDOWS_BY_SEQ
+WINDOW_SIZE_SEC = 3 
+NB_WINDOWS_BY_SEQ = MANUAL_SCORING_WINDOW_SEC//WINDOW_SIZE_SEC
 
 NB_STATES = 5
 
@@ -81,8 +80,9 @@ def write_set(psg_numbers: list,signal_id,name):
 	for psg_number in psg_numbers:
 		print("PSG:",psg_number, "Signal:",signal_id)
 		data = read_files(psg_number,signal_id)
-		print(data)
-		data = [levinson(i)[2][0] for i in data]
+		for i,j in enumerate(data):
+			rho, _ = yule_walker(j, 2, method='mle')
+			data[i] = rho[0]
 		for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
 			new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
 		new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
@@ -131,6 +131,7 @@ running_times = []
 
 for signal_id, signal_name in zip(signals_ids, signals_names):
 	tr = write_set(training_psgs,signal_id,"training_set")
+	print(tr[:10])
 	rm = modelGOHMM_nox(NB_STATES,random_initial_state=True)
 	algo = BW_GOHMM(rm)
 	starting_time = datetime.now()
