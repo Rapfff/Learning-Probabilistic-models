@@ -86,6 +86,7 @@ def write_set(psg_numbers: list,signal_id,name):
 		print("PSG:",psg_number, "Signal:",signal_id)
 		data = read_files(psg_number,signal_id)
 		for i,j in enumerate(data):
+			print(normalize(j))
 			rho, _ = yule_walker(normalize(j), 2, method='mle')
 			data[i] = rho[0]
 		for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
