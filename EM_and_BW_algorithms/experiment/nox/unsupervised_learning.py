@@ -5,7 +5,7 @@ parentdir = os.path.dirname(parentdir)
 sys.path.append(parentdir)
 
 from experiment.nox.edfreader import EDFreader
-from src.tools import saveSet
+from src.tools import saveSet, setFromList
 from src.learning.BW_GOHMM import BW_GOHMM
 from src.learning.BW import BW
 from src.models.GOHMM import GOHMM
@@ -86,7 +86,7 @@ def write_set(psg_numbers: list,signal_id,name):
 		for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
 			new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
 		new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
-	data = new_data
+	data = setFromList(new_data)
 	if name != False:
 		saveSet(data, name+".txt")
 	return data
