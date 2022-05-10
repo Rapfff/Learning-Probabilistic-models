@@ -1,7 +1,4 @@
 import os, sys
-from winreg import REG_NO_LAZY_FLUSH
-
-from regex import R
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 parentdir = os.path.dirname(parentdir)
