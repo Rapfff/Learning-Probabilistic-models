@@ -74,7 +74,7 @@ def read_files(psg_number: int, signal_id: int):
 def normalize(l):
 	m = mean(l)
 	s = stdev(l)
-	return [(i-m)/l for i in l]
+	return np.array([(i-m)/l for i in l])
 
 
 def write_set(psg_numbers: list,signal_id,name):
