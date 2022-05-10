@@ -71,6 +71,11 @@ def read_files(psg_number: int, signal_id: int):
 	data.append(read_EDF_signal(r,int((duration-c*WINDOW_SIZE_SEC)*frequency),signal_id))
 	return data
 
+def normalize(l):
+	m = mean(l)
+	s = stdev(l)
+	return [(i-m)/l for i in l]
+
 
 def write_set(psg_numbers: list,signal_id,name):
 	"""name is the name of the output files,
@@ -81,7 +86,7 @@ def write_set(psg_numbers: list,signal_id,name):
 		print("PSG:",psg_number, "Signal:",signal_id)
 		data = read_files(psg_number,signal_id)
 		for i,j in enumerate(data):
-			rho, _ = yule_walker(j, 2, method='mle')
+			rho, _ = yule_walker(normalize(j), 2, method='mle')
 			data[i] = rho[0]
 		for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
 			new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
