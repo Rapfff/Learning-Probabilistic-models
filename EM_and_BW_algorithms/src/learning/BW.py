@@ -74,7 +74,7 @@ class BW:
 		while True:
 			print(datetime.now(),pp,counter, prevloglikelihood/nb_traces,end='\r')
 			self.hhat, currentloglikelihood = self.generateHhat(traces)
-			
+			self.hhat.pprint()
 			counter += 1
 			self.h = self.hhat
 			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
