@@ -74,7 +74,7 @@ def read_files(psg_number: int, signal_id: int):
 def normalize(l):
 	m = mean(l)
 	s = stdev(l)
-	return np.array([(i-m)/l for i in l])
+	return np.array([(i-m)/s for i in l])
 
 
 def write_set(psg_numbers: list,signal_id,name):
@@ -86,8 +86,6 @@ def write_set(psg_numbers: list,signal_id,name):
 		print("PSG:",psg_number, "Signal:",signal_id)
 		data = read_files(psg_number,signal_id)
 		for i,j in enumerate(data):
-			print(j)
-			print(normalize(j))
 			rho, _ = yule_walker(normalize(j), 2, method='mle')
 			data[i] = rho[0]
 		for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
