@@ -117,6 +117,8 @@ def write_set(psg_numbers: list,signal_id,name=None,output_as_set=True):
 		data = setFromList(new_data)
 		if name:
 			saveSet(data, name+".txt")
+	else:
+		data = new_data
 	return data
 
 def evaluation(m: GOHMM, signal_id, psg_numbers: list) -> list:
