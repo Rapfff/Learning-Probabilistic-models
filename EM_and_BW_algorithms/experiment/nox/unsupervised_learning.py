@@ -83,6 +83,8 @@ def write_set(psg_numbers: list,signal_id,name):
 	fraction_test is a float between ]0,1[ corresponding to the fraction of
 	sequences in the test set """
 	new_data = []
+	data2 = []
+	new_data2 = []
 	dft = DiscreteFourierTransform(4,norm_mean=True,norm_std=True)
 	for psg_number in psg_numbers:
 		print("PSG:",psg_number, "Signal:",signal_id)
@@ -90,22 +92,34 @@ def write_set(psg_numbers: list,signal_id,name):
 		for i,j in enumerate(data):
 			rho = dft.fit_transform(j.reshape((1,len(j))))
 			data[i] = rho[0][0]
+			data2.append(rho[0][1])
 		data = normalize(data)
+		data2 = normalize(data2)
 		for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
 			new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
+			new_data2.append([data2[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
+			
 		new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
+		new_data2.append([data2[i+j] for j in range(len(data2)%NB_WINDOWS_BY_SEQ)])
 
 		sleep_stages = ["Wake","N1","N2","N3","REM"]
 		xx = [[] for _ in sleep_stages]
+		xx2= [[] for _ in sleep_stages]
 		h = pd.read_excel(file_paths_from_psg_number(psg_number)[1])
 		h = list(h["Event"])[1:]
-		for h_i, d_i in zip(h,new_data):
+		for h_i, d_i, d2_i in zip(h,new_data, new_data2):
 			if h_i in sleep_stages:
 				xx[sleep_stages.index(h_i)] += d_i
+				xx2[sleep_stages.index(h_i)] += d2_i
 		for i in range(5):
 			print(sleep_stages[i])
 			print("Mean:",mean(xx[i]))
 			print("Std:", stdev(xx[i]))
+		input()
+		for i in range(5):
+			print(sleep_stages[i])
+			print("Mean:",mean(xx2[i]))
+			print("Std:", stdev(xx2[i]))
 		input()
 
 	data = setFromList(new_data)
