@@ -1,6 +1,5 @@
 from locale import normalize
 import os, sys
-from EM_and_BW_algorithms.src.models.GOHMM import loadGOHMM
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 parentdir = os.path.dirname(parentdir)
@@ -8,7 +7,7 @@ sys.path.append(parentdir)
 
 from experiment.nox.edfreader import EDFreader
 from src.tools import saveSet, setFromList
-from src.learning.BW_GOHMM import BW_GOHMM
+from src.learning.BW_GOHMM import BW_GOHMM, loadGOHMM
 from src.learning.BW import BW
 from src.models.GOHMM import GOHMM
 from examples.examples_models import modelGOHMM_nox
