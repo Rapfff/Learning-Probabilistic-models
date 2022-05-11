@@ -4,38 +4,48 @@ from ast import literal_eval
 
 class MC_state(Model_state):
 	"""
-	Initialise an MC state
-	Takes on input the transition matrix of this state
+	Create a MC_state
 
-	:param next_matrix: [[proba_transition1,proba_transition2,...],[transition1_state,transition2_state,...],[transition1_symbol,transition2_symbol,...]] . next_matrix[0][x] is the probability to move to state next_matrix[1][x] generating next_matrix[2][x]
-	:type next_matrix: list of one list of float, one list of int and one list of str
+	Parameters
+	----------
+	next_matrix : [ list of float, list of int, list of str]
+		`[[proba_state1,proba_state2,...],[state1,state2,...], [observation1,observation2,...]]`.
+		`next_matrix[0][x]` is the probability to move to state
+		`next_matrix[1][x]` generating observation `next_matrix[2][x]`.
+	idd : int
+		State ID.
 	"""
 
-	def __init__(self,next_matrix: list, idd: int) -> None:
+	def __init__(self,next_matrix: list, idd: int):
 		super().__init__(next_matrix,idd)
 
 	def next(self) -> list:
 		"""
 		Return a state-observation pair according to the distributions described by next_matrix
 
-		:return: a state-observation pair
-		:rtype: list of one int and one str
+		Returns
+		-------
+		output : [int, str]
+			A state-observation pair.
 		"""
 		c = resolveRandom(self.transition_matrix[0])
 		return [self.transition_matrix[1][c],self.transition_matrix[2][c]]
 
 	def tau(self,state: int, obs: str) -> float:
 		"""
-		Return the probability of generating, from this state, observation <obs> and moving to state <s>
+		Return the probability of generating, from this state, observation `obs` while moving to state `s`.
 
-		:param s: a state ID
-		:type s: int
-		
-		:param obs: an observation
-		:type obs: str
-		
-		:return: the probability of generating, from this state, observation <obs> and moving to state <s>
-		:rtype: float
+		Parameters
+		----------
+		s : int
+			A state ID.
+		obs : str
+			An observation.
+
+		Returns
+		-------
+		output : float
+			The probability of generating, from this state, observation `obs` and moving to state `s`.
 		"""
 		for i in range(len(self.transition_matrix[0])):
 			if self.transition_matrix[1][i] == state and self.transition_matrix[2][i] == obs:
@@ -44,20 +54,16 @@ class MC_state(Model_state):
 
 	def observations(self) -> list:
 		"""
-		Return the list of all the observations that can be generated from this state
+		Return the list of all the observations that can be generated from this state.
 
-		:return: a list of observation
-		:rtype: list of str
+		Returns
+		-------
+		output : list of str
+			A list of observations.
 		"""
 		return list(set(self.transition_matrix[2]))
 
 	def __str__(self) -> str:
-		"""
-		Print the state on terminal on terminal.
-
-		:param i: id of the current state
-		:type i: int
-		"""
 		res = "----STATE s"+str(self.id)+"----\n"
 		for j in range(len(self.transition_matrix[0])):
 			if self.transition_matrix[0][j] > 0.000001:
@@ -83,30 +89,37 @@ class MC_state(Model_state):
 
 class MC(Model):
 	"""
-	Initialise a MCGT.
+	Create an MC.
 
-	:param states: a list of states
-	:type states: list of  MCGT_state
-
-	:param initial_state: determine which state is the initial one (then it's the id of the state), or what are the probability to start in each state (then it's a list of probabilities) 
-	:type initial_state: int or list of float
-
-	:param name: name of the model
-	:type name: str
+	Parameters
+	----------
+	states : list of MC_states
+		List of states in this MC.
+	initial_state : int or list of float
+		Determine which state is the initial one (then it's the id of the
+		state), or what are the probability to start in each state (then it's
+		a list of probabilities).
+	name : str, optional
+		Name of the model.
+		Default is "unknow_MC"
 	"""
-	def __init__(self,states: list, initial_state: int ,name: str ="unknown MC") -> None:
+	def __init__(self,states: list, initial_state: int ,name: str ="unknown_MC") -> None:
 		super().__init__(states,initial_state,name)
 
 
 def HMMtoMC(h) -> MC:
 	"""
-	Translate a given HMM <h> to a MC
+	Translate a given HMM `h` to a MC
 
-	:param h: an HMM
-	:type h: HMM
+	Parameters
+	----------
+	h : HMM
+		The HMM to translate.
 
-	:return: a MC equivalent to <h>
-	:rtype: MC
+	Returns
+	-------
+	MC
+		A MC equilavent to `h`.
 	"""
 	states_g = []
 	for sh in h.states:
@@ -122,13 +135,17 @@ def HMMtoMC(h) -> MC:
 
 def loadMC(file_path: str) -> MC:
 	"""
-	Load a model saved into a text file
+	Load an MC saved into a text file.
 
-	:param file_path: location of the text file
-	:type file_path: str
-
-	:return: an MC
-	:rtype: MC
+	Parameters
+	----------
+	file_path : str
+		Location of the text file.
+	
+	Returns
+	-------
+	output : MC
+		The MC saved in `file_path`.
 	"""
 	f = open(file_path,'r')
 	name = f.readline()[:-1]
@@ -150,7 +167,24 @@ def loadMC(file_path: str) -> MC:
 
 	return MC(states,initial_state,name)
 
-def MC_random(nb_states,alphabet,random_initial_state=False):
+def MC_random(nb_states: int,alphabet: list,random_initial_state: bool=False) -> MC:
+	"""
+	Generate a random MC.
+
+	Parameters
+	----------
+	number_states : int
+		Number of states.
+	alphabet : list of str
+		List of observations.
+	random_initial_state: bool, optional
+		If set to True we will start in each state with a random probability, otherwise we will always start in state 0.
+		Default is False.
+	
+	Returns
+	-------
+	A pseudo-randomly generated MC.
+	"""
 	s = []
 	for i in range(nb_states):
 		s += [i] * len(alphabet)

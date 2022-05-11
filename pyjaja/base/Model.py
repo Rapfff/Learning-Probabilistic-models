@@ -19,7 +19,7 @@ class Model_state:
 	def __init__(self,next_matrix: list, idd: int) -> None:
 		if round(sum(next_matrix[0]),2) != 1.0 and sum(next_matrix[0]) != 0:
 			print("Sum of the probabilies of the next_matrix should be 1 or 0 here it's ",sum(next_matrix[0]))
-			#return False
+			return False
 		self.transition_matrix = next_matrix
 		self.id = idd
 		

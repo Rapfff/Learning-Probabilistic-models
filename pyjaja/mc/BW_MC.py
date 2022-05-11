@@ -1,20 +1,59 @@
 from .MC import *
 from ..base.BW import *
-from multiprocessing import Pool
 from ..base.tools import correct_proba, getAlphabetFromSequences
-from numpy import dot, zeros, log
+from numpy import log
 
 class BW_MC(BW):
+	"""
+	class for general Baum-Welch algorithm on MC.
+	"""
 	def __init__(self):
 		super().__init__()
 	
-	def fit(self, traces, initial_model=None, nb_states=0, random_initial_state=False, output_file="output_model.txt", epsilon=0.01, verbose=False, pp=''):
+	def fit(self, traces: list, initial_model: bool=None, nb_states: int=None,
+			random_initial_state: bool=False, output_file: str=None,
+			epsilon: float=0.01, pp: str=''):
+		"""
+		Fits the model according to ``traces``.
+
+		Parameters
+		----------
+		traces : list
+			training set.
+		initial_model : MC, optional.
+			first hypothesis. If not set it will create a random MC with
+			``nb_states`` states. Should be set if ``nb_states`` is not set.
+		nb_states: int
+			If ``initial_model`` is not set it will create a random MC with
+			``nb_states`` states. Should be set if ``initial_model`` is not set.
+			Default is None.
+		random_initial_state: bool
+			If ``initial_model`` is not set it will create a random MC with
+			random initial state according to this sequence of probabilities.
+			Should be set if ``initial_model`` is not set.
+			Default is False.
+		output_file : str, optional
+			if set path file of the output model. Otherwise the output model
+			will not be saved into a text file.
+		epsilon : float, optional
+			the learning process stops when the difference between the
+			loglikelihood of the training set under the two last hypothesis is
+			lower than ``epsilon``. The lower this value the better the output,
+			but the longer the running time. By default 0.01.
+		pp : str, optional
+			Will be printed at each iteration. By default ''
+
+		Returns
+		-------
+		MC
+			fitted MC.
+		"""
 		if not initial_model:
-			if nb_states == 0:
-				print("ERROR")
+			if not nb_states:
+				print("Either nb_states or initial_model should be set")
 				return
 			initial_model = MC_random(nb_states,getAlphabetFromSequences(traces),random_initial_state)
-		return super().fit(traces, initial_model, output_file, epsilon, verbose, pp)
+		return super().fit(traces, initial_model, output_file, epsilon, pp)
 
 	def _processWork(self,sequence,times):
 		alpha_matrix = self.computeAlphas(sequence)

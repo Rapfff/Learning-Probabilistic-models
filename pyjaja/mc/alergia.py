@@ -1,27 +1,44 @@
-import os, sys
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
 from .MC import *
 from math import sqrt, log
 from ..base.tools import correct_proba, getAlphabetFromSequences
 class Alergia:
+	"""
+	class for general ALERGIA algorithm on MC.
+	"""
 
 	def __init__(self):
-		"""
-		Given a set of seq of observations return the MCGT learned by ALERGIA
-		sample = [[seq1,seq2,...],[val1,val2,...]]
-		all seq have same length
-		"""
 		None
 
-	def initialize(self,traces,alpha,alphabet=None):
+	def _initialize(self,traces:list,alpha:float,alphabet:list=None) -> None:
+		"""
+		Create the PTA from the training set ``traces ``, initialize
+		the alpha value and the alphabet.
+
+		Parameters
+		----------
+		traces : list
+			Training set.
+		alpha : float
+			alpha value used in the Hoeffding boung
+		alphabet : list, optional.
+			List of all possible observations, by default None.
+		"""
 		self.alpha = alpha
 		if alphabet == None:
 			self.alphabet = getAlphabetFromSequences(traces[0])
 		else:
 			self.alphabet = alphabet
+		self.createPTA(traces)
+	
+	def createPTA(self,traces: list) -> MC:
+		"""
+		Create a PTA from ``traces``.
 
+		Parameters
+		----------
+		traces : list
+			traces used to generate the PTA.
+		"""
 		N = sum(traces[1])
 		n = len(traces[0][0])
 
@@ -65,26 +82,61 @@ class Alergia:
 					self.states_transitions[-1][2].append(self.states_lbl[s2][-1])
 					s2 += 1
 
-	def fit(self,traces,alpha=0.1,alphabet=None):
-		self.initialize(traces,alpha,alphabet=None)
+	def fit(self,traces: list,alpha: float=0.1,alphabet: list=None) -> MC:
+		"""
+		Fits a MC according to ``traces``.
+
+		Parameters
+		----------
+		traces : list
+			_description_
+		alpha : float, optional
+			_description_, by default 0.1
+		alphabet : list, optional
+			_description_, by default None
+
+		Returns
+		-------
+		MC
+			fitted MC.
+		"""
+		self._initialize(traces,alpha,alphabet)
 		
 		for j in range(1,len(self.states_lbl)):
 			if self.states_lbl[j] != None:
 				for i in range(j):
 					if self.states_lbl[i] != None:
-						if self.compatibleMerge(i,j):
+						if self._compatibleMerge(i,j):
 							j -= 1
 							break
 
-		return self.toMCGT()
+		return self._toMC()
 
-	def transitionStateAction(self,state,action):
+	def _transitionStateAction(self,state,action):
 		try:
 			return self.states_transitions[state][1][self.states_transitions[state][2].index(action)]
 		except ValueError:
 			return None
 	
-	def different(self,i,j,a):
+	def _areDifferent(self,i:int,j:int,a:str) -> bool:
+		"""
+		return if nodes ``i`` and ``j`` are different for the observation
+		``a`` according to the Hoeffding bound computed  with ``self.alpha``.
+
+		Parameters
+		----------
+		i : int
+			index of the first node.
+		j : int
+			index of the second node.
+		a : str
+			observation.
+
+		Returns
+		-------
+		bool
+			``True`` if the are different, ``False`` otherwise.
+		"""
 		ni = self.states_counter[i]
 		nj = self.states_counter[j]
 		try:
@@ -98,17 +150,17 @@ class Alergia:
 		return ( abs((fi/ni) - (fj/nj)) > sqrt(0.5*log(2/self.alpha))*((1/sqrt(ni)) + (1/sqrt(nj))) )
 
 
-	def compatibleMerge(self,i,j):
+	def _compatibleMerge(self,i,j):
 		choices = [0]
 		pairs = [(i,j)]
 
 		while True:
 			a = self.alphabet[choices[-1]]
-			if self.different(i,j,a): #stop
+			if self._areDifferent(i,j,a): #stop
 				return False
 
-			i = self.transitionStateAction(i,a)
-			j = self.transitionStateAction(j,a)
+			i = self._transitionStateAction(i,a)
+			j = self._transitionStateAction(j,a)
 
 
 			if i == None or j == None or i == j:
@@ -118,7 +170,7 @@ class Alergia:
 				
 				while choices[-1] == len(self.alphabet):#roll back
 					choices = choices[:-1]
-					self.merge(i,j)
+					self._merge(i,j)
 					pairs = pairs[:-1]
 					if len(pairs) == 0:
 						return True
@@ -130,7 +182,7 @@ class Alergia:
 				choices.append(0)
 				pairs.append((i,j))
 
-	def merge(self,i,j):
+	def _merge(self,i,j):
 		if i > j :
 			j,i = i,j
 		for state in range(len(self.states_lbl)):
@@ -157,12 +209,14 @@ class Alergia:
 		self.states_transitions[j] = None
 		self.states_counter[j] = None
 
-	def toMCGT(self):
+	def _toMC(self):
 		states = []
+		c = -1 
 		for i in range(len(self.states_transitions)):
 			if self.states_lbl[i] != None:
+				c+=1
 				self.states_transitions[i][0] = [j/self.states_counter[i] for j in self.states_transitions[i][0]]
 				self.states_transitions[i][0] = correct_proba(self.states_transitions[i][0])
 				self.states_transitions[i][1] = [j-self.states_lbl[:j].count(None) for j in self.states_transitions[i][1]]
-				states.append(MC_state(self.states_transitions[i],i))
+				states.append(MC_state(self.states_transitions[i],c))
 		return MC(states,0)

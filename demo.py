@@ -39,8 +39,8 @@ def test_MC():
 	s = model.generateSet(100,10)
 	m1 = ja.BW_MC().fit(s,nb_states=6)
 	print(m1.logLikelihood(s))
-	m2 = ja.Alergia().fit(s,0.2)
-
+	m2 = ja.Alergia().fit(s,0.000005)
+	print(m2)
 	print(m2.logLikelihood(s))
 
 test_MC()

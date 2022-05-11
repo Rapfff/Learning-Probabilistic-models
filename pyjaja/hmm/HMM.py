@@ -19,7 +19,7 @@ class HMM_state(Model_state):
 		super().__init__(next_matrix, idd)
 		if round(sum(output_matrix[0]),2) != 1.0 and sum(output_matrix[0]) != 0:
 			print("Sum of the probabilies of the output_matrix should be 1 or 0 here it's ",sum(output_matrix[0]))
-			#return False
+			return False
 		self.output_matrix = output_matrix
 
 	def a(self, s: int) -> float:
@@ -95,7 +95,7 @@ class HMM_state(Model_state):
 	
 	def tau(self,s: int, obs: str) -> float:
 		"""
-		Return the probability of generating, from this state, observation `obs` and moving to state `s`.
+		Return the probability of generating, from this state, observation `obs` while moving to state `s`.
 
 		Parameters
 		----------
@@ -124,14 +124,6 @@ class HMM_state(Model_state):
 		
 
 	def __str__(self) -> str:
-		"""
-		Print the state on terminal.
-
-		Parameters
-		----------
-		i : int
-			id of the current state.
-		"""
 		res = "----STATE s"+str(self.id)+"----\n"
 		for j in range(len(self.transition_matrix[0])):
 			if self.transition_matrix[0][j] > 0.000001:
@@ -171,7 +163,9 @@ class HMM(Model):
 	states : list of HMM_states
 		List of states in this HMM.
 	initial_state : int or list of float
-		Determine which state is the initial one (then it's the id of the state), or what are the probability to start in each state (then it's a list of probabilities).
+		Determine which state is the initial one (then it's the id of the
+		state), or what are the probability to start in each state (then it's
+		a list of probabilities).
 	name : str, optional
 		Name of the model.
 		Default is "unknow_HMM"
@@ -238,7 +232,7 @@ class HMM(Model):
 
 def loadHMM(file_path: str) -> HMM:
 	"""
-	Load a model saved into a text file.
+	Load an HMM saved into a text file.
 
 	Parameters
 	----------

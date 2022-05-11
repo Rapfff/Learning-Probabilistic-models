@@ -10,9 +10,9 @@ class BW_HMM(BW):
 	def __init__(self):
 		super().__init__()
 
-	def fit(self, traces: list, initial_model: HMM=None, nb_states: int=0,
-			random_initial_state=False,
-			output_file: str=None, epsilon: float=0.01,
+	def fit(self, traces: list, initial_model: HMM=None, nb_states: int=None,
+			random_initial_state: bool=False, output_file: str=None,
+			epsilon: float=0.01,
 			pp: str=''):
 		"""
 		Fits the model according to ``traces``.
@@ -27,7 +27,7 @@ class BW_HMM(BW):
 		nb_states: int
 			If ``initial_model`` is not set it will create a random HMM with
 			``nb_states`` states. Should be set if ``initial_model`` is not set.
-			Default is 0.
+			Default is None.
 		random_initial_state: bool
 			If ``initial_model`` is not set it will create a random HMM with
 			random initial state according to this sequence of probabilities.
@@ -50,8 +50,8 @@ class BW_HMM(BW):
 			fitted HMM.
 		"""
 		if not initial_model:
-			if nb_states == 0:
-				print("ERROR")
+			if not nb_states:
+				print("Either nb_states or initial_model should be set")
 				return
 			initial_model = HMM_random(nb_states,getAlphabetFromSequences(traces),random_initial_state)
 		return super().fit(traces, initial_model, output_file, epsilon, pp)

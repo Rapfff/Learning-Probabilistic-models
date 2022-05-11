@@ -12,13 +12,55 @@ class BW_LTL:
 	def __init__(self) -> None:
 		pass
 	
-	def learn(self,formula: str,traces: list,alphabet: list,output_file="output_model.txt",epsilon=0.01,verbose=False,pp='',nb_states=None) -> MC:
+	def fit(self,formula: str,traces: list,alphabet: list,output_file: str=None,epsilon: float=0.01,pp: str='',nb_states: int=None) -> MC:
+		"""
+		Fits the model according to ``traces`` and ``formula``.
+
+		Parameters
+		----------
+		formula : str
+			LTL formula expressed as https://spot.lrde.epita.fr/concepts.html#ltl .
+		traces : list
+			training set.
+		alphabet : list
+			list containing all the possible observations.
+		output_file : str, optional
+			if set path file of the output model. Otherwise the output model
+			will not be saved into a text file.
+		epsilon : float, optional
+			the learning process stops when the difference between the
+			loglikelihood of the training set under the two last hypothesis is
+			lower than ``epsilon``. The lower this value the better the output,
+			but the longer the running time. By default 0.01.
+		pp : str, optional
+			Will be printed at each iteration. By default ''.
+		nb_states : int, optional
+			Desired number of states in the output model. By default None.
+
+		Returns
+		-------
+		MC
+			fitted MC.
+		"""
 		self.generateInitialModel(formula,nb_states,alphabet)
-		bw = BW_MC(self.initial_model)
-		output_model = bw.learn(traces,output_file,epsilon,verbose,pp)
+		bw = BW_MC()
+		output_model = bw.fit(traces,self.initial_model,output_file=output_file,epsilon=epsilon,pp=pp)
 		return output_model
 	
 	def generateInitialModel(self,formula: str,nb_states: int, alphabet: list) -> None:
+		"""
+		Generate a MC with ``nb_states`` states such that all traces generated
+		by this MC will satisfy the LTL formula ``formula``.
+
+		Parameters
+		----------
+		formula : str
+			An LTL formula.
+		nb_states : int
+			Number of states in the output model.
+		alphabet : list
+			List of all possibles observations.
+		"""
 		hoa = spot.translate(formula, 'Buchi', 'deterministic', 'state-based').to_str("hoa")
 		self.initial_model = HOAtoMC(hoa,alphabet)
 		self.initial_model.pprint()
@@ -39,8 +81,10 @@ class BW_LTL:
 		order to get as many
 		states as desired by the user.
 
-		:param to_add: number of states to add
-		:type to_add: int
+		Parameters
+		----------
+		to_add : int
+			number of states to add
 		"""
 		incoming_edges = [[] for i in self.initial_model.states]
 		for s in range(len(self.initial_model.states)):
@@ -68,7 +112,22 @@ class BW_LTL:
 			
 			to_add -= 1
 	
-def HOAtoMC(hoa,alphabet) -> MC:
+def HOAtoMC(hoa: str,alphabet: list) -> MC:
+	"""
+	Translate a MC expressed under HOA format to a pyjaja.MC
+
+	Parameters
+	----------
+	hoa : str
+		MC expressed under HOA format
+	alphabet : list
+		list of all possible observations
+
+	Returns
+	-------
+	MC
+		the equivalent MC.
+	"""
 	hoa = hoa.split("\n")
 	states = []
 	i = 0
