@@ -1,3 +1,4 @@
+from locale import normalize
 import os, sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
@@ -71,6 +72,10 @@ def read_files(psg_number: int, signal_id: int):
 	data.append(read_EDF_signal(r,int((duration-c*WINDOW_SIZE_SEC)*frequency),signal_id))
 	return data
 
+def normalize(ll):
+	m = mean(ll)
+	s = stdev(ll)
+	return [(i-m)/s for i in ll]
 
 
 def write_set(psg_numbers: list,signal_id,name):
@@ -85,6 +90,7 @@ def write_set(psg_numbers: list,signal_id,name):
 		for i,j in enumerate(data):
 			rho = dft.fit_transform(j.reshape((1,len(j))))
 			data[i] = rho[0][0]
+		data = normalize(data)
 		for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
 			new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
 		new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
