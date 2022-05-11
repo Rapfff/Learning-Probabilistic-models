@@ -78,7 +78,7 @@ def normalize(ll):
 	return [(i-m)/s for i in ll]
 
 
-def write_set(psg_numbers: list,signal_id,name=None):
+def write_set(psg_numbers: list,signal_id,name=None,output_as_set=True):
 	"""name is the name of the output files,
 	fraction_test is a float between ]0,1[ corresponding to the fraction of
 	sequences in the test set """
@@ -96,6 +96,7 @@ def write_set(psg_numbers: list,signal_id,name=None):
 			
 		new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
 		
+		"""
 		sleep_stages = ["Wake","N1","N2","N3","REM"]
 		xx = [[[] for _ in sleep_stages] for j in range(1)]
 		h = pd.read_excel(file_paths_from_psg_number(psg_number)[1])
@@ -111,11 +112,11 @@ def write_set(psg_numbers: list,signal_id,name=None):
 					print("Mean:",mean(xx[j][i]))
 					print("Std:", stdev(xx[j][i]))
 			input()
-		
-
-	data = setFromList(new_data)
-	if name:
-		saveSet(data, name+".txt")
+		"""
+	if output_as_set:
+		data = setFromList(new_data)
+		if name:
+			saveSet(data, name+".txt")
 	return data
 
 def evaluation(m: GOHMM, signal_id, psg_numbers: list) -> list:
@@ -128,7 +129,7 @@ def evaluation(m: GOHMM, signal_id, psg_numbers: list) -> list:
 	for psg_number in psg_numbers:
 		h = pd.read_excel(file_paths_from_psg_number(psg_number)[1])
 		h = list(h["Event"])[1:]
-		g = write_set([psg_number],signal_id,"test_set")
+		g = write_set([psg_number],signal_id)
 
 		for seq in range(len(g[0])):
 			alphas = bw.computeAlphas(g[0][seq])
@@ -146,6 +147,55 @@ def evaluation(m: GOHMM, signal_id, psg_numbers: list) -> list:
 					#	corr_matrix[s][sleep_stages.index(h[index_h])] += g[1][seq]*alphas_betas[s]
 	return corr_matrix
 
+def learning(signal, training_psgs):
+	signal_id, signal_name = signal
+	tr = write_set(training_psgs,signal_id)
+	rm = modelGOHMM_nox(NB_STATES,random_initial_state=True)
+	algo = BW_GOHMM(rm)
+	starting_time = datetime.now()
+	out = algo.learn(tr, output_file="model_"+signal_name+".txt")
+	print((datetime.now()-starting_time).total_seconds())
+	return out
+
+def comparison(m,signal_id,test_psg):
+	sleep_stages = ["Wake","N1","N2","N3","REM"]
+	h = pd.read_excel(file_paths_from_psg_number(test_psg)[1])
+	h = list(h["Event"])[1:]
+	manual_scoring = [i if i in sleep_stages else '?' for i in h]
+	automa_scoring = []
+
+	bw = BW_GOHMM(m)
+	g = write_set(test_psg,signal_id,output_as_set=False)
+	for seq in range(len(g)):
+		alphas = bw.computeAlphas(g[seq])
+		betas  = bw.computeBetas(g[seq])
+		votes = [0 for s in m.states]
+		for t in range(len(g[seq])):
+			alphas_betas = [alphas[s][t+1]*betas[s][t+1] for s in range(len(m.states))]
+			votes[alphas_betas.index(max(alphas_betas))] += 1
+		automa_scoring.append(votes.index(max(votes)))
+	
+	sleep_stages.append('?')
+	corr_matrix = []
+	for i in range(len(sleep_stages)):
+		corr_matrix.append([0 for j in m.states])
+	for t in range(len(manual_scoring)):
+		corr_matrix[sleep_stages.index(manual_scoring[t])][automa_scoring[t]] += 1
+	
+
+
+def print_correlation_matrix(corr_matrix):
+	string = " "*8+'|  Wake  |   N1   |   N2   |   N3   |  REM   |   ?    '
+	for i in range(len(corr_matrix)):
+		row = corr_matrix[i]
+		string += '\n'+'-'*53+'\n'
+		string += "   s"+str(i)+"   "
+		for j in row:
+			s = str(j)
+			string += '|'+" "*(8-len(s))+s
+	string += '\n'+'-'*53+'\n'
+	return string
+	
 
 
 signals_ids  = [     20] #,     24,     30,    34,      44,     48,     67,     71] 
@@ -153,6 +203,7 @@ signals_names = ["C3-M2"] #,"C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-
 psgs = list(range(1,51))
 #shuffle(psgs)
 training_psgs = [37]
+test_psgs     = [37]
 #test_psgs = psgs[25:30]
 running_times = []
 
@@ -163,18 +214,10 @@ for signal_id, signal_name in zip(signals_ids, signals_names):
 	starting_time = datetime.now()
 	out = algo.learn(tr, output_file="model_"+signal_name+".txt")
 	running_times.append((datetime.now()-starting_time).total_seconds())
-	"""
 	corr_matrix = evaluation(out, signal_id, test_psgs)
 	string  = signal_name+'\n'
-	string += " "*8+'|  Wake  |   N1   |   N2   |   N3   |  REM   '
-	for i in range(len(corr_matrix)):
-		row = corr_matrix[i]
-		string += '\n'+'-'*53+'\n'
-		string += "   s"+str(i)+"   "
-		for j in row:
-			s = str(j)
-			string += '|'+" "*(8-len(s))+s
-	string += '\n'+'-'*53+'\n'
+	string += print_correlation_matrix(corr_matrix)
+	"""
 	f = open("report_"+signal_name+".txt",'w')
 	f.write(string)
 	f.close()
