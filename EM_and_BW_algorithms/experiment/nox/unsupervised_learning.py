@@ -165,7 +165,7 @@ def comparison(m,signal_id,test_psg):
 	automa_scoring = []
 
 	bw = BW_GOHMM(m)
-	g = write_set(test_psg,signal_id,output_as_set=False)
+	g = write_set([test_psg],signal_id,output_as_set=False)
 	for seq in range(len(g)):
 		alphas = bw.computeAlphas(g[seq])
 		betas  = bw.computeBetas(g[seq])
@@ -181,10 +181,9 @@ def comparison(m,signal_id,test_psg):
 		corr_matrix.append([0 for j in m.states])
 	for t in range(len(manual_scoring)):
 		corr_matrix[sleep_stages.index(manual_scoring[t])][automa_scoring[t]] += 1
-	
+	print(string_correlation_matrix(corr_matrix))
 
-
-def print_correlation_matrix(corr_matrix):
+def string_correlation_matrix(corr_matrix):
 	string = " "*8+'|  Wake  |   N1   |   N2   |   N3   |  REM   |   ?    '
 	for i in range(len(corr_matrix)):
 		row = corr_matrix[i]
@@ -196,8 +195,11 @@ def print_correlation_matrix(corr_matrix):
 	string += '\n'+'-'*53+'\n'
 	return string
 	
+out = learning((20,"C3-M2"),[37])
+comparison(out,20,37)
 
 
+"""
 signals_ids  = [     20] #,     24,     30,    34,      44,     48,     67,     71] 
 signals_names = ["C3-M2"] #,"C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
 psgs = list(range(1,51))
@@ -216,12 +218,11 @@ for signal_id, signal_name in zip(signals_ids, signals_names):
 	running_times.append((datetime.now()-starting_time).total_seconds())
 	corr_matrix = evaluation(out, signal_id, test_psgs)
 	string  = signal_name+'\n'
-	string += print_correlation_matrix(corr_matrix)
-	"""
+	string += string_correlation_matrix(corr_matrix)
 	f = open("report_"+signal_name+".txt",'w')
 	f.write(string)
 	f.close()
 	print(string)
-	"""
 out.pprint()
 print("Average learning time",mean(running_times))
+"""
