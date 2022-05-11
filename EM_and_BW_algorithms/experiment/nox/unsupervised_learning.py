@@ -57,7 +57,6 @@ def read_files(psg_number: int, signal_id: int):
 	
 	r = EDFreader(edf_file)
 	frequency = r.getSampleFrequency(signal_id)
-	print(frequency)
 
 	begining, duration = find_starting_ending_point(r,frequency,hypno_file)
 	
@@ -85,7 +84,7 @@ def write_set(psg_numbers: list,signal_id,name):
 		data = read_files(psg_number,signal_id)
 		for i,j in enumerate(data):
 			rho = dft.fit_transform(j.reshape((1,len(j))))
-			data[i] = rho[0]
+			data[i] = rho[0][0]
 		for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
 			new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
 		new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
