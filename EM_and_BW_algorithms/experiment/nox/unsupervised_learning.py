@@ -103,24 +103,21 @@ def write_set(psg_numbers: list,signal_id,name):
 		new_data2.append([data2[i+j] for j in range(len(data2)%NB_WINDOWS_BY_SEQ)])
 
 		sleep_stages = ["Wake","N1","N2","N3","REM"]
-		xx = [[] for _ in sleep_stages]
-		xx2= [[] for _ in sleep_stages]
+		xx = [[[] for _ in sleep_stages] for j in range(2)]
 		h = pd.read_excel(file_paths_from_psg_number(psg_number)[1])
 		h = list(h["Event"])[1:]
 		for h_i, d_i, d2_i in zip(h,new_data, new_data2):
 			if h_i in sleep_stages:
-				xx[sleep_stages.index(h_i)] += d_i
-				xx2[sleep_stages.index(h_i)] += d2_i
-		for i in range(5):
-			print(sleep_stages[i])
-			print("Mean:",mean(xx[i]))
-			print("Std:", stdev(xx[i]))
-		input()
-		for i in range(5):
-			print(sleep_stages[i])
-			print("Mean:",mean(xx2[i]))
-			print("Std:", stdev(xx2[i]))
-		input()
+				xx[0][sleep_stages.index(h_i)] += d_i
+				xx[1][sleep_stages.index(h_i)] += d2_i
+		for j in range(2):
+			print("Coef number:",j)
+			for i in range(5):
+				if len(xx[j][i]) > 0:
+					print(sleep_stages[i])
+					print("Mean:",mean(xx[j][i]))
+					print("Std:", stdev(xx[j][i]))
+			input()
 
 	data = setFromList(new_data)
 	if name != False:
