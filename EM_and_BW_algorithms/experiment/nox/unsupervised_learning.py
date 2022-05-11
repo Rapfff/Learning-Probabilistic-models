@@ -114,7 +114,7 @@ def write_set(psg_numbers: list,signal_id,name=None):
 		
 
 	data = setFromList(new_data)
-	if name != False:
+	if name:
 		saveSet(data, name+".txt")
 	return data
 
