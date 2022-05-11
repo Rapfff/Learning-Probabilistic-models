@@ -78,7 +78,7 @@ def normalize(ll):
 	return [(i-m)/s for i in ll]
 
 
-def write_set(psg_numbers: list,signal_id,name):
+def write_set(psg_numbers: list,signal_id,name=None):
 	"""name is the name of the output files,
 	fraction_test is a float between ]0,1[ corresponding to the fraction of
 	sequences in the test set """
