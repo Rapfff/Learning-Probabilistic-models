@@ -152,7 +152,7 @@ signals_ids  = [     20] #,     24,     30,    34,      44,     48,     67,     
 signals_names = ["C3-M2"] #,"C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
 psgs = list(range(1,51))
 #shuffle(psgs)
-training_psgs = [psgs[randint(0,50)]]
+training_psgs = [37]
 #test_psgs = psgs[25:30]
 running_times = []
 
