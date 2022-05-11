@@ -1,5 +1,6 @@
 from locale import normalize
 import os, sys
+from EM_and_BW_algorithms.src.models.GOHMM import loadGOHMM
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 parentdir = os.path.dirname(parentdir)
@@ -195,7 +196,8 @@ def string_correlation_matrix(corr_matrix):
 	string += '\n'+'-'*53+'\n'
 	return string
 	
-out = learning((20,"C3-M2"),[37])
+#out = learning((20,"C3-M2"),[37])
+out = loadGOHMM("model_C3-M2.txt")
 comparison(out,20,37)
 
 
