@@ -179,10 +179,10 @@ def comparison(m,signal_id,test_psg):
 	
 	sleep_stages.append('?')
 	corr_matrix = []
-	for i in range(len(sleep_stages)):
-		corr_matrix.append([0 for j in m.states])
+	for i in m.states:
+		corr_matrix.append([0 for j in sleep_stages])
 	for t in range(len(manual_scoring)):
-		corr_matrix[sleep_stages.index(manual_scoring[t])][automa_scoring[t]] += 1
+		corr_matrix[automa_scoring[t]][sleep_stages.index(manual_scoring[t])] += 1
 	print(string_correlation_matrix(corr_matrix))
 
 def string_correlation_matrix(corr_matrix):
