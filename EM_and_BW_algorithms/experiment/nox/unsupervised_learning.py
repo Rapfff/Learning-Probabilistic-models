@@ -14,7 +14,8 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 from statistics import mean, stdev
-from statsmodels.regression.linear_model import yule_walker
+from pyts.approximation import DiscreteFourierTransform
+from random import randint
 MANUAL_SCORING_WINDOW_SEC = 30
 
 WINDOW_SIZE_SEC = 3 
@@ -71,10 +72,6 @@ def read_files(psg_number: int, signal_id: int):
 	data.append(read_EDF_signal(r,int((duration-c*WINDOW_SIZE_SEC)*frequency),signal_id))
 	return data
 
-def normalize(l):
-	m = mean(l)
-	s = stdev(l)
-	return np.array([(i-m)/s for i in l])
 
 
 def write_set(psg_numbers: list,signal_id,name):
@@ -82,18 +79,19 @@ def write_set(psg_numbers: list,signal_id,name):
 	fraction_test is a float between ]0,1[ corresponding to the fraction of
 	sequences in the test set """
 	new_data = []
+	dft = DiscreteFourierTransform(4,norm_mean=True,norm_std=True)
 	for psg_number in psg_numbers:
 		print("PSG:",psg_number, "Signal:",signal_id)
 		data = read_files(psg_number,signal_id)
 		for i,j in enumerate(data):
-			rho, _ = yule_walker(normalize(j), 2, method='mle')
+			rho = dft.fit_transform(j.reshape((1,len(j))))
 			data[i] = rho[0]
 		for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
 			new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
 		new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
 
 		sleep_stages = ["Wake","N1","N2","N3","REM"]
-		xx = [[] for s in sleep_stages]
+		xx = [[] for _ in sleep_stages]
 		h = pd.read_excel(file_paths_from_psg_number(psg_number)[1])
 		h = list(h["Event"])[1:]
 		for h_i, d_i in zip(h,new_data):
@@ -144,7 +142,7 @@ signals_ids  = [     20] #,     24,     30,    34,      44,     48,     67,     
 signals_names = ["C3-M2"] #,"C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
 psgs = list(range(1,51))
 #shuffle(psgs)
-training_psgs = [psgs[0]]
+training_psgs = [psgs[randint(0,50)]]
 #test_psgs = psgs[25:30]
 running_times = []
 
