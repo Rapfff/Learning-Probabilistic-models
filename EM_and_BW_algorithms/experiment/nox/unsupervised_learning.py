@@ -83,8 +83,6 @@ def write_set(psg_numbers: list,signal_id,name):
 	fraction_test is a float between ]0,1[ corresponding to the fraction of
 	sequences in the test set """
 	new_data = []
-	data2 = []
-	new_data2 = []
 	dft = DiscreteFourierTransform(4,norm_mean=True,norm_std=True)
 	for psg_number in psg_numbers:
 		print("PSG:",psg_number, "Signal:",signal_id)
@@ -92,32 +90,28 @@ def write_set(psg_numbers: list,signal_id,name):
 		for i,j in enumerate(data):
 			rho = dft.fit_transform(j.reshape((1,len(j))))
 			data[i] = rho[0][0]
-			data2.append(rho[0][1])
 		data = normalize(data)
-		data2 = normalize(data2)
 		for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
 			new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
-			new_data2.append([data2[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
 			
 		new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
-		new_data2.append([data2[i+j] for j in range(len(data2)%NB_WINDOWS_BY_SEQ)])
-
+		
 		sleep_stages = ["Wake","N1","N2","N3","REM"]
-		xx = [[[] for _ in sleep_stages] for j in range(2)]
+		xx = [[[] for _ in sleep_stages] for j in range(1)]
 		h = pd.read_excel(file_paths_from_psg_number(psg_number)[1])
 		h = list(h["Event"])[1:]
-		for h_i, d_i, d2_i in zip(h,new_data, new_data2):
+		for h_i, d_i in zip(h,new_data):
 			if h_i in sleep_stages:
 				xx[0][sleep_stages.index(h_i)] += d_i
-				xx[1][sleep_stages.index(h_i)] += d2_i
-		for j in range(2):
-			print("Coef number:",j)
+		for j in range(1):
+			print("Coef number:",j+1)
 			for i in range(5):
 				if len(xx[j][i]) > 0:
 					print(sleep_stages[i])
 					print("Mean:",mean(xx[j][i]))
 					print("Std:", stdev(xx[j][i]))
 			input()
+		
 
 	data = setFromList(new_data)
 	if name != False:
@@ -163,7 +157,7 @@ training_psgs = [psgs[randint(0,50)]]
 running_times = []
 
 for signal_id, signal_name in zip(signals_ids, signals_names):
-	tr = write_set(training_psgs,signal_id,"training_set")
+	tr = write_set(training_psgs,signal_id)
 	rm = modelGOHMM_nox(NB_STATES,random_initial_state=True)
 	algo = BW_GOHMM(rm)
 	starting_time = datetime.now()
