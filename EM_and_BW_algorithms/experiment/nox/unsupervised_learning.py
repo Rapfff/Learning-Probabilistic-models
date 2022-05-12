@@ -1,4 +1,3 @@
-from locale import normalize
 import os, sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
@@ -186,7 +185,7 @@ def comparison(m,signal_id,test_psg):
 	print(string_correlation_matrix(corr_matrix))
 
 def string_correlation_matrix(corr_matrix):
-	string = " "*8+'|  Wake  |   N1   |   N2   |   N3   |  REM   |   ?    '
+	string = " "*8+'|  Wake  |   N1   |   N2   |   N3   |  REM    '
 	for i in range(len(corr_matrix)):
 		row = corr_matrix[i]
 		string += '\n'+'-'*53+'\n'
