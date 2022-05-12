@@ -70,7 +70,10 @@ class BW:
 		"""
 		counter = 0
 		prevloglikelihood = 10
-		nb_traces = sum(traces[1])
+		try:
+			nb_traces = sum(traces[1])
+		except TypeError:
+			nb_traces = traces[1].sum()
 		while True:
 			print(datetime.now(),pp,counter, prevloglikelihood/nb_traces,end='\r')
 			self.hhat, currentloglikelihood = self.generateHhat(traces)

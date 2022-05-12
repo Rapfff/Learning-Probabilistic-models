@@ -5,7 +5,7 @@ parentdir = os.path.dirname(parentdir)
 sys.path.append(parentdir)
 
 from experiment.nox.edfreader import EDFreader
-from src.tools import saveSet, setFromList
+from src.tools import saveSet, loadSet
 from src.learning.BW_GOHMM import BW_GOHMM, loadGOHMM
 from src.learning.BW import BW
 from src.models.GOHMM import GOHMM
@@ -117,12 +117,14 @@ training_psg = [1,2,3]
 test_psg = [4,5]
 sleep_stages = ["Wake","N1","N2","N3","REM"]
 
-ts = write_set(training_psg,signal_id,"training")
+#ts = write_set(training_psg,signal_id,"training")
+ts = [loadSet(s+'_training.txt') for s in sleep_stages]
 init = [modelGOHMM_random(NB_STATES,True,-1.0,1.0,0.1,2.0) for _ in sleep_stages]
 out = []
 for i,s in enumerate(sleep_stages):
 	print("Learning:",s)
 	bw = BW_GOHMM(init[i])
+	print(ts[i][1])
 	out.append(bw.learn(ts[i],s+"_model.txt"))
 
 ts = write_set(test_psg,signal_id,"test")
