@@ -53,6 +53,7 @@ class BW_MC(BW):
 				print("Either nb_states or initial_model should be set")
 				return
 			initial_model = MC_random(nb_states,getAlphabetFromSequences(traces),random_initial_state)
+		self.alphabet = initial_model.observations()
 		return super().fit(traces, initial_model, output_file, epsilon, pp)
 
 	def _processWork(self,sequence,times):

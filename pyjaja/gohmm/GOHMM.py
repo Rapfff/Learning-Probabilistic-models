@@ -1,28 +1,38 @@
+from numpy.random import normal
+from ast import literal_eval
 from ..base.tools import resolveRandom, randomProbabilities
 from ..base.Model import Model, Model_state
-from ast import literal_eval
-
-class HMM_state(Model_state):
+from math import sqrt, exp, pi
+from random import uniform
+class GOHMM_state(Model_state):
 	"""
-	Creates a HMM_state
+	Creates a GOHMM_state
 
 	Parameters
 	----------
-	output_matrix : [ list of float, list of str]
-		`[[proba_symbol1,proba_symbol2,...],[symbol1,symbol2,...]]`. `output_matrix[0][x]` is the probability to generate the observation `output_matrix[1][x]`.
+	output_parameters : [mu,sigma]
 	next_matrix : [ list of float, list of int]
 		`[[proba_state1,proba_state2,...],[state1,state2,...]]`. `next_matrix[0][x]` is the probability to move to state `next_matrix[1][x]`.
 	idd : int
 		State ID.
 	"""
-	def __init__(self,output_matrix: list, next_matrix: list, idd: int):
-		super().__init__(next_matrix, idd)
-		if round(sum(output_matrix[0]),2) != 1.0 and sum(output_matrix[0]) != 0:
-			print("Sum of the probabilies of the output_matrix should be 1 or 0 here it's ",sum(output_matrix[0]))
-			return False
-		self.output_matrix = output_matrix
 
-	def a(self, s: int) -> float:
+	def __init__(self,next_matrix: list,output_parameters: list,idd: int):
+		super().__init__(next_matrix,idd)
+		self.output_parameters = output_parameters
+
+	def mu(self) -> float:
+		"""
+		Returns the mu parameter for this state.
+
+		Returns
+		-------
+		float
+			the mu parameter.
+		"""
+		return self.output_parameters[0]
+
+	def a(self,s: int) -> float:
 		"""
 		Returns the probability of moving, from this state, to state `s`.
 
@@ -41,9 +51,9 @@ class HMM_state(Model_state):
 		else:
 			return 0.0
 
-	def b(self, l: str) -> float:
+	def b(self,l: float) -> float:
 		"""
-		Returns the probability of generating, from this state, observation `l`.
+		Returns the likelihood of generating, from this state, observation `l`.
 
 		Parameters
 		----------
@@ -53,23 +63,23 @@ class HMM_state(Model_state):
 		Returns
 		-------
 		output : float
-			The probability of generating, from this state, observation `l`.
+			The likelihood of generating, from this state, observation `l`.
 		"""
-		if l in self.output_matrix[1]:
-			return self.output_matrix[0][self.output_matrix[1].index(l)]
-		else:
-			return 0.0
+		mu, sigma  = self.output_parameters
+		return exp(-0.5*((l-mu)/sigma)**2)/(sigma*sqrt(2*pi))
 
-	def next_obs(self) -> str:
+	def next_obs(self) -> float:
 		"""
-		Generates one observation according to the distribution described by `self.output_matrix`.
+		Generates one observation according to a normal distribution of
+		parameters `self.output_parameters`.
 		
 		Returns
 		-------
 		output : str
 			An observation.
 		"""
-		return self.output_matrix[1][resolveRandom(self.output_matrix[0])]
+		mu, sigma  = self.output_parameters
+		return normal(mu,sigma,1)[0]
 
 	def next_state(self) -> int:
 		"""
@@ -84,44 +94,33 @@ class HMM_state(Model_state):
 
 	def next(self) -> list:
 		"""
-		Returns a state-observation pair according to the distributions described by `self.next_matrix` and `self.output_matrix`.
+		Returns a state-observation pair according to the distributions
+		described by `self.next_matrix` and `self.output_parameters`.
 
 		Returns
 		-------
-		output : [int, str]
+		output : [int, float]
 			A state-observation pair.
 		"""
 		return [self.next_state(),self.next_obs()]
 	
-	def tau(self,s: int, obs: str) -> float:
+	def tau(self,state:int ,obs: float) -> float:
 		"""
-		Returns the probability of generating, from this state, observation `obs` while moving to state `s`.
+		Returns the likelihood of generating, from this state, observation `obs` while moving to state `s`.
 
 		Parameters
 		----------
 		s : int
 			A state ID.
-		obs : str
+		obs : float
 			An observation.
 
 		Returns
 		-------
 		output : float
-			The probability of generating, from this state, observation `obs` and moving to state `s`.
+			The likelihood of generating, from this state, observation `obs` and moving to state `s`.
 		"""
-		return self.a(s)*self.b(obs)
-
-	def observations(self) -> list:
-		"""
-		Returns the list of all the observations that can be generated from this state.
-
-		Returns
-		-------
-		output : list of str
-			A list of observations.
-		"""
-		return list(set(self.output_matrix[1]))
-		
+		return self.a(state)*self.b(obs)
 
 	def __str__(self) -> str:
 		res = "----STATE s"+str(self.id)+"----\n"
@@ -129,9 +128,8 @@ class HMM_state(Model_state):
 			if self.transition_matrix[0][j] > 0.000001:
 				res += "s"+str(self.id)+" -> s"+str(self.transition_matrix[1][j])+" : "+str(self.transition_matrix[0][j])+'\n'
 		res += "************\n"
-		for j in range(len(self.output_matrix[0])):
-			if self.output_matrix[0][j] > 0.000001:
-				res += "s"+str(self.id)+" => "+str(self.output_matrix[1][j])+" : "+str(self.output_matrix[0][j])+'\n'
+		res += "mean: "+str(round(self.output_parameters[0],4))+'\n'
+		res += "std : "+str(round(self.output_parameters[1],4))+'\n'
 		return res
 
 	def save(self) -> str:
@@ -145,32 +143,27 @@ class HMM_state(Model_state):
 			for state in self.transition_matrix[1]:
 				res += str(state)+' '
 			res += '\n'
-
-			for proba in self.output_matrix[0]:
-				res += str(proba)+' '
-			res += '\n'
-			for obs in self.output_matrix[1]:
-				res += str(obs)+' '
-			res += '\n'
+			res += str(self.output_parameters)
+			res += '\n'			
 			return res
 
-class HMM(Model):
+class GOHMM(Model):
 	"""
-	Creates an HMM.
+	Creates a GOHMM.
 
 	Parameters
 	----------
-	states : list of HMM_states
-		List of states in this HMM.
+	states : list of GOHMM_states
+		List of states in this GOHMM.
 	initial_state : int or list of float
 		Determine which state is the initial one (then it's the id of the
 		state), or what are the probability to start in each state (then it's
 		a list of probabilities).
 	name : str, optional
 		Name of the model.
-		Default is "unknow_HMM"
+		Default is "unknown_GOHMM"
 	"""
-	def __init__(self,states,initial_state,name="unknown_HMM"):
+	def __init__(self,states,initial_state,name="unknown_GOHMM"):
 		super().__init__(states,initial_state,name)
 
 	def a(self,s1: int,s2: int) -> float:
@@ -193,7 +186,7 @@ class HMM(Model):
 
 	def b(self,s: int, l: str) -> float:
 		"""
-		Returns the probability of generating `l` in state `s`.
+		Returns the likelihood of generating `l` in state `s`.
 
 		Parameters
 		----------
@@ -205,13 +198,13 @@ class HMM(Model):
 		Returns
 		-------
 		output : float
-			probability of generating `o` in state `s`.
+			Likelihood of generating `o` in state `s`.
 		"""
 		return self.states[s].b(l)
 	
-	def tau(self, s1: int, s2: int, obs: str) -> float:
+	def tau(self, s1: int, s2: int, obs: float) -> float:
 		"""
-		Return the probability of generating from state `s1` observation `obs` and moving to state `s2`.
+		Return the likelihood of generating from state `s1` observation `obs` and moving to state `s2`.
 
 		Parameters
 		----------
@@ -219,20 +212,36 @@ class HMM(Model):
 			ID of the source state.
 		s2 : int
 			ID of the destination state.
-		obs : str
+		obs : float
 			An observation.
 
 		Returns
 		-------
 		output : float
-			The probability of generating from state `s1` observation `obs` and moving to state `s`.
+			The likelihood of generating from state `s1` observation `obs` and moving to state `s`.
 		"""
 		return self.states[s1].tau(s2,obs)
 	
+	def mu(self,s:int) -> float:
+		"""
+		Returns the mu parameter for state ``s``.
 
-def loadHMM(file_path: str) -> HMM:
+		Parameters
+		----------
+		s : int
+			State ID
+
+		Returns
+		-------
+		float
+			mu parameter for state ``s``.
+		"""
+		return self.states[s].mu()
+
+
+def loadGOHMM(file_path: str) -> GOHMM:
 	"""
-	Loads an HMM saved into a text file.
+	Loads an GOHMM saved into a text file.
 
 	Parameters
 	----------
@@ -241,8 +250,8 @@ def loadHMM(file_path: str) -> HMM:
 	
 	Returns
 	-------
-	output : HMM
-		The HMM saved in `file_path`.
+	output : GOHMM
+		The GOHMM saved in `file_path`.
 	"""
 	f = open(file_path,'r')
 	name = f.readline()[:-1]
@@ -252,21 +261,19 @@ def loadHMM(file_path: str) -> HMM:
 	l = f.readline()
 	while l and l != '\n':
 		if l == '-\n':
-			states.append(HMM_state([[[],[]],[[],[]],c]))
+			states.append(GOHMM_state([[],[],[]],c))
 		else:
 			ps = [ float(i) for i in l[:-2].split(' ')]
 			l  = f.readline()[:-2].split(' ')
 			s  = [ int(i) for i in l ]
-			l  = f.readline()[:-2].split(' ')
-			po = [ float(i) for i in l]
-			o  = f.readline()[:-2].split(' ')
-			states.append(HMM_state([po,o],[ps,s],c))
+			o  = literal_eval(f.readline()[:-1])
+			states.append(GOHMM_state([ps,s],o,c))
 		c += 1
 		l = f.readline()
 
-	return HMM(states,initial_state,name)
+	return GOHMM(states,initial_state,name)
 
-def HMM_random(number_states: int, alphabet: list, random_initial_state: bool = False) -> HMM:
+def GOHMM_random(nb_states:int,random_initial_state:bool=False,min_mu: float=0.0,max_mu: float=2.0,min_sigma: float=0.5,max_sigma: float=2.0) -> GOHMM:
 	"""
 	Generates a random HMM.
 
@@ -279,18 +286,27 @@ def HMM_random(number_states: int, alphabet: list, random_initial_state: bool = 
 	random_initial_state: bool, optional
 		If set to True we will start in each state with a random probability, otherwise we will always start in state 0.
 		Default is False.
-	
+	min_mu : float, optional
+		lower bound for mu. By default 0.0
+	max_mu : float, optional
+		upper bound for mu. By default 2.0
+	min_sigma : float, optional
+		lower bound for sigma. By default 0.5
+	max_sigma : float, optional
+		upper bound for sigma. By default 2.0
+
 	Returns
 	-------
-	HMM
-		A pseudo-randomly generated HMM.
+	GOHMM
+		A pseudo-randomly generated GOHMM.
 	"""
+	s = [i for i in range(nb_states)]
 	states = []
-	for s in range(number_states):
-		states.append(HMM_state([randomProbabilities(len(alphabet)),alphabet],[randomProbabilities(number_states),list(range(number_states))],s))
-
+	for i in range(nb_states):
+		d = [round(uniform(min_mu,max_mu),3),round(uniform(min_sigma,max_sigma),3)]
+		states.append(GOHMM_state([randomProbabilities(nb_states),s],d,i))
 	if random_initial_state:
-		init = randomProbabilities(number_states)
+		init = randomProbabilities(nb_states)
 	else:
 		init = 0
-	return HMM(states,init)
+	return GOHMM(states,init,"GOHMM_random_"+str(nb_states)+"_states")

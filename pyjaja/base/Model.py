@@ -1,13 +1,11 @@
 from math import  log
-
-from scipy.fftpack import diff
 from .tools import resolveRandom
 from numpy import array, append, dot, zeros, vsplit
 from numpy.random import geometric
 
 class Model_state:
 	"""
-	Abstract class that represent a state.
+	Abstract class that represents a state.
 	
 	Parameters
 	----------

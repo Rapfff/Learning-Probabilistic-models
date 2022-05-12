@@ -91,8 +91,8 @@ class BW:
 		#overrided
 		pass
 
-	def _runProcesses(self,traces, multiprocessing):
-		if multiprocessing:
+	def _runProcesses(self,traces):
+		if platform != "win32":
 			p = Pool(processes = NB_PROCESS)
 			tasks = []
 			for seq,times in zip(traces[0],traces[1]):
@@ -130,14 +130,13 @@ class BW:
 		self.h = initial_model
 		self.hhat = initial_model
 		self.nb_states = len(self.h.states)
-		self.alphabet = self.h.observations()
 
 		counter = 0
 		prevloglikelihood = 10
 		nb_traces = sum(traces[1])
 		while True:
-			print(pp, datetime.now(),counter, prevloglikelihood/nb_traces,end='\r')
-			temp = self._runProcesses(traces, platform !="win32")
+			print(pp, datetime.now(),counter, prevloglikelihood/nb_traces,end='\n')
+			temp = self._runProcesses(traces)
 			self.hhat, currentloglikelihood = self._generateHhat(temp)
 			
 			counter += 1

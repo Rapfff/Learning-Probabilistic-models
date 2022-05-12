@@ -18,7 +18,6 @@ def test_HMM():
 	model = ja.loadHMM("test_save.txt")
 	s = model.generateSet(100,1/2,"geo",5)
 	#m3 = ja.BW_HMM().fit(s,nb_states=5)
-
 	#print(m3.logLikelihood(s))
 	print(model.logLikelihood(s))
 
@@ -33,9 +32,9 @@ def test_MC():
 		return ja.MC([g_s0,g_s1,g_s2,g_s3,g_s4,g_s5],0,"MCGT4")
 	print("\nMC")
 	model = modelMC4()
-	print(model)
 	model.save("test_save.txt")
 	model = ja.loadMC("test_save.txt")
+	print(model)
 	s = model.generateSet(100,10)
 	m1 = ja.BW_MC().fit(s,nb_states=6)
 	print(m1.logLikelihood(s))
@@ -43,5 +42,24 @@ def test_MC():
 	print(m2)
 	print(m2.logLikelihood(s))
 
-test_MC()
+def test_GOHMM():
+	def modelGOHMM2():
+		s0 = ja.GOHMM_state([[0.9,0.1],[0,1]],[3.0,5.0],0)
+		s1 = ja.GOHMM_state([[0.05,0.9,0.04,0.01],[0,1,2,4]],[0.5,1.5],1)
+		s2 = ja.GOHMM_state([[0.05,0.8,0.14,0.01],[1,2,3,4]],[0.2,0.7],2)
+		s3 = ja.GOHMM_state([[0.05,0.95],[2,3]],[0.0,0.3],3)
+		s4 = ja.GOHMM_state([[0.1,0.9],[1,4]],[2.0,4.0],4)
+		return ja.GOHMM([s0,s1,s2,s3,s4],[0.1,0.7,0.0,0.0,0.2],"GOHMM2")
+	print("\nGOHMM")
+	model = modelGOHMM2() 
+	model.save("test_save.txt")
+	model = ja.loadGOHMM("test_save.txt")
+	print(model)
+	s = model.generateSet(100,1/2,"geo",5)
+	m3 = ja.BW_GOHMM().fit(s,nb_states=5,random_initial_state=True)
+	print(m3)
+	print(m3.logLikelihood(s))
+	print(model.logLikelihood(s))
+
+test_GOHMM()
 remove("test_save.txt")

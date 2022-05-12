@@ -1,16 +1,17 @@
-from .HMM import HMM, HMM_state, HMM_random
+from .GOHMM import *
 from ..base.BW import *
 from ..base.tools import correct_proba, getAlphabetFromSequences
 from numpy import log
 
-class BW_HMM(BW):
+
+class BW_GOHMM(BW):
 	"""
-	class for general Baum-Welch algorithm on HMM.
+	class for general Baum-Welch algorithm on GOHMM.
 	"""
 	def __init__(self):
 		super().__init__()
 
-	def fit(self, traces: list, initial_model: HMM=None, nb_states: int=None,
+	def fit(self, traces: list, initial_model: GOHMM=None, nb_states: int=None,
 			random_initial_state: bool=False, output_file: str=None,
 			epsilon: float=0.01,
 			pp: str=''):
@@ -21,15 +22,15 @@ class BW_HMM(BW):
 		----------
 		traces : list
 			training set.
-		initial_model : HMM, optional.
-			first hypothesis. If not set it will create a random HMM with
+		initial_model : GOHMM, optional.
+			first hypothesis. If not set it will create a random GOHMM with
 			``nb_states`` states. Should be set if ``nb_states`` is not set.
 		nb_states: int
-			If ``initial_model`` is not set it will create a random HMM with
+			If ``initial_model`` is not set it will create a random GOHMM with
 			``nb_states`` states. Should be set if ``initial_model`` is not set.
 			Default is None.
 		random_initial_state: bool
-			If ``initial_model`` is not set it will create a random HMM with
+			If ``initial_model`` is not set it will create a random GOHMM with
 			random initial state according to this sequence of probabilities.
 			Should be set if ``initial_model`` is not set.
 			Default is False.
@@ -46,67 +47,60 @@ class BW_HMM(BW):
 
 		Returns
 		-------
-		HMM
-			fitted HMM.
+		GOHMM
+			fitted GOHMM.
 		"""
 		if not initial_model:
 			if not nb_states:
 				print("Either nb_states or initial_model should be set")
 				return
-			initial_model = HMM_random(nb_states,getAlphabetFromSequences(traces),random_initial_state)
-		self.alphabet = initial_model.observations()
+			initial_model = GOHMM_random(nb_states,getAlphabetFromSequences(traces),random_initial_state)
 		return super().fit(traces, initial_model, output_file, epsilon, pp)
 
 	def _processWork(self,sequence,times):
+		sequence = array(sequence)
 		alpha_matrix = self.computeAlphas(sequence)
 		beta_matrix = self.computeBetas(sequence)
 		proba_seq = alpha_matrix.T[-1].sum()
+		input(proba_seq)
 		if proba_seq != 0.0:
-			####################
 			den = dot(alpha_matrix*beta_matrix,times/proba_seq).sum(axis=1)
-			####################
 			num_a = zeros(shape=(self.nb_states,self.nb_states))
-			num_b = zeros(shape=(self.nb_states,len(self.alphabet)))
+			num_mu = zeros(self.nb_states)
+			num_va = zeros(self.nb_states)
 			for s in range(self.nb_states):
+				num_mu[s] = dot(alpha_matrix[s][1:]*beta_matrix[s][:-1]*sequence,times/proba_seq).sum()
+				num_va[s] = dot(alpha_matrix[s][1:]*beta_matrix[s][:-1]*(sequence-self.h.mu(s))**2,times/proba_seq).sum()
 				for ss in range(self.nb_states):
 					p = array([self.h_tau(s,ss,o) for o in sequence])
 					num_a[s,ss] = dot(alpha_matrix[s][:-1]*p*beta_matrix[ss][1:],times/proba_seq).sum()
-					for o, obs in enumerate(self.alphabet):
-						arr_dirak = [1.0 if t == obs else 0.0 for t in sequence]
-						num_b[s,o] = dot(alpha_matrix[s][:-1]*arr_dirak*beta_matrix[s][:-1],times/proba_seq).sum()
-			####################
 			num_init = alpha_matrix.T[0]*beta_matrix.T[0]*times/proba_seq
-			####################
-			return [den, num_a, num_b, proba_seq, times, num_init]
+			return [den,num_a,num_mu,num_va,proba_seq,times,num_init]
 		return False
 
 	def _generateHhat(self,temp):
-		den = zeros(shape=(self.nb_states,))
 		a   = zeros(shape=(self.nb_states,self.nb_states))
-		b   = zeros(shape=(self.nb_states,len(self.alphabet)))
-		lst_den = array([i[0] for i in temp]).T
-		lst_num_a = array([i[1] for i in temp]).T.reshape(self.nb_states*self.nb_states,len(temp))
-		lst_num_b = array([i[2] for i in temp]).T.reshape(self.nb_states*len(self.alphabet),len(temp))
-		lst_proba=array([i[3] for i in temp])
-		lst_times=array([i[4] for i in temp])
-		lst_init =array([i[5] for i in temp]).T
 		
-		currentloglikelihood = dot(log(lst_proba),lst_times)
+		den = array([i[0] for i in temp]).sum(axis=0)
+		lst_num_a = array([i[1] for i in temp]).T.reshape(self.nb_states*self.nb_states,len(temp))
+		mu = array([i[2] for i in temp]).sum(axis=0)
+		va = array([i[3] for i in temp]).sum(axis=0)
+		lst_proba=array([i[4] for i in temp])
+		lst_times=array([i[5] for i in temp])
+		init =array([i[6] for i in temp]).sum(axis=0)
 
-		for s in range(self.nb_states):
-			den[s] = lst_den[s].sum()
-			for x in range(self.nb_states):
-				a[s,x] = lst_num_a[x*self.nb_states+s].sum()
-			for x in range(len(self.alphabet)):
-				b[s,x] = lst_num_b[x*self.nb_states+s].sum()
+
+		currentloglikelihood = dot(log(lst_proba),lst_times)
+		
 
 		new_states = []
 		for s in range(self.nb_states):
+			for x in range(self.nb_states):
+				a[s,x] = lst_num_a[x*self.nb_states+s].sum()
 			la = [ correct_proba(a[s]/den[s]), list(range(self.nb_states)) ]
-			lb = [ correct_proba(b[s]/den[s]) , self.alphabet ]
+			new_states.append(GOHMM_state(la,[mu[s]/den[s],va[s]/den[s]],s))
 
-			new_states.append(HMM_state(lb,la,s))
 
-		initial_state = [lst_init[s].sum()/lst_init.sum() for s in range(self.nb_states)]
+		initial_state = [init[s]/init.sum() for s in range(self.nb_states)]
 		
-		return [HMM(new_states,initial_state),currentloglikelihood]
+		return [GOHMM(new_states,initial_state),currentloglikelihood]
