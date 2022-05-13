@@ -115,9 +115,9 @@ sleep_stages = ["Wake","N1","N2","N3","REM"]
 #	bw = BW_GOHMM(init[i])
 #	out.append(bw.learn(ts[i],s+"_model.txt"))
 
-#ts = write_set(test_psg,signal_id,"test")
-out = [loadGOHMM(s+"_model.txt") for s in sleep_stages]
+ts = write_set(test_psg,signal_id,"test")
 ts = [loadSet(s+'_test.txt') for s in sleep_stages]
+out = [loadGOHMM(s+"_model.txt") for s in sleep_stages]
 corr = [[0 for s in sleep_stages] for i in out]
 for i,s in enumerate(sleep_stages):
 	print("Testing:",s)
