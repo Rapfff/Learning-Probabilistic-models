@@ -211,6 +211,13 @@ class Model:
 			alpha_matrix[-1] += [None for i in range(len_seq)]
 		return alpha_matrix
 
+	def logLikelihood_oneseq(self,sequence: list) -> float:
+		alpha_matrix = self._initAlphaMatrix(len(sequence))
+		alpha_matrix = self._updateAlphaMatrix(sequence,0,alpha_matrix)
+		loglikelihood = log(sum([alpha_matrix[s][-1] for s in range(len(self.states))]))
+		return loglikelihood
+
+
 	def logLikelihood(self,sequences: list) -> float:
 		"""
 		Compute the average loglikelihood of a set of sequences which all have the same length

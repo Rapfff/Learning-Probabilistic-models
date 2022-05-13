@@ -8,7 +8,7 @@ from experiment.nox.edfreader import EDFreader
 from src.tools import saveSet, loadSet
 from src.learning.BW_GOHMM import BW_GOHMM
 from src.learning.BW import BW
-from src.models.GOHMM import GOHMM
+from src.models.GOHMM import GOHMM, loadGOHMM
 from examples.examples_models import modelGOHMM_random
 import numpy as np
 import pandas as pd
@@ -106,21 +106,23 @@ training_psg = [1,2,3]
 test_psg = [4,5]
 sleep_stages = ["Wake","N1","N2","N3","REM"]
 
-ts = write_set(training_psg,signal_id,"training")
+#ts = write_set(training_psg,signal_id,"training")
 #ts = [loadSet(s+'_training.txt') for s in sleep_stages]
-init = [modelGOHMM_random(NB_STATES,True,-1.0,1.0,0.1,2.0) for _ in sleep_stages]
-out = []
-for i,s in enumerate(sleep_stages):
-	print("Learning:",s)
-	bw = BW_GOHMM(init[i])
-	out.append(bw.learn(ts[i],s+"_model.txt"))
+#init = [modelGOHMM_random(NB_STATES,True,-1.0,1.0,0.1,2.0) for _ in sleep_stages]
+#out = []
+#for i,s in enumerate(sleep_stages):
+#	print("Learning:",s)
+#	bw = BW_GOHMM(init[i])
+#	out.append(bw.learn(ts[i],s+"_model.txt"))
 
-ts = write_set(test_psg,signal_id,"test")
+#ts = write_set(test_psg,signal_id,"test")
+out = [loadGOHMM(s+"_model.txt") for s in sleep_stages]
+ts = [loadSet(s+'_test.txt') for s in sleep_stages]
 corr = [[0 for s in sleep_stages] for i in out]
 for i,s in enumerate(sleep_stages):
 	print("Testing:",s)
 	for seq in ts[i][0]:
-		ll = [m.logLikelihood(seq) for m in out]
+		ll = [m.logLikelihood_oneseq(seq) for m in out]
 		corr[ll.index(max(ll))][i] += 1
 
 print(string_correlation_matrix(corr))
