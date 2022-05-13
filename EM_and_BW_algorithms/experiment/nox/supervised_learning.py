@@ -6,16 +6,13 @@ sys.path.append(parentdir)
 
 from experiment.nox.edfreader import EDFreader
 from src.tools import saveSet, loadSet
-from src.learning.BW_GOHMM import BW_GOHMM, loadGOHMM
+from src.learning.BW_GOHMM import BW_GOHMM
 from src.learning.BW import BW
 from src.models.GOHMM import GOHMM
 from examples.examples_models import modelGOHMM_random
 import numpy as np
 import pandas as pd
-from datetime import datetime
 from statistics import mean, stdev
-from pyts.approximation import DiscreteFourierTransform
-from random import randint
 MANUAL_SCORING_WINDOW_SEC = 30
 AUTOMATIC_SCORING_WINDOW_SEC = 1
 
@@ -65,17 +62,10 @@ def read_files(psg_number: int, signal_id: int):
 	return data
 
 def normalize(ll):
-	m = sum([mean(i) for i in ll])/len(ll)
-	s = 0.0
-	c = 1
-	for i in ll:
-		for j in i:
-			c += 1
-			s += (j-m)**2
-	s /= c
-	for i in range(len(ll)):
-		ll[i] = [(j-m)/s for j in ll[i]]
-	return ll
+	ll = np.array(ll)
+	m = np.mean(ll)
+	s = np.std(ll)
+	return (ll-m)/s
 
 
 def write_set(psg_numbers: list,signal_id,name):
@@ -96,7 +86,7 @@ def write_set(psg_numbers: list,signal_id,name):
 				ts[sleep_stages.index(manual)][1].append(1)
 	for i,s in enumerate(sleep_stages):
 		saveSet(ts[i],s+'_'+name+".txt")
-	return data
+	return ts
 
 def string_correlation_matrix(corr_matrix):
 	string = " "*8+'|  Wake  |   N1   |   N2   |   N3   |  REM    '
@@ -110,16 +100,16 @@ def string_correlation_matrix(corr_matrix):
 	string += '\n'+'-'*53+'\n'
 	return string
 
-
 signal_id = 20
 signal_name = "C3-M2"
 training_psg = [1,2,3]
 test_psg = [4,5]
 sleep_stages = ["Wake","N1","N2","N3","REM"]
 
-#ts = write_set(training_psg,signal_id,"training")
-ts = [loadSet(s+'_training.txt') for s in sleep_stages]
-print(ts[0][:15])
+ts = write_set(training_psg,signal_id,"training")
+#ts = [loadSet(s+'_training.txt') for s in sleep_stages]
+print(ts[0][:5])
+input()
 init = [modelGOHMM_random(NB_STATES,True,-1.0,1.0,0.1,2.0) for _ in sleep_stages]
 out = []
 for i,s in enumerate(sleep_stages):
