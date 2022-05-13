@@ -62,7 +62,8 @@ def saveSet(t_set: list, file_path: str) -> None:
 	:type file_path: str
 	"""
 	try:
-		t_set[0] = t_set[0].tolist()
+		for i in range(len(t_set[0])):
+			t_set[0][i] = t_set[0][i].tolist()
 	except AttributeError:
 		pass
 	f = open(file_path,'w')
