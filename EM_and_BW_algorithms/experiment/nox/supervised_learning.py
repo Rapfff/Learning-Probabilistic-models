@@ -108,8 +108,6 @@ sleep_stages = ["Wake","N1","N2","N3","REM"]
 
 ts = write_set(training_psg,signal_id,"training")
 #ts = [loadSet(s+'_training.txt') for s in sleep_stages]
-print(ts[0][:5])
-input()
 init = [modelGOHMM_random(NB_STATES,True,-1.0,1.0,0.1,2.0) for _ in sleep_stages]
 out = []
 for i,s in enumerate(sleep_stages):
