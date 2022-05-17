@@ -135,7 +135,7 @@ class BW:
 		prevloglikelihood = 10
 		nb_traces = sum(traces[1])
 		while True:
-			print(pp, datetime.now(),counter, prevloglikelihood/nb_traces,end='\n')
+			print(pp, datetime.now(),counter, prevloglikelihood/nb_traces,end='\r')
 			temp = self._runProcesses(traces)
 			self.hhat, currentloglikelihood = self._generateHhat(temp)
 			

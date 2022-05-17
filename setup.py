@@ -16,7 +16,7 @@ setup(
     version='0.0.1',
     url="",
     description='''''',
-    author='',
-    author_email="",
+    author='Raphaël Reynouard',
+    author_email="raphal20@ru.is",
     license='MIT',
 )

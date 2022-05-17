@@ -1,6 +1,6 @@
 from .MC import *
 from ..base.BW import *
-from ..base.tools import correct_proba, getAlphabetFromSequences
+from ..base.tools import getAlphabetFromSequences
 from numpy import log
 
 class BW_MC(BW):
@@ -62,10 +62,11 @@ class BW_MC(BW):
 		proba_seq = alpha_matrix.T[-1].sum()
 		if proba_seq != 0.0:
 			####################
-			den = dot(alpha_matrix*beta_matrix,times/proba_seq).sum(axis=1)
+			den = zeros(self.nb_states)
 			####################
 			num = zeros(shape=(self.nb_states,self.nb_states*len(self.alphabet)))
 			for s in range(self.nb_states):
+				den[s] = dot(alpha_matrix[s][:-1]*beta_matrix[s][:-1],times/proba_seq).sum()
 				c = 0
 				for ss in range(self.nb_states):
 					for obs in self.alphabet:
@@ -101,7 +102,7 @@ class BW_MC(BW):
 		list_obs = self.alphabet*self.nb_states
 		new_states = []
 		for s in range(self.nb_states):
-			l = [ correct_proba(tau[s]/den[s]) , list_sta, list_obs ]
+			l = [ tau[s]/den[s] , list_sta, list_obs ]
 			new_states.append(MC_state(l,s))
 		initial_state = [lst_init[s].sum()/lst_init.sum() for s in range(self.nb_states)]
 		return [MC(new_states,initial_state),currentloglikelihood]

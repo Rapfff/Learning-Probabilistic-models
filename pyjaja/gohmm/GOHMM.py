@@ -66,7 +66,7 @@ class GOHMM_state(Model_state):
 			The likelihood of generating, from this state, observation `l`.
 		"""
 		mu, sigma  = self.output_parameters
-		return exp(-0.5*((l-mu)/sigma)**2)/(sigma*sqrt(2*pi))
+		return exp(-0.5*((mu-l)/sigma)**2)/(sigma*sqrt(2*pi))
 
 	def next_obs(self) -> float:
 		"""

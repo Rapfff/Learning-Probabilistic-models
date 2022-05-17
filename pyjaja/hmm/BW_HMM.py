@@ -1,6 +1,6 @@
 from .HMM import HMM, HMM_state, HMM_random
 from ..base.BW import *
-from ..base.tools import correct_proba, getAlphabetFromSequences
+from ..base.tools import getAlphabetFromSequences
 from numpy import log
 
 class BW_HMM(BW):
@@ -63,11 +63,12 @@ class BW_HMM(BW):
 		proba_seq = alpha_matrix.T[-1].sum()
 		if proba_seq != 0.0:
 			####################
-			den = dot(alpha_matrix*beta_matrix,times/proba_seq).sum(axis=1)
+			den   = zeros(self.nb_states)
 			####################
 			num_a = zeros(shape=(self.nb_states,self.nb_states))
 			num_b = zeros(shape=(self.nb_states,len(self.alphabet)))
 			for s in range(self.nb_states):
+				den[s] = dot(alpha_matrix[s][:-1]*beta_matrix[s][:-1],times/proba_seq).sum()
 				for ss in range(self.nb_states):
 					p = array([self.h_tau(s,ss,o) for o in sequence])
 					num_a[s,ss] = dot(alpha_matrix[s][:-1]*p*beta_matrix[ss][1:],times/proba_seq).sum()
@@ -102,8 +103,8 @@ class BW_HMM(BW):
 
 		new_states = []
 		for s in range(self.nb_states):
-			la = [ correct_proba(a[s]/den[s]), list(range(self.nb_states)) ]
-			lb = [ correct_proba(b[s]/den[s]) , self.alphabet ]
+			la = [ a[s]/den[s], list(range(self.nb_states)) ]
+			lb = [ b[s]/den[s] , self.alphabet ]
 
 			new_states.append(HMM_state(lb,la,s))
 

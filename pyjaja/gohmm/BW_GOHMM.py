@@ -1,6 +1,6 @@
 from .GOHMM import *
 from ..base.BW import *
-from ..base.tools import correct_proba, getAlphabetFromSequences
+from ..base.tools import getAlphabetFromSequences
 from numpy import log
 
 
@@ -62,25 +62,25 @@ class BW_GOHMM(BW):
 		alpha_matrix = self.computeAlphas(sequence)
 		beta_matrix = self.computeBetas(sequence)
 		proba_seq = alpha_matrix.T[-1].sum()
-		input(proba_seq)
 		if proba_seq != 0.0:
-			den = dot(alpha_matrix*beta_matrix,times/proba_seq).sum(axis=1)
-			num_a = zeros(shape=(self.nb_states,self.nb_states))
+			den    = zeros(self.nb_states)
+			num_a  = zeros(shape=(self.nb_states,self.nb_states))
 			num_mu = zeros(self.nb_states)
 			num_va = zeros(self.nb_states)
 			for s in range(self.nb_states):
-				num_mu[s] = dot(alpha_matrix[s][1:]*beta_matrix[s][:-1]*sequence,times/proba_seq).sum()
-				num_va[s] = dot(alpha_matrix[s][1:]*beta_matrix[s][:-1]*(sequence-self.h.mu(s))**2,times/proba_seq).sum()
+				den[s] = dot(alpha_matrix[s][:-1]*beta_matrix[s][:-1],times/proba_seq).sum()
+				num_mu[s] = dot(alpha_matrix[s][:-1]*beta_matrix[s][:-1]*sequence,times/proba_seq).sum()
+				num_va[s] = dot(alpha_matrix[s][:-1]*beta_matrix[s][:-1]*(sequence-self.h.mu(s))**2,times/proba_seq).sum()
 				for ss in range(self.nb_states):
 					p = array([self.h_tau(s,ss,o) for o in sequence])
 					num_a[s,ss] = dot(alpha_matrix[s][:-1]*p*beta_matrix[ss][1:],times/proba_seq).sum()
 			num_init = alpha_matrix.T[0]*beta_matrix.T[0]*times/proba_seq
 			return [den,num_a,num_mu,num_va,proba_seq,times,num_init]
+		print('proba0')
 		return False
 
 	def _generateHhat(self,temp):
 		a   = zeros(shape=(self.nb_states,self.nb_states))
-		
 		den = array([i[0] for i in temp]).sum(axis=0)
 		lst_num_a = array([i[1] for i in temp]).T.reshape(self.nb_states*self.nb_states,len(temp))
 		mu = array([i[2] for i in temp]).sum(axis=0)
@@ -97,8 +97,8 @@ class BW_GOHMM(BW):
 		for s in range(self.nb_states):
 			for x in range(self.nb_states):
 				a[s,x] = lst_num_a[x*self.nb_states+s].sum()
-			la = [ correct_proba(a[s]/den[s]), list(range(self.nb_states)) ]
-			new_states.append(GOHMM_state(la,[mu[s]/den[s],va[s]/den[s]],s))
+			la = [ a[s]/den[s], list(range(self.nb_states)) ]
+			new_states.append(GOHMM_state(la,[mu[s]/den[s],sqrt(va[s]/den[s])],s))
 
 
 		initial_state = [init[s]/init.sum() for s in range(self.nb_states)]
