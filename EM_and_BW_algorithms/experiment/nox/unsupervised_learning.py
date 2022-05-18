@@ -78,13 +78,7 @@ def bandpower(data, sf, band, window_sec=None, relative=False):
     if relative:
         bp /= simps(psd, dx=freq_res)
 
-    plt.figure(figsize=(8, 4))
     plt.plot(freqs, psd, color='k', lw=2)
-    plt.xlabel('Frequency (Hz)')
-    plt.ylabel('Power spectral density (V^2 / Hz)')
-    plt.ylim([0, psd.max() * 1.1])
-    plt.title("Welch's periodogram")
-    plt.xlim([0, freqs.max()])
     plt.show()
     return bp
 
