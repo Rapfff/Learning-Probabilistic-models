@@ -15,6 +15,7 @@ import pandas as pd
 from scipy.signal import welch
 from scipy.integrate import simps
 from statistics import mean, stdev
+import matplotlib.pyplot as plt
 MANUAL_SCORING_WINDOW_SEC = 30
 AUTOMATIC_SCORING_WINDOW_SEC = 30
 SEQUENCE_SIZE = 90
@@ -76,6 +77,14 @@ def bandpower(data, sf, band, window_sec=None, relative=False):
     bp = simps(psd[idx_band], dx=freq_res)
     if relative:
         bp /= simps(psd, dx=freq_res)
+
+    plt.figure(figsize=(8, 4))
+    plt.plot(freqs, psd, color='k', lw=2)
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Power spectral density (V^2 / Hz)')
+    plt.ylim([0, psd.max() * 1.1])
+    plt.title("Welch's periodogram")
+    plt.xlim([0, freqs.max()])
     return bp
 
 def splitInSequences(ll):
