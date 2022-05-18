@@ -16,7 +16,7 @@ from scipy.signal import welch
 from scipy.integrate import simps
 from statistics import mean, stdev
 MANUAL_SCORING_WINDOW_SEC = 30
-AUTOMATIC_SCORING_WINDOW_SEC = 1
+AUTOMATIC_SCORING_WINDOW_SEC = 30
 SEQUENCE_SIZE = 90
 NB_STATES = 5
 
