@@ -78,8 +78,6 @@ def bandpower(data, sf, band, window_sec=None, relative=False):
     if relative:
         bp /= simps(psd, dx=freq_res)
 
-    plt.plot(freqs, psd, color='k', lw=2)
-    plt.show()
     return bp
 
 def splitInSequences(ll):
@@ -118,6 +116,7 @@ def string_correlation_matrix(corr_matrix):
 
 def evaluation(psg_numbers,m):
 	corr = [[0 for s in sleep_stages] for i in range(NB_STATES)]
+	dt = [[] for i in sleep_stages]
 	bw = BW(m)
 	for psg_number in psg_numbers:
 		h = pd.read_excel(file_paths_from_psg_number(psg_number)[1])
@@ -135,9 +134,10 @@ def evaluation(psg_numbers,m):
 				if h[index_h] in sleep_stages:
 					chosen = alphas_betas.index(max(alphas_betas))
 					corr[chosen][sleep_stages.index(h[index_h])] += g[1][seq]
+					dt[sleep_stages.index(h[index_h])].append(g[0][seq][t])
 					#for s in range(len(m.states)):
 					#	corr[s][sleep_stages.index(h[index_h])] += g[1][seq]*alphas_betas[s]
-	return corr
+	return [corr,dt]
 
 signal_id = 44
 signal_name = "F3-M2"
@@ -145,8 +145,8 @@ training_psg = [1,2,3]
 test_psg = [4,5]
 sleep_stages = ["Wake","N1","N2","N3","REM"]
 
-ts = write_set(training_psg,signal_id,"training")
-#ts = loadSet('training.txt')
+#ts = write_set(training_psg,signal_id,"training")
+ts = loadSet('training.txt')
 init = modelGOHMM_nox()
 bw = BW_GOHMM(init)
 out = bw.learn(ts,'output_model.txt')
@@ -154,7 +154,11 @@ out = bw.learn(ts,'output_model.txt')
 #ts = [loadSet(s+'_test.txt') for s in sleep_stages]
 out = loadGOHMM("output_model.txt")
 print("Testing:")
-corr = evaluation(test_psg,out)
+corr, dt = evaluation(test_psg,out)
+
+for i,s in enumerate(sleep_stages):
+	print(s+": "+str(mean(dt[i]))+", "+str(stdev(dt[i])))
+
 
 print(string_correlation_matrix(corr))
 
