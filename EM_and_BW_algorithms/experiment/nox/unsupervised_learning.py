@@ -5,22 +5,19 @@ parentdir = os.path.dirname(parentdir)
 sys.path.append(parentdir)
 
 from experiment.nox.edfreader import EDFreader
-from src.tools import saveSet, setFromList
-from src.learning.BW_GOHMM import BW_GOHMM, loadGOHMM
+from src.tools import saveSet, loadSet
+from src.learning.BW_GOHMM import BW_GOHMM
 from src.learning.BW import BW
-from src.models.GOHMM import GOHMM
+from src.models.GOHMM import GOHMM, loadGOHMM
 from examples.examples_models import modelGOHMM_nox
 import numpy as np
 import pandas as pd
-from datetime import datetime
+from scipy.signal import welch
+from scipy.integrate import simps
 from statistics import mean, stdev
-from pyts.approximation import DiscreteFourierTransform
-from random import randint
 MANUAL_SCORING_WINDOW_SEC = 30
-
-WINDOW_SIZE_SEC = 3 
-NB_WINDOWS_BY_SEQ = MANUAL_SCORING_WINDOW_SEC//WINDOW_SIZE_SEC
-
+AUTOMATIC_SCORING_WINDOW_SEC = 1
+SEQUENCE_SIZE = 90
 NB_STATES = 5
 
 #PSG 21 BROKEN ??
@@ -53,136 +50,55 @@ def find_starting_ending_point(r,frequency,hypno_file):
 	return (begining,duration)
 
 def read_files(psg_number: int, signal_id: int):
-	edf_file , hypno_file = file_paths_from_psg_number(psg_number)
-	
+	edf_file , hypno_file = file_paths_from_psg_number(psg_number)	
 	r = EDFreader(edf_file)
 	frequency = r.getSampleFrequency(signal_id)
-
 	begining, duration = find_starting_ending_point(r,frequency,hypno_file)
 	
 	r.fseek(signal_id,begining,EDFreader.EDFSEEK_SET)
 	data = []
 	c = 0
-	while (c+1)*WINDOW_SIZE_SEC < duration:
-		data.append(read_EDF_signal(r,int(WINDOW_SIZE_SEC*frequency),signal_id))
+	while (c+1)*AUTOMATIC_SCORING_WINDOW_SEC < duration:
+		v = read_EDF_signal(r,int(AUTOMATIC_SCORING_WINDOW_SEC*frequency),signal_id)
+		data.append(bandpower(v,frequency,[0.5,4],5,True))
 		c += 1
-		if data[-1][0] == 0.0 and data[-1][1] == 1.0:
-			print(psg_number,c*WINDOW_SIZE_SEC,duration)
-	data.append(read_EDF_signal(r,int((duration-c*WINDOW_SIZE_SEC)*frequency),signal_id))
 	return data
 
-def normalize(ll):
-	m = mean(ll)
-	s = stdev(ll)
-	return [(i-m)/s for i in ll]
+def bandpower(data, sf, band, window_sec=None, relative=False):
+    low, high = band
+    if window_sec is not None:
+        nperseg = window_sec * sf
+    else:
+        nperseg = (2 / low) * sf
+    freqs, psd = welch(data, sf, nperseg=nperseg)
+    freq_res = freqs[1] - freqs[0]
+    idx_band = np.logical_and(freqs >= low, freqs <= high)
+    bp = simps(psd[idx_band], dx=freq_res)
+    if relative:
+        bp /= simps(psd, dx=freq_res)
+    return bp
 
+def splitInSequences(ll):
+	res = [[],[]]
+	for i in range(len(ll)//SEQUENCE_SIZE):
+		seq = ll[i*SEQUENCE_SIZE:(i+1)*SEQUENCE_SIZE]
+		if not seq in res[0]:
+			res[0].append(seq)
+			res[1].append(1)
+		else:
+			res[1][res[0].index(seq)] += 1
+	res[0].append(ll[(i+1)*SEQUENCE_SIZE:])
+	res[1].append(1)
+	return res
 
-def write_set(psg_numbers: list,signal_id,name=None,output_as_set=True):
-	"""name is the name of the output files,
-	fraction_test is a float between ]0,1[ corresponding to the fraction of
-	sequences in the test set """
-	new_data = []
-	dft = DiscreteFourierTransform(4,norm_mean=True,norm_std=True)
+def write_set(psg_numbers: list,signal_id,name=None):
 	for psg_number in psg_numbers:
 		print("PSG:",psg_number, "Signal:",signal_id)
 		data = read_files(psg_number,signal_id)
-		for i,j in enumerate(data):
-			rho = dft.fit_transform(j.reshape((1,len(j))))
-			data[i] = rho[0][0]
-		data = normalize(data)
-		for i in range(0,len(data) - NB_WINDOWS_BY_SEQ,NB_WINDOWS_BY_SEQ):
-			new_data.append([data[i+j] for j in range(NB_WINDOWS_BY_SEQ)])
-			
-		new_data.append([data[i+j] for j in range(len(data)%NB_WINDOWS_BY_SEQ)])
-		
-		"""
-		sleep_stages = ["Wake","N1","N2","N3","REM"]
-		xx = [[[] for _ in sleep_stages] for j in range(1)]
-		h = pd.read_excel(file_paths_from_psg_number(psg_number)[1])
-		h = list(h["Event"])[1:]
-		for h_i, d_i in zip(h,new_data):
-			if h_i in sleep_stages:
-				xx[0][sleep_stages.index(h_i)] += d_i
-		for j in range(1):
-			print("Coef number:",j+1)
-			for i in range(5):
-				if len(xx[j][i]) > 0:
-					print(sleep_stages[i])
-					print("Mean:",mean(xx[j][i]))
-					print("Std:", stdev(xx[j][i]))
-			input()
-		"""
-	if output_as_set:
-		data = setFromList(new_data)
-		if name:
-			saveSet(data, name+".txt")
-	else:
-		data = new_data
+		data = splitInSequences(data)
+	if name:
+		saveSet(data,name+".txt")
 	return data
-
-def evaluation(m: GOHMM, signal_id, psg_numbers: list) -> list:
-	sleep_stages = ["Wake","N1","N2","N3","REM"]
-	bw = BW(m)
-	corr_matrix = []
-	for i in m.states:
-		corr_matrix.append([0 for j in sleep_stages])
-
-	for psg_number in psg_numbers:
-		h = pd.read_excel(file_paths_from_psg_number(psg_number)[1])
-		h = list(h["Event"])[1:]
-		g = write_set([psg_number],signal_id)
-
-		for seq in range(len(g[0])):
-			alphas = bw.computeAlphas(g[0][seq])
-			betas  = bw.computeBetas(g[0][seq])
-
-			for t in range(len(g[0][seq])):
-				alphas_betas = [alphas[s][t+1]*betas[s][t+1] for s in range(len(m.states))]
-				index_h = int((t+seq*NB_WINDOWS_BY_SEQ)*WINDOW_SIZE_SEC/MANUAL_SCORING_WINDOW_SEC)
-				if index_h >= len(h):
-					break
-				if h[index_h] in sleep_stages:
-					chosen = alphas_betas.index(max(alphas_betas))
-					corr_matrix[chosen][sleep_stages.index(h[index_h])] += g[1][seq]
-					#for s in range(len(m.states)):
-					#	corr_matrix[s][sleep_stages.index(h[index_h])] += g[1][seq]*alphas_betas[s]
-	return corr_matrix
-
-def learning(signal, training_psgs):
-	signal_id, signal_name = signal
-	tr = write_set(training_psgs,signal_id)
-	rm = modelGOHMM_nox(NB_STATES,random_initial_state=True)
-	algo = BW_GOHMM(rm)
-	starting_time = datetime.now()
-	out = algo.learn(tr, output_file="model_"+signal_name+".txt")
-	print((datetime.now()-starting_time).total_seconds())
-	return out
-
-def comparison(m,signal_id,test_psg):
-	sleep_stages = ["Wake","N1","N2","N3","REM"]
-	h = pd.read_excel(file_paths_from_psg_number(test_psg)[1])
-	h = list(h["Event"])[1:]
-	manual_scoring = [i if i in sleep_stages else '?' for i in h]
-	automa_scoring = []
-
-	bw = BW_GOHMM(m)
-	g = write_set([test_psg],signal_id,output_as_set=False)
-	for seq in range(len(g)):
-		alphas = bw.computeAlphas(g[seq])
-		betas  = bw.computeBetas(g[seq])
-		votes = [0 for s in m.states]
-		for t in range(len(g[seq])):
-			alphas_betas = [alphas[s][t+1]*betas[s][t+1] for s in range(len(m.states))]
-			votes[alphas_betas.index(max(alphas_betas))] += 1
-		automa_scoring.append(votes.index(max(votes)))
-	
-	sleep_stages.append('?')
-	corr_matrix = []
-	for i in m.states:
-		corr_matrix.append([0 for j in sleep_stages])
-	for t in range(len(manual_scoring)):
-		corr_matrix[automa_scoring[t]][sleep_stages.index(manual_scoring[t])] += 1
-	print(string_correlation_matrix(corr_matrix))
 
 def string_correlation_matrix(corr_matrix):
 	string = " "*8+'|  Wake  |   N1   |   N2   |   N3   |  REM    '
@@ -195,36 +111,47 @@ def string_correlation_matrix(corr_matrix):
 			string += '|'+" "*(8-len(s))+s
 	string += '\n'+'-'*53+'\n'
 	return string
-	
-#out = learning((20,"C3-M2"),[37])
-out = loadGOHMM("model_C3-M2.txt")
-comparison(out,20,37)
+
+def evaluation(psg_numbers,m):
+	corr = [[0 for s in sleep_stages] for i in range(NB_STATES)]
+	bw = BW(m)
+	for psg_number in psg_numbers:
+		h = pd.read_excel(file_paths_from_psg_number(psg_number)[1])
+		h = list(h["Event"])[1:]
+		g = write_set([psg_number],signal_id)
+
+		for seq in range(len(g[0])):
+			alphas = bw.computeAlphas(g[0][seq])
+			betas  = bw.computeBetas(g[0][seq])
+			for t in range(len(g[0][seq])):
+				alphas_betas = [alphas[s][t]*betas[s][t] for s in range(len(m.states))]
+				index_h = int(t+seq*SEQUENCE_SIZE)
+				if index_h >= len(h):
+					break
+				if h[index_h] in sleep_stages:
+					chosen = alphas_betas.index(max(alphas_betas))
+					corr[chosen][sleep_stages.index(h[index_h])] += g[1][seq]
+					#for s in range(len(m.states)):
+					#	corr[s][sleep_stages.index(h[index_h])] += g[1][seq]*alphas_betas[s]
+	return corr
+
+signal_id = 44
+signal_name = "F3-M2"
+training_psg = [1,2,3]
+test_psg = [4,5]
+sleep_stages = ["Wake","N1","N2","N3","REM"]
+
+ts = write_set(training_psg,signal_id,"training")
+#ts = loadSet('training.txt')
+init = modelGOHMM_nox()
+bw = BW_GOHMM(init)
+out = bw.learn(ts,'output_model.txt')
+
+#ts = [loadSet(s+'_test.txt') for s in sleep_stages]
+out = loadGOHMM("output_model.txt")
+print("Testing:")
+corr = evaluation(test_psg,out)
+
+print(string_correlation_matrix(corr))
 
 
-"""
-signals_ids  = [     20] #,     24,     30,    34,      44,     48,     67,     71] 
-signals_names = ["C3-M2"] #,"C4-M1","E1-M2","E2-M1","F3-M2","F4-M1","O1-M2","O2-M1"]
-psgs = list(range(1,51))
-#shuffle(psgs)
-training_psgs = [37]
-test_psgs     = [37]
-#test_psgs = psgs[25:30]
-running_times = []
-
-for signal_id, signal_name in zip(signals_ids, signals_names):
-	tr = write_set(training_psgs,signal_id)
-	rm = modelGOHMM_nox(NB_STATES,random_initial_state=True)
-	algo = BW_GOHMM(rm)
-	starting_time = datetime.now()
-	out = algo.learn(tr, output_file="model_"+signal_name+".txt")
-	running_times.append((datetime.now()-starting_time).total_seconds())
-	corr_matrix = evaluation(out, signal_id, test_psgs)
-	string  = signal_name+'\n'
-	string += string_correlation_matrix(corr_matrix)
-	f = open("report_"+signal_name+".txt",'w')
-	f.write(string)
-	f.close()
-	print(string)
-out.pprint()
-print("Average learning time",mean(running_times))
-"""

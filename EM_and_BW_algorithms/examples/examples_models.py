@@ -93,7 +93,7 @@ def modelGOHMM_random(nb_states,random_initial_state=False,min_mu=0.0,max_mu=2.0
 		init = 0
 	return GOHMM(states,init,"GOHMM_random_"+str(nb_states)+"_states")
 
-def modelGOHMM_nox(nb_states=5,random_initial_state=True,min_mu=-1.0,max_mu=1.0,min_std=0.05,max_std=1.0,self_loop_prob=0.8):
+def modelGOHMM_nox(nb_states=5,random_initial_state=True,min_mu=0.0,max_mu=1.0,min_std=0.05,max_std=1.0,self_loop_prob=0.8):
 	m = modelGOHMM_random(nb_states,random_initial_state,min_mu,max_mu,min_std,max_std)
 	for s in range(nb_states):
 		r = 1-m.states[s].transition_matrix[0][s]
