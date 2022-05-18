@@ -85,6 +85,7 @@ def bandpower(data, sf, band, window_sec=None, relative=False):
     plt.ylim([0, psd.max() * 1.1])
     plt.title("Welch's periodogram")
     plt.xlim([0, freqs.max()])
+    plt.show()
     return bp
 
 def splitInSequences(ll):
