@@ -78,7 +78,7 @@ class BW_GOHMM(BW):
 
 		new_states = []
 		for s in range(self.nb_states):
-			la = [ correct_proba([a[s][i]/den[s] for i in range(self.nb_states)]) , list(range(self.nb_states))]
+			la = [ [a[s][i]/den[s] for i in range(self.nb_states)] , list(range(self.nb_states))]
 			lb = [ mu[s]/den[s] , sqrt(va[s]/den[s])]
 			new_states.append(GOHMM_state(la,lb))
 
