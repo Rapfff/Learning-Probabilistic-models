@@ -1,144 +1,158 @@
-import os, sys
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
-from tools import resolveRandom
+from ..base.tools import resolveRandom, randomProbabilities
 from math import log
+from ..base.Model import Model, Model_state
+from .Scheduler import Scheduler
+from numpy.random import geometric
+from numpy import array, append, dot, zeros, vsplit
+from ast import literal_eval
 
-class MemorylessScheduler:
-	def __init__(self,actions):
-		self.actions = actions
+class MDP_state(Model_state):
+	"""
+	Class for a MDP state
+	"""
 
-	def get_action(self,current_state):
-		return self.actions[current_state]
-
-class FiniteMemoryScheduler:
-	def __init__(self,action_matrix,transition_matrix):
+	def __init__(self,transition_matrix: dict, idd : int) -> None:
 		"""
-		action_matrix = {scheduler_state: [[proba1,proba2,...],[action1,action2,...]],
-					     scheduler_state: [[proba1,proba2,...],[action1,action2,...]],
-					     ...}
-		transition_matrix = {obs1: [scheduler_state_dest_if_current_state_=_0,scheduler_state_dest_if_current_state_=_1,...]
-							 obs2: [scheduler_state_dest_if_current_state_=_0,scheduler_state_dest_if_current_state_=_1,...]
-							 ...}
-		"""	
-		self.s = 0
-		self.action_matrix = action_matrix
-		self.transition_matrix = transition_matrix
+		Creates a MDP state
 
-	def reset(self):
-		self.s = 0
+		Parameters
+		----------
+		transition_matrix : dict
+			transition_matrix = {action1 : [[proba_transition1,proba_transition2,...],[transition1_state,transition2_state,...],[transition1_obs,transition2_obs,...]],
+			action2 : [[proba_transition1,proba_transition2,...],[transition1_state,transition2_state,...],[transition1_obs,transition2_obs,...]]
+			...}
+		idd : int
+			State ID
+		"""
+		super().__init__(transition_matrix, idd)
 
-	def get_action(self):
-		"""return an action to execute by the agent"""
-		return self.action_matrix[self.s][1][resolveRandom(self.action_matrix[self.s][0])]
+	def next(self,action: str) -> list:
+		"""
+		Return a state-observation pair according to the distributions
+		described by transition_matrix and the given executed action.
 
-	def add_observation(self,obs):
-		"""give to the scheduler the new observation seen by the agent"""
-		if obs in self.transition_matrix:
-			self.s = self.transition_matrix[obs][self.s]
+		Parameters
+		----------
+		action: str
+			An action.
 
-	def get_actions(self,s=None):
-		"""return the actions (and their probability) that the agent can execute now"""
-		if s==None:
-			return self.action_matrix[self.s]
-		else:
-			return self.action_matrix[s]
+		Returns
+		-------
+		output : [int, str]
+			A state-observation pair.
+		"""
+		if not action in self.transition_matrix:
+			print("Error: action",action,"is not available in state",self.idd)
+			return False
+		c = resolveRandom(self.transition_matrix[action][0])
+		return [self.transition_matrix[action][1][c],self.transition_matrix[action][2][c]]
+	
+	def tau(self,action: str,state: int,obs: str) -> float:
+		"""
+		Returns the probability of generating, from this state and using
+		`action`, observation `obs` while moving to state `state`.
 
-	def get_sequence_states(self,seq_obs):
-		"""given a sequence of observations, return the sequence of states the scheduler goes through"""
-		self.reset()
-		res = [0]
-		for o in seq_obs:
-			self.add_observation(o)
-			res.append(self.s)
+		Parameters
+		----------
+		action: str
+			An action.
+		state : int
+			A state ID.
+		obs : str
+			An observation.
+
+		Returns
+		-------
+		output : float
+			A probability.
+		"""
+		if action not in self.actions():
+			return 0.0
+		for i in range(len(self.transition_matrix[action][0])):
+			if self.transition_matrix[action][1][i] == state and self.transition_matrix[action][2][i] == obs:
+				return self.transition_matrix[action][0][i]
+		return 0.0
+	
+	def observations(self) -> list:
+		"""
+		Return the list of all the observations that can be generated from this state.
+
+		Returns
+		-------
+		output : list of str
+			A list of observations.
+		"""
+		return list(set([self.transition_matrix[a][2] for a in self.actions()]))
+
+	def actions(self) -> list:
+		"""
+		Return the list of all the actions that can be executed in this state.
+
+		Returns
+		-------
+		output : list of str
+			A list of actions.
+		"""
+		return [i for i in self.transition_matrix]
+
+	def __str__(self) -> str:
+		res = "----STATE s"+str(self.id)+"----\n"
+		for action in self.transition_matrix:
+			for j in range(len(self.transition_matrix[action][0])):
+				if self.transition_matrix[action][0][j] > 0.0001:
+					res += "s"+str(self.id)+" - ("+action+") -> s"+str(self.transition_matrix[action][1][j])+" : "+self.transition_matrix[action][2][j]+' : '+str(self.transition_matrix[action][0][j])+'\n'
 		return res
 
-	def get_probability(self,action,state=None):
-		"""given a scheduler state and an action return the probability to execute this action in this state"""
-		if state == None:
-			state = self.s
-		if not action in self.action_matrix[state][1]:
-			return 0
-		return self.action_matrix[state][0][self.action_matrix[state][1].index(action)]
-
-
-class MDP_state:
-
-	def __init__(self,next_matrix):
-		"""
-		next_matrix = {action1 : [[proba_transition1,proba_transition2,...],[transition1_state,transition2_state,...],[transition1_obs,transition2_obs,...]],
-					   action2 : [[proba_transition1,proba_transition2,...],[transition1_state,transition2_state,...],[transition1_obs,transition2_obs,...]]
-					   ...}
-		"""
-		for action in next_matrix:
-			if round(sum(next_matrix[action][0]),2) < 1.0:
-				print("Sum of the probabilies of the next_matrix should be 1.0 here it's ",sum(next_matrix[action][0]))
-				return False
-		self.next_matrix = next_matrix
-
-	def next(self,action):
-		if not action in self.next_matrix:
-			print("ACTION",action,"is not available in state")
-		c = resolveRandom(self.next_matrix[action][0])
-		return [self.next_matrix[action][1][c],self.next_matrix[action][2][c]]
-
-	def actions(self):
-		return [i for i in self.next_matrix]
-
-	def g(self,action,state,obs):
-		if action not in self.actions():
-			#print("Not",action,"in",self.actions())
-			return 0.0
-		for i in range(len(self.next_matrix[action][0])):
-			if self.next_matrix[action][1][i] == state and self.next_matrix[action][2][i] == obs:
-				return self.next_matrix[action][0][i]
-		return 0.0
-
-	def __str__(self):
+	def save(self) -> str:
+		if len(self.transition_matrix) == 0: #end state
+			return "-\n"
 		res = ""
-		for action in self.next_matrix:
+		for action in self.transition_matrix:
 			res += str(action)
 			res += '\n'
-			for proba in self.next_matrix[action][0]:
+			for proba in self.transition_matrix[action][0]:
 				res += str(proba)+' '
 			res += '\n'
-			for state in self.next_matrix[action][1]:
+			for state in self.transition_matrix[action][1]:
 				res += str(state)+' '
 			res += '\n'
-			for obs in self.next_matrix[action][2]:
+			for obs in self.transition_matrix[action][2]:
 				res += str(obs)+' '
 			res += '\n'
 		res += "*\n"
 		return res
 
-class MDP:
+class MDP(Model):
+	"""
+	Class representing a MDP.
+	"""
+	def __init__(self,states: list,initial_state,name: str="unknown_MDP"):
+		"""
+		Create a MDP.
 
-	def __init__(self,states,initial_state,name="unknown MDP"):
-		self.initial_state = initial_state
-		self.states = states
-		self.name = name
+		Parameters
+		----------
+		states : list of MDP_states
+			List of states in this MDP.
+		initial_state : int or list of float
+			Determine which state is the initial one (then it's the id of the
+			state), or what are the probability to start in each state (then it's
+			a list of probabilities).
+		name : str, optional
+			Name of the model. Default is "unknow_MDP"
+		"""
+		super().__init__(states,initial_state,name)
 
-	def __str__(self):
-		return self.name
+	def actions(self) -> list:
+		"""
+		Returns all the actions for this model. Warning: some actions may be
+		unavailable in some states.
 
-	def save(self,file_path):
-		f = open(file_path,'w')
-		f.write(self.name)
-		f.write('\n')
-		f.write(str(self.initial_state))
-		f.write('\n')
-		for s in self.states:
-			f.write(str(s))
-		f.close()
-
-	def saveTerminal(self):
-		print(self.name)
-		print(str(self.initial_state))
-		for s in self.states:
-			print(str(s))
-
-	def actions(self):
+		Returns
+		-------
+		list of str
+			A list of actions.
+		"""
 		res = []
 		for s in self.states:
 			res += s.actions()
@@ -146,73 +160,142 @@ class MDP:
 		res.sort()
 		return res
 
-	def actions_state(self,s):
+	def actionsState(self,s:int) -> list:
+		"""
+		Return the list of all the actions that can be executed in state `s`.
+
+		Returns
+		-------
+		output : list of str
+			A list of actions.
+		"""
 		return self.states[s].actions()
 
-	def observations(self):
-		res = []
-		for s in self.states:
-			for act in s.actions():
-				res += s.next_matrix[act][2]
-		res = list(set(res))
-		res.sort()
-		return res
+	def tau(self,s1: int,action: str,s2: int,obs: str) -> float:
+		"""
+		Returns the probability of moving from state ``s1`` executing `action`
+		to ``s2`` generating observation ``obs``.
 
-	def pi(self,s):
-		if s == self.initial_state:
-			return 1.0
-		else:
-			return 0.0
-
-	def g(self,s1,action,s2,obs):
-		return self.states[s1].g(action,s2,obs)
+		Parameters
+		----------
+		s1: int
+			source state ID.
+		action: str
+			An action.
+		s2: int
+			destination state ID.
+		obs: str
+			generated observation.
+		
+		Returns
+		-------
+		float
+			A probability.
+		"""
+		return self.states[s1].tau(action,s2,obs)
 			
-	def run(self,number_steps,scheduler):
-		#output = [self.states[self.initial_state].observation]
+	def run(self,number_steps: int,scheduler: Scheduler) -> list:
+		"""
+		Simulates a run of length ``number_steps`` of the model under
+		``scheduler`` and returns the sequence of actions-observations generated.
+		
+		Parameters
+		----------
+		number_steps: int
+			length of the simulation.
+
+		Returns
+		-------
+		output: list of str
+			List of alterning state-observation.
+		"""
 		res = []
-		#actions = []
-		current = self.initial_state
+		current = resolveRandom(self.initial_state)
 		scheduler.reset()
-
 		current_len = 0
-
 		while current_len < number_steps:
-			action = scheduler.get_action()
-			#actions.append(action)
-			while action not in self.states[current].next_matrix:
-				action = scheduler.get_action()
+			action = scheduler.getAction()
 
+			while action not in self.states[current].transition_matrix:
+				action = scheduler.getAction()
+			
 			res.append(action)
 			next_state, observation = self.states[current].next(action)
-
-			#output.append(observation)
 			res.append(observation)
-			scheduler.add_observation(observation)
-
+			scheduler.addObservation(observation)
+			
 			current = next_state
 			current_len += 1
 		return res
 
-	def pprint(self):
-		for i in range(len(self.states)):
-			print("\n----STATE s",i,"----",sep='',end='')
-			if i == self.initial_state:
-				print("(initial_state)")
-			else:
-				print()
-			for action in self.states[i].next_matrix:
-				for j in range(len(self.states[i].next_matrix[action][0])):
-					if self.states[i].next_matrix[action][0][j] > 0.0001:
-						print("s",i," - (",action,") -> s",self.states[i].next_matrix[action][1][j]," : ",self.states[i].next_matrix[action][2][j],' : ',self.states[i].next_matrix[action][0][j],sep='')
-		print()
+	def generateSet(self, set_size: int, param, scheduler: Scheduler, distribution=None, min_size=None) -> list:
+		"""
+		Generates a set (training set / test set) containing `set_size` traces
+		generated under ``scheduler``.
 
-	#-------------------------------------------
-	def logLikelihood(self,sequences):
+		Parameters
+		----------
+		set_size: int
+			number of traces in the output set.
+		param: a list, an int or a float.
+			the parameter(s) for the distribution. See "distribution".
+		scheduler: Scheduler:
+			A scheduler used to generated all the traces.
+		distribution: str, optional
+			If ``distribution=='geo'`` then the sequence length will be
+			distributed by a geometric law such that the expected length is
+			``min_size+(1/param)``.
+			If distribution==None param can be an int, in this case all the
+			seq will have the same length (``param``), or ``param`` can be a
+			list of int.
+			Default is None.
+		min_size: int, optional
+			see "distribution". Default is None.
+		
+		Returns
+		-------
+		output: list
+			a set (training set / test set).
+		"""
+		seq = []
+		val = []
+		for i in range(set_size):
+			if distribution == 'geo':
+				curr_size = min_size + int(geometric(param))
+			else:
+				if type(param) == list:
+					curr_size = param[i]
+				elif type(param) == int:
+					curr_size = param
+
+			trace = self.run(curr_size, scheduler)
+
+			if not trace in seq:
+				seq.append(trace)
+				val.append(0)
+
+			val[seq.index(trace)] += 1
+
+		return [seq,val]
+
+	def logLikelihood(self,sequences: list) -> float:
+		"""
+		Compute the average loglikelihood of a set of sequences.
+
+		Parameters
+		----------
+		sequences: list containing one list of str and one list of int
+			set of sequences of actions-observations.
+		
+		Returns
+		-------
+		output: float
+			loglikelihood of ``sequences`` under this model.
+		"""
 		sequences_sorted = sequences[0][:]
 		sequences_sorted.sort()
 		loglikelihood = 0.0
-
-		alpha_matrix = self.initAlphaMatrix(int(len(sequences[0][0])/2))
+		alpha_matrix = self._initAlphaMatrix(len(sequences_sorted[0])//2)
 		for seq in range(len(sequences_sorted)):
 			sequence_actions = [sequences_sorted[seq][i] for i in range(0,len(sequences_sorted[seq]),2)]
 			sequence_obs = [sequences_sorted[seq][i+1] for i in range(0,len(sequences_sorted[seq]),2)]
@@ -220,99 +303,67 @@ class MDP:
 			times = sequences[1][sequences[0].index(sequence)]
 			common = 0
 			if seq > 0:
-				while sequences_sorted[seq-1][common] == sequence[common]:
+				while common < min(len(sequences_sorted[seq-1]),len(sequence)):
+					if sequences_sorted[seq-1][common] != sequence[common]:
+						break
 					common += 1
 			common = int(common/2)
-			alpha_matrix = self.computeAlphaMatrix(sequence_obs,sequence_actions,common,alpha_matrix)
-			if sum([alpha_matrix[s][-1] for s in range(len(self.states))]) <= 0.0:
-				print(sequences_sorted[seq])
-				return None
-			else:
-				loglikelihood += log(sum([alpha_matrix[s][-1] for s in range(len(self.states))]))
+			alpha_matrix = self._updateAlphaMatrix(sequence_obs,sequence_actions,common,alpha_matrix)
+			if alpha_matrix[-1].sum() > 0:
+				loglikelihood += log(alpha_matrix[-1].sum()) * times
 
 		return loglikelihood/sum(sequences[1])
+	
+	def _updateAlphaMatrix(self, sequence_obs: list,
+						   sequence_actions:list,
+						   common: int, alpha_matrix: list) -> array:
+		"""
+		Update the given alpha values for all the states for a new
+		`sequence_obs` of observations. It keeps the alpha values for the
+		``common`` first observations of the ``sequence``. The idea is the 
+		following: if you have already computed the alpha values for a previous
+		sequence and you want to compute the alpha values of a new sequence
+		that starts with the same ``common`` observations you don't need to
+		compute again the first ``common`` alpha values for each states. If,
+		on the other hand, you have still not computed any alpha values you can
+		simply set ``common`` to 0 and give an empty ``alpha_matrix`` which has
+		the right size. The method ``initAlphaMatrix`` can generate such matrix.
 
-	def computeAlphaMatrix(self,sequence_obs,sequence_actions,common,alpha_matrix):
+		Parameters
+		----------
+		sequence_obs: list of str
+			a sequence of observations.
+		sequence_actions: list of str
+			a sequence of actions.
+		common: int
+			for each state, the first ``common`` alpha values will be keept
+			unchanged.
+		alpha_matrix: 2-D narray of float
+			the ``alpha_matrix`` to update. Can be generated by the method
+			``initAlphaMatrix``.
+
+		Returns
+		-------
+		output: 2-D narray of float
+			the alpha matrix containing all the alpha values for all the states
+			for this sequence: ``alpha_matrix[s][t]`` is the probability of
+			being in state ``s`` after seing the ``t-1`` first observation of
+			``sequence``.
+		"""
+		nb_states = len(self.states)
+		diff_size = len(alpha_matrix)-1 - len(sequence_obs)
+		if diff_size < 0: # alpha_matrix too small
+			n = zeros(-diff_size * nb_states).reshape(-diff_size,nb_states)
+			alpha_matrix = append(alpha_matrix,n,axis=0)
+		elif diff_size > 0: #alpha_matrix too big
+			alpha_matrix = vsplit(alpha_matrix,[len(alpha_matrix)-diff_size,nb_states])[0]
 		for k in range(common,len(sequence_obs)):
-			action = sequence_actions[k]
-			for s in range(len(self.states)):
-				summ = 0.0
-				for ss in range(len(self.states)):
-					p = self.g(ss,action,s,sequence_obs[k])
-					summ += alpha_matrix[ss][k]*p
-				alpha_matrix[s][k+1] = summ
+			for s in range(nb_states):
+				p = array([self.tau(ss,sequence_actions[k],s,sequence_obs[k]) for ss in range(len(self.states))])
+				alpha_matrix[k+1,s] = dot(alpha_matrix[k],p)
 		return alpha_matrix
 
-	def initAlphaMatrix(self,len_seq):
-		alpha_matrix = []
-		for s in range(len(self.states)):
-			if s == self.initial_state:
-				alpha_matrix.append([1.0])
-			else:
-				alpha_matrix.append([0.0])
-			alpha_matrix[-1] += [None for i in range(len_seq)]
-		return alpha_matrix
-
-	def probasSequences(self,sequences):
-		#given sequences = [seq1,seq2...] /!\ all sequences should be pairwise different
-		#return probas   = [prob_seq1,prob_seq2,...]
-		sequences_sorted = sequences
-		sequences_sorted.sort()
-		alpha_matrix = self.initAlphaMatrix(int(len(sequences[0])/2))
-		probas = []
-		for seq in range(len(sequences_sorted)):
-			sequence_actions = [sequences_sorted[seq][i] for i in range(0,len(sequences_sorted[seq]),2)]
-			sequence_obs = [sequences_sorted[seq][i+1] for i in range(0,len(sequences_sorted[seq]),2)]
-			sequence = sequences_sorted[seq]
-			common = 0
-			if seq > 0:
-				while sequences_sorted[seq-1][common] == sequence[common]:
-					common += 1
-			common = int(common/2)
-			alpha_matrix = self.computeAlphaMatrix(sequence_obs,sequence_actions,common,alpha_matrix)
-			probas.append(sum([alpha_matrix[s][-1] for s in range(len(self.states))]))
-		return probas	
 	#-------------------------------------------
-
-	def saveToMathematica(self,output_file):
-		f = open(output_file,'w',encoding="utf-8")
-		f.write('L={"start","')
-		f.write('","'.join(self.observations()))
-		f.write('"};\n')
-		f.write('A={"')
-		f.write('","'.join(self.actions()))
-		f.write('"};\n')
-		f.write('S={')
-		f.write(','.join([str(i) for i in range(len(self.states))]))
-		f.write('};\n')
-		f.write('iota={ {"start",'+str(self.initial_state)+'} -> 1};\n')
-
-		f.write('tau={')
-		flag = False
-		for s1 in range(len(self.states)):
-			for a in self.actions():
-				if flag:
-					f.write(',')
-				flag = True
-				f.write('\n\t{"'+str(a)+'",'+str(s1)+'} -> { ')
-				if not a in self.actions_state(s1):
-					f.write('{"error",'+str(s1)+'} -> 1')
-					#add error with prob 0 for other states
-					#add 0 probtransition for all other obs
-				else:
-					ss = ""
-					for s2 in range(len(self.states)):
-						for o in self.observations():
-							ss += '{"'+str(o)+'",'+str(s2)+'} -> '+str(self.g(s1,a,s2,o))+', '
-							#f.write('{"'+str(o)+'",'+str(s2)+'} -> '+str(self.g(s1,a,s2,o))+', ')
-						#add error with 0 prob
-					ss = ss[:-2]
-					f.write(ss)
-				f.write('}')
-		f.write('\n};\n')
-
-		f.write("M = MDP[S,iota,tau];")
-		f.close()
 
 	def saveToPrism(self,output_file):
 		f = open(output_file,'w',encoding="utf-8")
@@ -325,7 +376,7 @@ class MDP:
 			state = self.states[s]
 			for a in state.actions():
 				f.write("\t["+a+"] s="+str(s)+" -> ")
-				f.write(" + ".join([str(state.next_matrix[a][0][t])+" : (s'="+str(state.next_matrix[a][1][t])+") & (l'="+str(self.observations().index(state.next_matrix[a][2][t]))+")" for t in range(len(state.next_matrix[a][0]))]))
+				f.write(" + ".join([str(state.transition_matrix[a][0][t])+" : (s'="+str(state.transition_matrix[a][1][t])+") & (l'="+str(self.observations().index(state.transition_matrix[a][2][t]))+")" for t in range(len(state.transition_matrix[a][0]))]))
 				f.write(";\n")
 		f.write("\n")
 		f.write("endmodule\n")
@@ -348,71 +399,14 @@ def KLDivergence(m1,m2,test_set):
 			res += (pm1[seq]/tot_m1)*log(pm1[seq]/pm2[seq])
 	return res
 
-def maxReachabilityScheduler(m,s):
-	#Return the memoryless scheduler that maximizes the probability to reach 
-	# state s in MDP m
-	observations = m.observations()
-	bad_states = [i for i in range(len(m.states))]
-	bad_states.remove(s)
-	good_states = [s]
-	f = True
-	while f:
-		f = False
-		for ss in bad_states:
-			next_ss = False
-			for o in observations:
-				for a in m.states[ss].actions():
-					for sss in good_states:
-						if m.states[ss].g(a,sss,o) > 0:
-							bad_states.remove(ss)
-							good_states.append(ss)
-							next_ss = True
-							f = True
-							break
-					if next_ss:
-						break
-				if next_ss:
-					break
-	old_x = [0 if i!=s else 1 for i in range(len(m.states))]
-	while True:
-		x = []
-		for ss in range(len(m.states)):
-			if ss == s:
-				x.append(1)
-			elif ss in bad_states:
-				x.append(0)
-			else:
-				t = [0.0 for i in range(len(m.states[ss].actions())) ]
-				for a_i in range(len(m.states[ss].actions())):
-					a = m.states[ss].actions()[a_i]
-					for o in observations:
-						for sss in good_states:
-							t[a_i] += m.states[ss].g(a,sss,o)*old_x[sss]
-				x.append(max(t))
-		if max([abs(x[i] - old_x[i]) for i in range(len(x))]) < 0.001:
-			break
-		else:
-			old_x = x
-
-	memoryless_sched = [] 
-	for ss in range(len(m.states)):
-		t = [0.0 for i in range(len(m.states[ss].actions())) ]
-		for a_i in range(len(m.states[ss].actions())):
-			a = m.states[ss].actions()[a_i]
-			for o in observations:
-				for sss in good_states:
-					t[a_i] += m.states[ss].g(a,sss,o)*old_x[sss]
-		memoryless_sched.append(m.states[ss].actions()[t.index(max(t))])
-
-	return MemorylessScheduler(memoryless_sched)
-
 def loadMDP(file_path):
 	f = open(file_path,'r')
 	name = f.readline()[:-1]
-	initial_state = int(f.readline()[:-1])
+	initial_state = literal_eval(f.readline()[:-1])
 	states = []
 	
 	l = f.readline()
+	c = 0
 	while l:
 		d = {}
 		while l != "*\n":
@@ -422,21 +416,27 @@ def loadMDP(file_path):
 			t = f.readline()[:-2].split(' ')
 			d[a] = [p,s,t]
 			l = f.readline()
-		states.append(MDP_state(d))
+		states.append(MDP_state(d,c))
+		c += 1
 		l = f.readline()
 	return MDP(states,initial_state,name)
 
-def MDPFileToMathematica(file_path,output_file):
-	m = loadMDP(file_path)
-	m.saveToMathematica(output_file)
+def modelMDP_random(nb_states,alphabet,actions):
+	s = []
+	for i in range(nb_states):
+		s += [i] * len(alphabet)
+	obs = alphabet*nb_states
+	states = []
+	for i in range(nb_states):
+		dic = {}
+		for act in actions:
+			dic[act] = [randomProbabilities(len(obs)),s,obs]
+		states.append(MDP_state(dic,i))
+	return MDP(states,0,"MDP_random_"+str(nb_states)+"_states")
 
 def MDPFileToPrism(file_path,output_file):
 	m = loadMDP(file_path)
 	m.saveToPrism(output_file)
-
-def prismToMathematica(file_path,output_file):
-	m = loadPrismMDP(file_path)
-	m.saveToMathematica(output_file)
 
 def loadPrismMDP(file_path):
 	f = open(file_path)
@@ -480,9 +480,7 @@ def loadPrismMDP(file_path):
 			states[state][a].append( [ map_s_o[states[state][a][1][i]] for i in range(len(states[state][a][1])) ] )
 
 
-	states = [MDP_state(i) for i in states]
+	states = [MDP_state(j,i) for i,j in enumerate(states)]
 
 	m = MDP(states,init,file_path[:-6])
-	#m.pprint()
-	#m.save(file_path[:-6]+".txt")
 	return m

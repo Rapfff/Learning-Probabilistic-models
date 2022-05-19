@@ -1,9 +1,5 @@
-import os, sys
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
-from models.MDP import *
-from tools import correct_proba
+from .MDP import *
+from ..base.tools import correct_proba
 from random import randint
 from multiprocessing import cpu_count, Pool
 from time import time

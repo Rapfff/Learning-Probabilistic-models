@@ -1,13 +1,8 @@
-import os, sys
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir1 = os.path.dirname(currentdir)
-parentdir  = os.path.dirname(parentdir1)
-sys.path.append(parentdir)
-from pyjaja.learning.BW_MDP import BW_MDP
-from pyjaja.models.MDP import MemorylessScheduler, loadMDP
-from pyjaja.tools import resolveRandom, mergeSets, saveSet
+
+from .BW_MDP import BW_MDP
+from .MDP import MemorylessScheduler, loadMDP
+from ..base.tools import resolveRandom, mergeSets, saveSet
 from multiprocessing import cpu_count, Pool
-from examples.examples_models import scheduler_uniform
 from random import random
 from datetime import datetime
 

@@ -126,11 +126,11 @@ class HMM_state(Model_state):
 	def __str__(self) -> str:
 		res = "----STATE s"+str(self.id)+"----\n"
 		for j in range(len(self.transition_matrix[0])):
-			if self.transition_matrix[0][j] > 0.000001:
+			if self.transition_matrix[0][j] > 0.0001:
 				res += "s"+str(self.id)+" -> s"+str(self.transition_matrix[1][j])+" : "+str(self.transition_matrix[0][j])+'\n'
 		res += "************\n"
 		for j in range(len(self.output_matrix[0])):
-			if self.output_matrix[0][j] > 0.000001:
+			if self.output_matrix[0][j] > 0.0001:
 				res += "s"+str(self.id)+" => "+str(self.output_matrix[1][j])+" : "+str(self.output_matrix[0][j])+'\n'
 		return res
 

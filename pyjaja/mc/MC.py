@@ -33,11 +33,12 @@ class MC_state(Model_state):
 
 	def tau(self,state: int, obs: str) -> float:
 		"""
-		Return the probability of generating, from this state, observation `obs` while moving to state `s`.
+		Return the probability of generating, from this state, observation
+		`obs` while moving to state `state`.
 
 		Parameters
 		----------
-		s : int
+		state : int
 			A state ID.
 		obs : str
 			An observation.
@@ -45,7 +46,7 @@ class MC_state(Model_state):
 		Returns
 		-------
 		output : float
-			The probability of generating, from this state, observation `obs` and moving to state `s`.
+			A probability.
 		"""
 		for i in range(len(self.transition_matrix[0])):
 			if self.transition_matrix[1][i] == state and self.transition_matrix[2][i] == obs:
@@ -66,7 +67,7 @@ class MC_state(Model_state):
 	def __str__(self) -> str:
 		res = "----STATE s"+str(self.id)+"----\n"
 		for j in range(len(self.transition_matrix[0])):
-			if self.transition_matrix[0][j] > 0.000001:
+			if self.transition_matrix[0][j] > 0.0001:
 				res += "s"+str(self.id)+" - ("+str(self.transition_matrix[2][j])+") -> s"+str(self.transition_matrix[1][j])+" : "+str(self.transition_matrix[0][j])+'\n'
 		return res
 
@@ -89,21 +90,24 @@ class MC_state(Model_state):
 
 class MC(Model):
 	"""
-	Create an MC.
-
-	Parameters
-	----------
-	states : list of MC_states
-		List of states in this MC.
-	initial_state : int or list of float
-		Determine which state is the initial one (then it's the id of the
-		state), or what are the probability to start in each state (then it's
-		a list of probabilities).
-	name : str, optional
-		Name of the model.
-		Default is "unknow_MC"
-	"""
+	Class representing a MC.
+	"""	
 	def __init__(self,states: list, initial_state: int ,name: str ="unknown_MC") -> None:
+		"""
+		Creates an MC.
+
+		Parameters
+		----------
+		states : list of MC_states
+			List of states in this MC.
+		initial_state : int or list of float
+			Determine which state is the initial one (then it's the id of the
+			state), or what are the probability to start in each state (then it's
+			a list of probabilities).
+		name : str, optional
+			Name of the model.
+			Default is "unknow_MC"
+		"""
 		super().__init__(states,initial_state,name)
 
 

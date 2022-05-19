@@ -61,5 +61,25 @@ def test_GOHMM():
 	print(m3.logLikelihood(s))
 	print(model.logLikelihood(s))
 
-test_GOHMM()
+def test_MDP():
+	def modelMDP_bigstreet(p=0.75):
+		m_s_rr = ja.MDP_state({'m': [[p,1-p],[1,2],['L','R']], 's': [[p,1-p],[2,0],['L','R']]},0)
+		m_s_ll = ja.MDP_state({'m': [[p,1-p],[0,2],['R','L']], 's': [[p,1-p],[2,1],['R','L']]},1)
+		m_s_di = ja.MDP_state({'m': [[1.0],[3],['HIT']],       's': [[1.0],[4],['OK']]},2)
+		m_s_de = ja.MDP_state({'m': [[1.0],[3],['HIT']],       's': [[1.0],[3],['HIT']]},3)
+		m_s_vi = ja.MDP_state({'m': [[1.0],[4],['OK']],        's': [[1.0],[4],['OK']]},4)
+		return ja.MDP([m_s_rr,m_s_ll,m_s_di,m_s_de,m_s_vi],[0.5,0.5,0.0,0.0,0.0],"bigstreet")
+	print("\nMDP")
+	model = modelMDP_bigstreet()
+	model.save("test_save.txt")
+	model = ja.loadMDP("test_save.txt")
+	print(model)
+	scheduler = ja.UniformScheduler(model.actions())
+	s = model.generateSet(100,10,scheduler)
+	#m1 = ja.BW_MDP().fit(s,nb_states=6)
+	#print(m1.logLikelihood(s))
+	print(model.logLikelihood(s))
+
+
+test_MDP()
 remove("test_save.txt")
