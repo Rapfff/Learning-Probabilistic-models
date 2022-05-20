@@ -1,173 +1,190 @@
 from .MDP import *
-from ..base.tools import correct_proba
-from random import randint
-from multiprocessing import cpu_count, Pool
-from time import time
-import datetime
+from ..base.BW import *
+from ..base.tools import correct_proba, getActionsObservationsFromSequences
+from numpy import array, dot, append, zeros, ones, log
 
 NB_PROCESS = 11
 
-class Estimation_algorithm_MDP:
-	def __init__(self,h,alphabet,actions):
+class BW_MDP(BW):
+	"""
+	Class for general Passive Baum-Welch algorithm on MDP.
+	"""
+	
+	def __init__(self):
+		super().__init__()
+	
+	def fit(self, traces: list, initial_model: MDP=None, nb_states: int=None,
+			random_initial_state: bool=False, output_file: str=None,
+			epsilon: float=0.01, pp: str=''):
 		"""
-		h is a MDP
-		alphabet is a list of the possible observations (list of strings)
+		Fits the model according to ``traces``.
+
+		Parameters
+		----------
+		traces : list
+			training set.
+		initial_model : MDP, optional.
+			first hypothesis. If not set it will create a random MDP with
+			``nb_states`` states. Should be set if ``nb_states`` is not set.
+		nb_states: int
+			If ``initial_model`` is not set it will create a random MDP with
+			``nb_states`` states. Should be set if ``initial_model`` is not set.
+			Default is None.
+		random_initial_state: bool
+			If ``initial_model`` is not set it will create a random MDP with
+			random initial state according to this sequence of probabilities.
+			Should be set if ``initial_model`` is not set.
+			Default is False.
+		output_file : str, optional
+			if set path file of the output model. Otherwise the output model
+			will not be saved into a text file.
+		epsilon : float, optional
+			the learning process stops when the difference between the
+			loglikelihood of the training set under the two last hypothesis is
+			lower than ``epsilon``. The lower this value the better the output,
+			but the longer the running time. By default 0.01.
+		pp : str, optional
+			Will be printed at each iteration. By default ''
+
+		Returns
+		-------
+		MDP
+			fitted MDP.
 		"""
-		self.h = h
-		self.hhat = h
-		self.alphabet = alphabet
+		if not initial_model:
+			if not nb_states:
+				print("Either nb_states or initial_model should be set")
+				return
+			actions, observations = getActionsObservationsFromSequences(traces)
+			initial_model = MDP_random(nb_states,observations,actions,random_initial_state)
+		self.alphabet = observations
 		self.actions = actions
-		self.nb_states = len(self.h.states)
+		return super().fit(traces, initial_model, output_file, epsilon, pp)
 
-	def h_g(self,s1,act,s2,obs):
-		return self.h.g(s1,act,s2,obs)
+	def h_tau(self,s1: int,act: str,s2: int,obs: str) -> float:
+		"""
+		Returns the probability of moving from state ``s1`` executing `action`
+		to ``s2`` generating observation ``obs``.
 
-	def hhat_g(self,s1,act,s2,obs):
-		return self.hhat.g(s1,act,s2,obs)
-
-	def computeAlphas(self,sequence,sequence_actions):
-		"""Here we compute all the values alpha(k,t) for a given sequence"""
-		alpha_matrix = []
-		for i in range(self.nb_states):
-			if i == self.h.initial_state:
-				alpha_matrix.append([1.0])
-			else:
-				alpha_matrix.append([0.0])
-
-		for k in range(0,len(sequence)):
-			action = sequence_actions[k]
-			for s in range(self.nb_states):
-				summ = 0.0
-				for ss in range(self.nb_states):
-					p = self.h_g(ss,action,s,sequence[k])
-					summ += alpha_matrix[ss][k]*p
-				alpha_matrix[s].append(summ)
-
-		return alpha_matrix
-
-	def computeBetas(self,sequence,sequence_actions):
-		"""Here we compute all the values beta(t,k) for a given sequence"""
-		beta_matrix = []
-		for s in range(self.nb_states):
-			beta_matrix.append([1.0])
+		Parameters
+		----------
+		s1: int
+			source state ID.
+		action: str
+			An action.
+		s2: int
+			destination state ID.
+		obs: str
+			generated observation.
 		
-		for k in range(len(sequence)-1,-1,-1):
-			action = sequence_actions[k]
+		Returns
+		-------
+		float
+			A probability.
+		"""
+		return self.h.tau(s1,act,s2,obs)
+
+	def computeAlphas(self,sequence: list, sequence_actions: list) -> array:
+		"""
+		Compute the alpha values for ``sequence`` under the current BW
+		hypothesis.
+
+		Parameters
+		----------
+		sequence : list of str
+			sequence of observations.
+		sequence_actions : list of str
+			sequence of actions.
+
+		Returns
+		-------
+		2-D narray
+			array containing the alpha values.
+		"""
+		len_seq = len(sequence)
+		init_arr = array(self.h.initial_state)
+		zero_arr = zeros(shape=(len_seq*self.nb_states,))
+		alpha_matrix = append(init_arr,zero_arr).reshape(len_seq+1,self.nb_states)
+		for k in range(len_seq):
 			for s in range(self.nb_states):
-				summ = 0.0
-				for ss in range(self.nb_states):
-					p = self.h_g(s,action,ss,sequence[k])
-					summ += beta_matrix[ss][1 if ss<s else 0]*p
-				beta_matrix[s].insert(0,summ)
+				p = array([self.h_tau(ss,sequence_actions[k],s,sequence[k]) for ss in range(self.nb_states)])
+				alpha_matrix[k+1,s] = dot(alpha_matrix[k],p)
+		return alpha_matrix.T
 
-		return beta_matrix
+	def computeBetas(self,sequence: list,sequence_actions: list) -> array:
+		"""
+		Compute the beta values for ``sequence`` under the current BW
+		hypothesis.
 
-	def processWork(self,sequence,times):
+		Parameters
+		----------
+		sequence : list of str
+			sequence of observations.
+		sequence_actions : list of str
+			sequence of actions.
+
+		Returns
+		-------
+		2-D narray
+			array containing the beta values.
+		"""
+		len_seq = len(sequence)
+		init_arr = ones(self.nb_states)
+		zero_arr = zeros(shape=(len_seq*self.nb_states,))
+		beta_matrix = append(zero_arr,init_arr).reshape(len_seq+1,self.nb_states)
+		for k in range(len(sequence)-1,-1,-1):
+			for s in range(self.nb_states):
+				p = array([self.h_tau(s,sequence_actions[k],ss,sequence[k]) for ss in range(self.nb_states)])
+				beta_matrix[k,s] = dot(beta_matrix[k+1],p)
+		return beta_matrix.T
+
+	def _processWork(self,sequence,times):
 		sequence_actions = [sequence[i] for i in range(0,len(sequence),2)]
 		sequence_obs = [sequence[i+1] for i in range(0,len(sequence),2)]
-		
 		alpha_matrix = self.computeAlphas(sequence_obs,sequence_actions)
 		beta_matrix = self.computeBetas(sequence_obs,sequence_actions)
-		
-		proba_seq = beta_matrix[self.h.initial_state][0]
+		proba_seq = alpha_matrix.T[-1].sum()
 		if proba_seq != 0.0:
-			####################
-			den = []
+			den = zeros(shape=(self.nb_states,len(self.actions)))
+			num = zeros(shape=(self.nb_states,len(self.actions),self.nb_states*len(self.alphabet)))	
 			for s in range(self.nb_states):
-				den.append({})
-				for a in self.actions:
-					den[-1][a] = 0.0
-				for t in range(len(sequence_actions)):
-					den[-1][sequence_actions[t]] += alpha_matrix[s][t]*beta_matrix[s][t]*times/proba_seq
-			####################
-			num = []
-			for s in range(self.nb_states):
-				num.append({})
-				for a in self.actions:
-					num[-1][a] =  [0.0 for i in range(self.nb_states*len(self.observations))]
-				for t in range(len(sequence_obs)):
-					action = sequence_actions[t]
-					observation = sequence_obs[t]
-					
-					for ss in range(self.nb_states):
-						p = 0.0
-						for i in range(len(self.h.states[s].next_matrix[action][0])):
-							if self.h.states[s].next_matrix[action][1][i] == ss and self.h.states[s].next_matrix[action][2][i] == observation:
-								p = self.h.states[s].next_matrix[action][0][i]
-								break
-						if p != 0.0:
-							num[-1][action][ss*len(self.observations)+self.observations.index(observation)] += alpha_matrix[s][t]*p*beta_matrix[ss][t+1]*times/proba_seq
-			####################
-			return [den,num, proba_seq,times]
+				for i,a in enumerate(self.actions):
+					arr_dirak = [1.0 if t == a else 0.0 for t in sequence_actions]
+					den[s,i] += dot(alpha_matrix[s][:-1]*beta_matrix[s][:-1]*arr_dirak,times/proba_seq).sum()
+				c = 0
+				for ss in range(self.nb_states):
+					p = array([self.h_tau(s,a,ss,o) for o,a in zip(sequence_obs,sequence_actions)])
+					for obs in self.alphabet:
+						for ia,act in enumerate(self.actions):
+							arr_dirak = [1.0 if o == obs and a == act else 0.0 for o,a in zip(sequence_obs,sequence_actions)]
+							num[s,ia,c] = dot(alpha_matrix[s][:-1]*arr_dirak*beta_matrix[ss][1:]*p,times/proba_seq).sum()
+						c += 1
+			num_init = alpha_matrix.T[0]*beta_matrix.T[0]*times/proba_seq
+			return [den,num, proba_seq,times,num_init]
 		return False
 
+	def _generateHhat(self,temp):
+		den = array([i[0] for i in temp]).sum(axis=0)
+		num = array([i[1] for i in temp]).T.sum(axis=3).T
+		lst_proba=array([i[2] for i in temp])
+		lst_times=array([i[3] for i in temp])
+		lst_init =array([i[4] for i in temp]).T
 
-	def learn(self,traces,output_file="output_model.txt",epsilon=0.01,pp=''):
-		"""
-		Given a set of sequences of pairs action-observation,
-		it adapts the parameters of h in order to maximize the probability to get 
-		these sequences of observations.
-		traces = [[trace1,trace2,...],[number_of_trace1,number_of_trace2,...]]
-		trace = [action,obs1,action2,obs2,...,actionx,obsx]
-		"""
+		currentloglikelihood = dot(log(lst_proba),lst_times)
+
+		list_sta = []
+		for i in range(self.nb_states):
+			for _ in self.alphabet:
+				list_sta.append(i)
+		list_obs = self.alphabet*self.nb_states
+		new_states = []
+
+		for s in range(self.nb_states):
+			dic = {}
+			for j,a in enumerate(self.actions):
+				dic[a] = [ [num[s][j][i]/den[s][j] for i in range(len(list_sta))] , list_sta, list_obs ]
+			new_states.append(MDP_state(dic,s))
+		initial_state = correct_proba([lst_init[s].sum()/lst_init.sum() for s in range(self.nb_states)])
 		
-		self.observations = []
-		for seq in traces[0]:
-			for i in range(1,len(seq),2):
-				if not seq[i] in self.observations:
-					self.observations.append(seq[i])
-
-		counter = 0
-		prevloglikelihood = 10
-		while True:
-			#print(datetime.datetime.now(),pp,counter, prevloglikelihood)
-			den = []
-			for s in range(self.nb_states):
-				den.append({})
-				for a in self.actions:
-					den[-1][a] = 0
-			tau = []
-			for s in range(self.nb_states):
-				tau.append({})
-				for a in self.actions:
-					tau[-1][a] = [0 for i in range(self.nb_states*len(self.observations))]
-			
-			p = Pool(processes = NB_PROCESS)
-			tasks = []
-			
-			for seq in range(len(traces[0])):
-				tasks.append(p.apply_async(self.processWork, [traces[0][seq], traces[1][seq],]))
-			
-			temp = [res.get() for res in tasks if res.get() != False]
-			currentloglikelihood = sum([log(i[2])*i[3] for i in temp])
-
-			for s in range(self.nb_states):
-				for a in self.actions:
-					den[s][a] = sum([i[0][s][a] for i in temp])
-					
-					for x in range(self.nb_states*len(self.observations)):
-						tau[s][a][x] = sum([i[1][s][a][x] for i in temp])
-
-			list_sta = []
-			for i in range(self.nb_states):
-				for o in self.observations:
-					list_sta.append(i)
-			list_obs = self.observations*self.nb_states
-			new_states = []
-			for s in range(self.nb_states):
-				dic = {}
-				for a in self.actions:
-					dic[a] = [ correct_proba([tau[s][a][i]/den[s][a] for i in range(len(list_sta))]) , list_sta, list_obs ]
-				new_states.append(MDP_state(dic))
-
-			self.hhat = MDP(new_states,self.h.initial_state)
-			
-			counter += 1
-			if abs(prevloglikelihood - currentloglikelihood) < epsilon:
-				break
-			else:
-				prevloglikelihood = currentloglikelihood
-				self.h = self.hhat
-
-		self.h.save(output_file)
-		return self.h
+		return [MDP(new_states,initial_state), currentloglikelihood]
+		

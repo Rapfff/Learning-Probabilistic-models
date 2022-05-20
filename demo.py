@@ -75,9 +75,10 @@ def test_MDP():
 	model = ja.loadMDP("test_save.txt")
 	print(model)
 	scheduler = ja.UniformScheduler(model.actions())
-	s = model.generateSet(100,10,scheduler)
-	#m1 = ja.BW_MDP().fit(s,nb_states=6)
-	#print(m1.logLikelihood(s))
+	s = model.generateSet(500,10,scheduler)
+	m1 = ja.BW_MDP().fit(s,nb_states=5,random_initial_state=True)
+	print(m1)
+	print(m1.logLikelihood(s))
 	print(model.logLikelihood(s))
 
 

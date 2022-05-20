@@ -10,7 +10,7 @@ class BW_MC(BW):
 	def __init__(self):
 		super().__init__()
 	
-	def fit(self, traces: list, initial_model: bool=None, nb_states: int=None,
+	def fit(self, traces: list, initial_model: MC=None, nb_states: int=None,
 			random_initial_state: bool=False, output_file: str=None,
 			epsilon: float=0.01, pp: str=''):
 		"""
@@ -61,9 +61,7 @@ class BW_MC(BW):
 		beta_matrix = self.computeBetas(sequence)
 		proba_seq = alpha_matrix.T[-1].sum()
 		if proba_seq != 0.0:
-			####################
 			den = zeros(self.nb_states)
-			####################
 			num = zeros(shape=(self.nb_states,self.nb_states*len(self.alphabet)))
 			for s in range(self.nb_states):
 				den[s] = dot(alpha_matrix[s][:-1]*beta_matrix[s][:-1],times/proba_seq).sum()
@@ -81,7 +79,7 @@ class BW_MC(BW):
 		return False
 
 	def _generateHhat(self,temp):
-		den = zeros(shape=(self.nb_states,))
+		den = zeros(self.nb_states)
 		tau = zeros(shape=(self.nb_states,self.nb_states*len(self.alphabet)))
 		lst_den = array([i[0] for i in temp]).T
 		lst_num = array([i[1] for i in temp]).T.reshape(self.nb_states*self.nb_states*len(self.alphabet),len(temp))

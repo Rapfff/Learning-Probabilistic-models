@@ -421,7 +421,26 @@ def loadMDP(file_path):
 		l = f.readline()
 	return MDP(states,initial_state,name)
 
-def modelMDP_random(nb_states,alphabet,actions):
+def MDP_random(nb_states: int,alphabet: list,actions: list,random_initial_state: bool = False) -> MDP:
+	"""
+	Generate a random MDP.
+
+	Parameters
+	----------
+	number_states : int
+		Number of states.
+	alphabet : list of str
+		List of observations.
+	actions : list of str
+		List of actions.	
+	random_initial_state: bool, optional
+		If set to True we will start in each state with a random probability, otherwise we will always start in state 0.
+		Default is False.
+	
+	Returns
+	-------
+	A pseudo-randomly generated MDP.
+	"""
 	s = []
 	for i in range(nb_states):
 		s += [i] * len(alphabet)
@@ -432,7 +451,11 @@ def modelMDP_random(nb_states,alphabet,actions):
 		for act in actions:
 			dic[act] = [randomProbabilities(len(obs)),s,obs]
 		states.append(MDP_state(dic,i))
-	return MDP(states,0,"MDP_random_"+str(nb_states)+"_states")
+	if random_initial_state:
+		init = randomProbabilities(nb_states)
+	else:
+		init = 0
+	return MDP(states,init,"MDP_random_"+str(nb_states)+"_states")
 
 def MDPFileToPrism(file_path,output_file):
 	m = loadMDP(file_path)

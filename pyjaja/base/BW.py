@@ -1,6 +1,6 @@
 from sys import platform
 from multiprocessing import cpu_count, Pool
-from numpy import array, dot, append, zeros
+from numpy import array, dot, append, zeros, ones
 from datetime import datetime
 
 NB_PROCESS = cpu_count()-1
@@ -58,7 +58,7 @@ class BW:
 				alpha_matrix[k+1,s] = dot(alpha_matrix[k],p)
 		return alpha_matrix.T
 
-	def computeBetas(self,sequence):
+	def computeBetas(self,sequence: list) -> array:
 		"""
 		Compute the beta values for ``sequence`` under the current BW
 		hypothesis.
@@ -74,7 +74,7 @@ class BW:
 			array containing the beta values.
 		"""
 		len_seq = len(sequence)
-		init_arr = array([1.0]*self.nb_states)
+		init_arr = ones(self.nb_states)
 		zero_arr = zeros(shape=(len_seq*self.nb_states,))
 		beta_matrix = append(zero_arr,init_arr).reshape(len_seq+1,self.nb_states)
 		for k in range(len(sequence)-1,-1,-1):

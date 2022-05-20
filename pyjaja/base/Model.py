@@ -84,9 +84,9 @@ class Model:
 			self.initial_state = [0.0 for i in range(len(states))]
 			self.initial_state[initial_state] = 1.0
 		else:
-			if sum(initial_state) != 1.0:
-				print("Error: the sum of initial_state should be 1.0")
-				return False
+			# if sum(initial_state) != 1.0:
+			# 	print("Error: the sum of initial_state should be 1.0, here it's",sum(initial_state))
+			# 	return False
 			self.initial_state = initial_state
 		self.states = states
 		self.name = name
@@ -243,7 +243,7 @@ class Model:
 		else:
 			res += "Initial state: "
 			for i in range(len(self.states)):
-				if self.initial_state[i] != 0.0:
+				if self.initial_state[i] >= 0.001:
 					res += 's'+str(i)+': '+str(round(self.initial_state[i],3))+', '
 			res = res[:-2]+'\n'
 		for i in range(len(self.states)):
