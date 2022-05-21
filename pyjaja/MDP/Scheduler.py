@@ -111,7 +111,8 @@ class FiniteMemoryScheduler:
 
 	def reset(self) -> None:
 		"""
-		Reset the model to its initial state
+		Reset the model to its initial state. Should be done before generating
+		a new trace.
 		"""
 		self.s = 0
 

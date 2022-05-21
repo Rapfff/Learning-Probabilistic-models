@@ -71,16 +71,13 @@ def test_MDP():
 		return ja.MDP([m_s_rr,m_s_ll,m_s_di,m_s_de,m_s_vi],[0.5,0.5,0.0,0.0,0.0],"bigstreet")
 	print("\nMDP")
 	model = modelMDP_bigstreet()
-	model.save("test_save.txt")
-	model = ja.loadMDP("test_save.txt")
 	print(model)
 	scheduler = ja.UniformScheduler(model.actions())
-	s = model.generateSet(500,10,scheduler)
-	m1 = ja.BW_MDP().fit(s,nb_states=5,random_initial_state=True)
+	s = model.generateSet(100,10,scheduler)
+	m1 = ja.Active_BW_MDP().fit(s,0,40,10,nb_states=5,random_initial_state=True)
 	print(m1)
 	print(m1.logLikelihood(s))
 	print(model.logLikelihood(s))
 
 
 test_MDP()
-remove("test_save.txt")

@@ -128,7 +128,6 @@ class BW:
 			fitted model.
 		"""
 		self.h = initial_model
-		self.hhat = initial_model
 		self.nb_states = len(self.h.states)
 
 		counter = 0

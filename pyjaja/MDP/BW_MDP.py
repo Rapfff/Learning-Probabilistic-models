@@ -57,6 +57,9 @@ class BW_MDP(BW):
 				return
 			actions, observations = getActionsObservationsFromSequences(traces)
 			initial_model = MDP_random(nb_states,observations,actions,random_initial_state)
+		else:
+			observations = initial_model.observations()
+			actions = initial_model.actions()
 		self.alphabet = observations
 		self.actions = actions
 		return super().fit(traces, initial_model, output_file, epsilon, pp)

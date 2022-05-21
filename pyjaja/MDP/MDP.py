@@ -82,7 +82,10 @@ class MDP_state(Model_state):
 		output : list of str
 			A list of observations.
 		"""
-		return list(set([self.transition_matrix[a][2] for a in self.actions()]))
+		obs = []
+		for a in self.actions():
+			obs += [o for o in self.transition_matrix[a][2]]
+		return list(set(obs))
 
 	def actions(self) -> list:
 		"""
