@@ -402,7 +402,20 @@ def KLDivergence(m1,m2,test_set):
 			res += (pm1[seq]/tot_m1)*log(pm1[seq]/pm2[seq])
 	return res
 
-def loadMDP(file_path):
+def loadMDP(file_path: str) -> MDP:
+	"""
+	Load an MDP saved into a text file.
+
+	Parameters
+	----------
+	file_path : str
+		Location of the text file.
+	
+	Returns
+	-------
+	output : MDP
+		The MDP saved in `file_path`.
+	"""
 	f = open(file_path,'r')
 	name = f.readline()[:-1]
 	initial_state = literal_eval(f.readline()[:-1])

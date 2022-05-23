@@ -6,18 +6,21 @@ from math import sqrt, exp, pi
 from random import uniform
 class GOHMM_state(Model_state):
 	"""
-	Creates a GOHMM_state
-
-	Parameters
-	----------
-	output_parameters : [mu,sigma]
-	next_matrix : [ list of float, list of int]
-		`[[proba_state1,proba_state2,...],[state1,state2,...]]`. `next_matrix[0][x]` is the probability to move to state `next_matrix[1][x]`.
-	idd : int
-		State ID.
+	Class for a GOHMM state
 	"""
-
 	def __init__(self,next_matrix: list,output_parameters: list,idd: int):
+		"""
+		Creates a GOHMM_state
+
+		Parameters
+		----------
+		output_parameters : list of two floats.
+			Parameters of the gaussian distribution in this states: [mu,sigma].
+		next_matrix : [ list of float, list of int]
+			`[[proba_state1,proba_state2,...],[state1,state2,...]]`. `next_matrix[0][x]` is the probability to move to state `next_matrix[1][x]`.
+		idd : int
+			State ID.
+		"""
 		super().__init__(next_matrix,idd)
 		self.output_parameters = output_parameters
 

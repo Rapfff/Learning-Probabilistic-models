@@ -160,7 +160,8 @@ class Model:
 
 	def run(self,number_steps: int) -> list:
 		"""
-		Simulates a run of length ``number_steps`` of the model and return the sequence of observations generated.
+		Simulates a run of length ``number_steps`` of the model and return the
+		sequence of observations generated.
 		
 		Parameters
 		----------
