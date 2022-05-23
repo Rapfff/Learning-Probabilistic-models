@@ -4,6 +4,8 @@ from ..base.tools import correct_proba, getAlphabetFromSequences
 class Alergia:
 	"""
 	class for general ALERGIA algorithm on MC.
+	This algorithm is described here:
+	https://grfia.dlsi.ua.es/repositori/grfia/pubs/57/icgi1994.pdf
 	"""
 
 	def __init__(self):

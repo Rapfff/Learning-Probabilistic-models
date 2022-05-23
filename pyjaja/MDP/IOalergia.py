@@ -1,27 +1,63 @@
-import os, sys
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
-from models.MDP import *
+from .MDP import *
 from math import sqrt, log
+from ..base.tools import getActionsObservationsFromSequences
 
+class IOFPTA_state:
+	"""
+	Class for a IOFPTA state
+	"""
+	def __init__(self, obs: str, c: int, lbl: list) -> None:
+		"""
+		Creates a IOFTPA state. 
 
-class IOFTPA_state:
-
-	def __init__(self, obs, c, lbl):
+		Parameters
+		----------
+		obs : str
+			The observation associated to this state.
+		c : int
+			A counter corresponding to the number of times we went through this
+			state.
+		lbl : list
+			A list of alternating action-observation.
+			The prefix associated to this state.
+		"""
 		self.observation = obs
 		self.counter = c
 		self.label = lbl
 		self.id = -1
 		self.transitions = {}
 
-	def counter_add(self,n):
+	def counterAdd(self,n:int) -> None:
+		"""
+		In creases the counter by ``n``
+
+		Parameters
+		----------
+		n : int
+			An integer 
+		"""
 		self.counter += n
 
-	def set_id(self,i):
+	def setId(self,i:int) -> None:
+		"""
+		Set the ID of this state to ``i``.
+
+		Parameters
+		----------
+		i : int
+			A new state ID.
+		"""
 		self.id = i
 
-	def successors(self):
+	def successors(self) -> list:
+		"""
+		Returns the list of all states that can be reached from this state.
+
+		Returns
+		-------
+		list
+			List of state IDs.
+		"""
 		res = []
 		for a in self.transitions:
 			for s in self.transitions[a][1]:
@@ -30,133 +66,309 @@ class IOFTPA_state:
 		res.sort()
 		return res
 
-	def successors_action(self,action):
-		if not self.action_allowed(action):
+	def successorsAction(self,action: str) -> list:
+		"""
+		Returns the list of all states that can be reached from this state
+		executing ``action``.
+
+		Returns
+		-------
+		list
+			List of state IDs.
+		"""
+		if not self.actionAllowed(action):
 			return []
 		return self.transitions[action][1]
 
 
-	def transitions_add(self,action,prob,state):
-		if not self.action_allowed(action):
-			self.transitions[action] = [[prob],[state]]
+	def transitionsAdd(self, action: str, prob: float, state: int) -> None:
+		"""
+		Add a transition leaving this state.
+
+		Parameters
+		----------
+		action : str
+			An action.
+		prob : float
+			A probability.
+		state : int
+			A state ID (the destination state).
+		"""
+		if not self.actionAllowed(action):
+			self.transitions[action] = [[prob], [state]]
 		else:
 			self.transitions[action][0].append(prob)
 			self.transitions[action][1].append(state)
 
-	def transition_change(self,action,old_state,new_state):
+	def transitionChange(self, action: str, old_state: int, new_state: int) -> None:
+		"""
+		Change the destination state of a given transition.
+
+		Parameters
+		----------
+		action : str
+			An action.
+		old_state : int
+			A state ID (the previous destination).
+		new_state : int
+			A state ID (the new destination).
+		"""
 		self.transitions[action][1][self.transitions[action][1].index(old_state)] = new_state
 
-	def transition_prob_add(self,action,state,x):
-		self.transitions[action][0][self.transitions[action][1].index(state)] += x
+	def getTransitionProb(self,action: str,s2: int) -> float:
+		"""
+		Returns the probability that we reach ``s2`` from this state executing
+		``action``.
 
-	def get_transition_prob(self,action,s2):
+		Parameters
+		----------
+		action : str
+			An action.
+		s2 : int
+			A state ID.
+
+		Returns
+		-------
+		float
+			A probability.
+		"""
 		return self.transitions[action][0][self.transitions[action][1].index(s2)]
 
-	def action_allowed(self,act):
+	def actionAllowed(self,act: str) -> bool:
+		"""
+		Checks if action ``act`` can be executed in this state.
+
+		Parameters
+		----------
+		act : str
+			An action.
+
+		Returns
+		-------
+		bool
+			True if action ``act`` can be executed in this state.
+		"""
 		return act in self.transitions
 
-	def actions_allowed(self):
+	def actionsAllowed(self) -> list:
+		"""
+		Returns the list of all actions that can be executed in this state.
+
+		Returns
+		-------
+		list
+			A list of actions.
+		"""
 		return [a for a in self.transitions]
 
-	def pprint(self):
-		print(self.label,self.transitions,sep="\t")
+	def __str__(self) -> str:
+		return self.label+'\t'+self.transitions
 
 
 
-class IOFTPA:
+class IOFPTA:
+	"""
+	Class for a Input and Output Frequency Prefix Tree Acceptor.
+	"""
+	def __init__(self,states: list, o: list, a: list) -> None:
+		"""
+		Creates a IOFPTA
 
-	def __init__(self,states,o,a):
+		Parameters
+		----------
+		states : list of IOFPTA_states
+			A list of all the states in this IOFPTA
+		o : list of str
+			A list of all possible observations
+		a : list of str
+			A list of all possible actions
+		"""
 		self.states = states
 		self.observations = o
 		self.actions = a
 
-	def pprint(self):
+	def __str__(self) -> str:
+		res = ""
 		for s in self.states:
-			s.pprint()
+			res += str(s)
+		return res
 
-	def successor(self,state_index,action,obs):
-		if not self.states[state_index].action_allowed(action):
+	def successor(self, state: int, action: str, obs: str) -> int:
+		"""
+		Returns the index of the state we reach after executing ``action`` in
+		``state`` and seeing ``obs``.
+
+		Parameters
+		----------
+		state : int
+			A state ID.
+		action : str
+			An action.
+		obs : str
+			An observation.
+
+		Returns
+		-------
+		int
+			A state ID.
+		"""
+		if not self.states[state].actionAllowed(action):
 			return None
 
-		for i in self.states[state_index].successors_action(action):
+		for i in self.states[state].successorsAction(action):
 			if self.states[i].observation == obs:
 				return i
 
+	def compatible(self, s1: int, s2: int, epsilon: float) -> bool:
+		"""
+		Checks if state `s1` and `s2` are ``epsilon`` compatible.
 
-	def compatible(self,s1,s2,alpha):
+		Parameters
+		----------
+		s1 : int
+			A state ID.
+		s2 : int
+			A state ID.
+		epsilon : float
+			A float between 0 and 1 (0 excluded).
+
+		Returns
+		-------
+		bool
+			True if s1 and s2 are epsilon compatible.
+		"""
 		if s1 == None or s2 == None:
 			return True
+		
 		if self.states[s1].observation != self.states[s2].observation:
 			return False
-		
+
 		for a in self.actions:
 			for o in self.observations:
-				if not self.hoeffding(s1,s2,a,o,alpha):
+				if not self.hoeffding(s1, s2, a, o, epsilon):
 					return False
-				if not self.compatible(self.successor(s1,a,o),self.successor(s2,a,o),alpha):
+				if not self.compatible(self.successor(s1, a, o), self.successor(s2, a, o), epsilon):
 					return False
-
 		return True
 				
-	def hoeffding(self,s1,s2,a,o,alpha):
-		i1 = self.successor(s1,a,o)
-		i2 = self.successor(s2,a,o)
+	def hoeffding(self, s1: int, s2: int, a: str, o: str, epsilon: float) -> bool:
+		"""
+		Checks if the distance of distributions of state ``s1`` and state
+		``s2`` for action ``a`` and observation ``o`` is within the Hoeffding
+		bound with parameter ``epsilon``. 
 
-		
+		Parameters
+		----------
+		s1 : int
+			A state ID.
+		s2 : int
+			A state ID.
+		a : str
+			An action.
+		o : str
+			An observation.
+		epsilon : float
+			A float between 0 and 1 (0 excluded).			
+
+		Returns
+		-------
+		bool
+			True if the distance of distributions are in the Hoeffding bound.
+		"""
+		i1 = self.successor(s1, a, o)
+		i2 = self.successor(s2, a, o)
+
 		if i1 == None or i2 == None:
 			return True
 				
-		f1 = self.states[s1].get_transition_prob(a,i1)
+		f1 = self.states[s1].getTransitionProb(a, i1)
 		n1 = sum(self.states[s1].transitions[a][0])
-		f2 = self.states[s2].get_transition_prob(a,i2)
+		f2 = self.states[s2].getTransitionProb(a, i2)
 		n2 = sum(self.states[s2].transitions[a][0])
 
 		if n1*n2 == 0:
 			return True
 
-		return abs((f1/n1)-(f2/n2)) < (sqrt(1/n1)+sqrt(1/n2))*sqrt(log(2/alpha)/2)
+		return abs((f1/n1)-(f2/n2)) < (sqrt(1/n1)+sqrt(1/n2))*sqrt(log(2/epsilon)/2)
 
-	def find_predec(self,s):
+	def findPredec(self,s: int) -> list:
+		"""
+		Returns a list of pairs state-action (s',a) s.t., by executing action a
+		in state s', we can reach state ``s``.
+
+		Parameters
+		----------
+		s : int
+			A state ID.
+
+		Returns
+		-------
+		list
+			A list of pairs stateID-action.
+		"""
 		res = []
 		for i in range(len(self.states)):
-			for a in self.states[i].actions_allowed():
-				for j in self.states[i].successors_action(a):
+			for a in self.states[i].actionsAllowed():
+				for j in self.states[i].successorsAction(a):
 					if j == s:
 						res.append((i,a))
 		return res
 
-	def merge(self,s1,s2):
+	def merge(self,s1:int ,s2: int) -> None:
+		"""
+		Merges state ``s2`` into state ``s1``.
+
+		Parameters
+		----------
+		s1 : int
+			A state ID.
+		s2 : int
+			A state ID.
+		"""
 		#action = self.states[s2].label[-2]
 		if s1 == None or s2 == None:
 			return None
 
-		predec = self.find_predec(s2)
+		predec = self.findPredec(s2)
 		for sa in predec:
-			self.states[sa[0]].transition_change(sa[1],s2,s1)
+			self.states[sa[0]].transitionChange(sa[1],s2,s1)
 
-		self.states[s1].counter_add(self.states[s2].counter)
+		self.states[s1].counterAdd(self.states[s2].counter)
 		self.states[s2].counter = 0 #useless but meaningfull
 
-		for a in self.states[s2].actions_allowed():
+		for a in self.states[s2].actionsAllowed():
 			for o in self.observations:
 				succ2 = self.successor(s2,a,o)
 				if succ2 != None:
 					succ1 = self.successor(s1,a,o)
 					if succ1 != None:
 						self.merge(succ1,succ2)
-						#self.states[s1].transition_prob_add(a,succ1,self.states[s2].get_transition_prob(a,succ2))
-						#self.states[succ1].counter_add(self.states[succ2].counter)
+						#self.states[s1].transition_prob_add(a,succ1,self.states[s2].getTransitionProb(a,succ2))
+						#self.states[succ1].counterAdd(self.states[succ2].counter)
 						#self.states[succ2].counter = 0 #useless but meaningfull
 					else:
-						self.states[s1].transitions_add(a,self.states[s2].get_transition_prob(a,succ2),succ2)
+						self.states[s1].transitionsAdd(a,self.states[s2].getTransitionProb(a,succ2),succ2)
 
-	def run_seq(self,seq):
+	def runSeq(self,seq:list) -> bool:
+		"""
+		Checks if the IOFTPA can generate the given trace ``seq``.
+
+		Parameters
+		----------
+		seq : list
+			A trace, i.e. a list of alternating action-observation.
+
+		Returns
+		-------
+		bool
+			_description_
+		"""
 		s_current = 0
 		i_current = 0
 		path = [s_current]
 		while i_current < len(seq):
 			f = True
-			for s in self.states[s_current].successors_action(seq[i_current]):
+			for s in self.states[s_current].successorsAction(seq[i_current]):
 				if self.states[s].observation == seq[i_current+1]:
 					s_current = s
 					path.append(s_current)
@@ -172,10 +384,23 @@ class IOFTPA:
 		return True
 
 
-	def cleanMDP(self,red):
+	def cleanMDP(self,red: list) -> MDP:
+		"""
+		Returns a MDP built from a subset of states of this IOFTPA.
+
+		Parameters
+		----------
+		red : list
+			A list of state IDs.
+
+		Returns
+		-------
+		MDP
+			An MDP.
+		"""
 		states = []
 		for i in range(len(red)):
-			self.states[red[i]].set_id(i)
+			self.states[red[i]].setId(i)
 
 		for i in red:
 			dic = self.states[i].transitions
@@ -186,90 +411,56 @@ class IOFTPA:
 					dic[a][0][j] /= tot
 					dic[a][2].append(self.states[dic[a][1][j]].observation)
 					dic[a][1][j] = self.states[dic[a][1][j]].id
-			states.append(MDP_state(dic))
+			states.append(MDP_state(dic, len(states)))
 		return MDP(states,0)
 
 
 
 class IOAlergia:
-
+	"""
+	Class for an  IOAlergia algorithm.
+	This algorithm is described here:
+	https://arxiv.org/pdf/1212.3873.pdf
+	"""
 	def __init__(self):
-		"""
-		Given a set of seq of observations return the MCGT learned by ALERGIA
-		sample = [[seq1,seq2,...],[val1,val2,...]]
-		all seq have same length
-		"""
 		None
 		
-	def initialize(self,sample,alpha,actions=None,observations=None):
+	def _initialize(self,sample,alpha,actions,observations):
 		pass
 		self.alpha = alpha
 		self.sample = sample
 
-
-		if actions == None or observations == None:
-			self.observations = []
-			self.actions = []
-			for seq in sample[0]:
-				for i in range(1,len(seq),2):
-					if observations == None:
-						if not seq[i] in self.observations:
-							self.observations.append(seq[i])
-					if actions == None:
-						if not seq[i-1] in self.actions:
-							self.actions.append(seq[i-1])
-		
-		if actions != None:
-			self.actions = actions
-		if observations != None:
-			self.observations = observations
+		self.actions = actions
+		self.observations = observations
 
 		self.actions.sort()
 		self.observations.sort()
 		self.N = sum(sample[1])
 		self.n = len(sample[0][0])
-
-		self.t = self.buildIOFTPA()
+		self.t = self._buildIOFPTA()
 		self.a = self.t
 		
-	def buildIOFTPA(self):
+	def _buildIOFPTA(self):
 		states_lbl = [[]]
-
-		states = [IOFTPA_state("",self.N,[])]
-		
-		#states_transitions = [
-		#						state1: {action1: [[proba1,proba2,...],[state1,state2,...]], action2: [[proba1,proba2,...],[state1,state2,...]], ...},
-		#						state2: {action1: [[proba1,proba2,...],[state1,state2,...]], action2: [[proba1,proba2,...],[state1,state2,...]], ...},
-		#
-		#						...
-		#					  ]
-
-		states_transitions = []
-
+		states = [IOFPTA_state("",self.N,[])]
 		#init states_lbl and states_counter
 		for i in range(0,self.n,2):
 			for seq in range(len(self.sample[0])):
 				if not self.sample[0][seq][:i+2] in states_lbl:
 					states_lbl.append(self.sample[0][seq][:i+2])
-					states.append( IOFTPA_state(self.sample[0][seq][i+1], self.sample[1][seq], self.sample[0][seq][:i+2]))
+					states.append( IOFPTA_state(self.sample[0][seq][i+1], self.sample[1][seq], self.sample[0][seq][:i+2]))
 				else:
-					states[states_lbl.index(self.sample[0][seq][:i+2])].counter_add(self.sample[1][seq])
-
+					states[states_lbl.index(self.sample[0][seq][:i+2])].counterAdd(self.sample[1][seq])
 		#sorting states
 		states_lbl.sort()
 		for s in states:
-			s.set_id(states_lbl.index(s.label))
-	
+			s.setId(states_lbl.index(s.label))
 		states_sorted = [None]*len(states)	
 		for s in states:
 			states_sorted[s.id] = s
-
-
 		#init states_transitions
 		for s1 in range(len(states_sorted)):
-			
 			len_s1 = len(states_sorted[s1].label)
-			
 			s2 = s1 + 1
 			while s2 < len(states_sorted):
 				if len(states_sorted[s2].label) < len_s1 + 2: # too short
@@ -280,14 +471,30 @@ class IOAlergia:
 					s2 += 1
 				else: # OK
 					act = states_sorted[s2].label[-2]
-					states_sorted[s1].transitions_add(act, states_sorted[s2].counter, s2)
+					states_sorted[s1].transitionsAdd(act, states_sorted[s2].counter, s2)
 					s2 += 1
 
-		return IOFTPA(states_sorted,self.observations,self.actions)
+		return IOFPTA(states_sorted,self.observations,self.actions)
 
-	def learn(self,sample,alpha,actions=None,observations=None):
+	def fit(self,sample:list,epsilon:float) -> MDP:
+		"""
+		Fits the model according to ``traces``.
 
-		self.initialize(sample,alpha,actions=None,observations=None)
+		Parameters
+		----------
+		sample : list
+			A trainig set.
+		epsilon : float
+			Espilon parameter for the compatibility test.
+			Should be between 0 and 1 (0 excluded).
+
+		Returns
+		-------
+		MDP
+			Fitted MDP.
+		"""
+		self.actions, self.observations = getActionsObservationsFromSequences(sample)
+		self._initialize(sample,epsilon,self.actions,self.observations)
 		red = [0]
 		blue = self.a.states[0].successors()
 
@@ -296,7 +503,7 @@ class IOAlergia:
 			merged = False
 			
 			for state_r in red:
-				if self.t.compatible(state_r,state_b,self.alpha):
+				if self.t.compatible(state_r,state_b,epsilon):
 					self.a.merge(state_r,state_b)
 					merged = True
 					break

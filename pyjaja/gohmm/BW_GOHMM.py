@@ -7,6 +7,8 @@ from numpy import log
 class BW_GOHMM(BW):
 	"""
 	class for general Baum-Welch algorithm on GOHMM.
+	This algorithm is described here:
+	http://www.inass.org/2020/2020022920.pdf
 	"""
 	def __init__(self):
 		super().__init__()

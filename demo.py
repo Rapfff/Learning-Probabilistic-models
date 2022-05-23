@@ -55,11 +55,12 @@ def test_GOHMM():
 	model.save("test_save.txt")
 	model = ja.loadGOHMM("test_save.txt")
 	print(model)
-	s = model.generateSet(100,1/2,"geo",6)
-	m3 = ja.BW_GOHMM().fit(s,nb_states=5,random_initial_state=True)
+	training_set = model.generateSet(100,1/2,"geo",6)
+	test_set = model.generateSet(1000,1/2,"geo",6)
+	m3 = ja.BW_GOHMM().fit(training_set,nb_states=5,random_initial_state=True)
 	print(m3)
-	print(m3.logLikelihood(s))
-	print(model.logLikelihood(s))
+	print(m3.logLikelihood(test_set))
+	print(model.logLikelihood(test_set))
 
 def test_MDP():
 	def modelMDP_bigstreet(p=0.75):
@@ -73,11 +74,15 @@ def test_MDP():
 	model = modelMDP_bigstreet()
 	print(model)
 	scheduler = ja.UniformScheduler(model.actions())
-	s = model.generateSet(100,10,scheduler)
-	m1 = ja.Active_BW_MDP().fit(s,0,40,10,nb_states=5,random_initial_state=True)
-	print(m1)
-	print(m1.logLikelihood(s))
-	print(model.logLikelihood(s))
+	training_set = model.generateSet(100,10,scheduler)
+	test_set = model.generateSet(100,10,scheduler)
+	#m1 = ja.Active_BW_MDP().fit(training_set,lr="dynamic",nb_iterations=40,nb_sequences=10,nb_states=5,random_initial_state=True)
+	#print(m1)
+	m2 = ja.IOAlergia().fit(training_set, 0.1)
+	print(m2)
+	print(model.logLikelihood(test_set))
+	#print(m1.logLikelihood(test_set))
+	print(m2.logLikelihood(test_set))
 
 
 test_MDP()

@@ -6,6 +6,8 @@ from numpy import log
 class BW_HMM(BW):
 	"""
 	class for general Baum-Welch algorithm on HMM.
+	This algorithm is described here:
+	https://web.ece.ucsb.edu/Faculty/Rabiner/ece259/Reprints/tutorial%20on%20hmm%20and%20applications.pdf
 	"""
 	def __init__(self):
 		super().__init__()
