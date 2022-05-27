@@ -1,5 +1,4 @@
 from random import random
-from numpy.random import geometric
 from scipy.stats import norm
 from numpy import nditer
 
@@ -186,15 +185,18 @@ def getAlphabetFromSequences(sequences: list) -> list:
 		list of observations.
 	"""
 	sequences = sequences[0]
-	if type(sequences) == str:
-		return list(set(sequences))
-	else:
-		observations = []
+	observations = []
+	if type(sequences[0][0]) == float: # timed sequences
 		for sequence_obs in sequences:
+			for x in range(1,len(sequence_obs),2):
+				if sequence_obs[x] not in observations:
+					observations.append(sequence_obs[x])	
+	else:
+		for sequence_obs in sequences: # non-timed sequences
 			for x in sequence_obs:
 				if x not in observations:
 					observations.append(x)
-		return observations
+	return observations
 
 def getActionsObservationsFromSequences(sequences: list ) -> list:
 	"""

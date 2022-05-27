@@ -104,8 +104,15 @@ def test_CTMC():
 	print(model)
 	st = model.generateSet(100,10, timed=True)
 	su = model.generateSet(100,10, timed=False)
+	m1 = ja.BW_CTMC().fit(st,nb_states=4,self_loop=False)
+	m2 = ja.BW_CTMC().fit(su,nb_states=4,self_loop=False)
 	print(model.logLikelihood(st))
+	print(m1.logLikelihood(st))
+	print(m2.logLikelihood(st))
 	print(model.logLikelihood(su))
+	print(m1.logLikelihood(su))
+	print(m2.logLikelihood(su))
+	
 	
 test_CTMC()
 remove("test_save.txt")

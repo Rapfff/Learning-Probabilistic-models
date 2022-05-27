@@ -2,6 +2,9 @@ from math import  log
 from .tools import resolveRandom
 from numpy import array, append, dot, zeros, vsplit
 from numpy.random import geometric
+from multiprocessing import cpu_count, Pool
+from sys import platform
+from math import log
 
 class Model_state:
 	"""
@@ -252,6 +255,26 @@ class Model:
 		res += '\n'
 		return res
 
+	def logLikelihood(self,sequences: list) -> float:
+		"""
+		Compute the average loglikelihood of a set of sequences if
+		multiprocessing is disable.
+
+		Parameters
+		----------
+		sequences: list containing one list of str and one list of int
+			set of sequences of observations.
+		
+		Returns
+		-------
+		output: float
+			loglikelihood of ``sequences`` under this model.
+		"""
+		if platform != "win32":
+			return self._logLikelihood_multiproc(sequences)
+		else:
+			return self._logLikelihood_oneproc(sequences)
+
 	def _updateAlphaMatrix(self,sequence: list,
 						   common: int,
 						   alpha_matrix: list) -> array:
@@ -320,9 +343,10 @@ class Model:
 		alpha_matrix = append(init_arr,zero_arr).reshape(len_seq+1,nb_states)
 		return alpha_matrix
 
-	def logLikelihood(self,sequences: list) -> float:
+	def _logLikelihood_oneproc(self,sequences: list) -> float:
 		"""
-		Compute the average loglikelihood of a set of sequences.
+		Compute the average loglikelihood of a set of sequences if
+		multiprocessing is disable.
 
 		Parameters
 		----------
@@ -354,3 +378,38 @@ class Model:
 				loglikelihood += log(alpha_matrix[-1].sum()) * times
 
 		return loglikelihood / sum(sequences[1])
+
+	def _logLikelihood_multiproc(self, sequences: list) -> float:
+		p = Pool(processes = cpu_count()-1)
+		tasks = []
+		for seq,times in zip(sequences[0],sequences[1]):
+			tasks.append(p.apply_async(self._computeAlphas, [seq, times,]))
+		temp = [res.get() for res in tasks if res.get() != False]
+		return sum(temp)/sum(sequences[1])
+
+	def _computeAlphas(self,sequence: list, times: int) -> float:
+		"""
+		Compute the alpha values for ``sequence``.
+
+		Parameters
+		----------
+		sequence: list of str
+			Sequence of observations.
+		times: int
+			Number of times this sequence appears in the sample.
+
+		Returns
+		-------
+		float
+			loglikelihood of ``sequence`` multiplied by ``times``.
+		"""
+		nb_states = len(self.states)
+		len_seq = len(sequence)
+		prev_arr = array(self.initial_state)
+		for k in range(len_seq):
+			new_arr = zeros(nb_states)
+			for s in range(nb_states):
+				p = array([self.tau(ss,s,sequence[k]) for ss in range(nb_states)])
+				new_arr[s] = dot(prev_arr,p)
+			prev_arr = new_arr
+		return log(prev_arr.sum())*times

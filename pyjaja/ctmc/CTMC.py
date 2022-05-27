@@ -6,6 +6,9 @@ from ..mc.MC import MC, MC_state
 from ..base.Model import Model
 from math import exp, log
 from random import randint
+from numpy import array, zeros, dot
+from sys import platform
+from multiprocessing import cpu_count, Pool
 class CTMC_state:
 	"""
 	Class for a CTMC state
@@ -23,7 +26,7 @@ class CTMC_state:
 		idd : int
 			State ID.
 		"""
-		if min(lambda_matrix[0]) <= 0.0:
+		if min(lambda_matrix[0]) < 0.0:
 			print("Error: all rates should be strictly positive.")
 		self.lambda_matrix = lambda_matrix
 		self.id = idd
@@ -273,27 +276,33 @@ class CTMC(Model):
 			c += 1
 		return output
 	
-	def proba_one_timed_seq(self,sequence) -> float: #TODO
-		alpha_matrix = [[self.initial_state[i]] for i in range(len(self.states))]
-		for k in range(0,len(sequence),2):
-			for s in range(len(self.states)):
-				summ = 0.0
-				for ss in range(len(self.states)):
-					p = self.l(ss,s,sequence[k+1])*exp(-self.e(ss)*sequence[k])
-					summ += alpha_matrix[ss][k//2]*p
-				alpha_matrix[s].append(summ)
-		res = sum([alpha_matrix[s][-1] for s in range(len(self.states))])
-		return res
+	def _computeAlphas(self, sequence: list, times: int) -> float:
+		obs_seq   = [sequence[i] for i in range(1,len(sequence),2)]
+		times_seq = [sequence[i] for i in range(0,len(sequence),2)]
+		nb_states = len(self.states)
+		len_seq = len(obs_seq)
+		prev_arr = array(self.initial_state)
+		for k in range(len_seq):
+			new_arr = zeros(nb_states)
+			for s in range(nb_states):
+				p = array([self.l(ss,s,obs_seq[k])*exp(-self.e(ss)*times_seq[k]) for ss in range(nb_states)])
+				new_arr[s] = dot(prev_arr,p)
+			prev_arr = new_arr
+		return log(prev_arr.sum())*times
 
-	def logLikelihood(self,traces) -> float: #TODO
+	def logLikelihood(self,traces) -> float:
 		if type(traces[0][0][0]) == str: # non-timed traces
-			res = super().logLikelihood(traces)
+			return super().logLikelihood(traces)
 		else: # timed traces
-			res = 0.0
-			for sequence, times in zip(traces[0],traces[1]):
-				proba_seq = self.proba_one_timed_seq(sequence)
-				res += log(proba_seq)*times
-		return res/sum(traces[1])
+			if platform != "win32":
+				p = Pool(processes = cpu_count()-1)
+				tasks = []
+				for seq,times in zip(traces[0],traces[1]):
+					tasks.append(p.apply_async(self._computeAlphas, [seq, times,]))
+				temp = [res.get() for res in tasks if res.get() != False]
+			else:
+				temp = [self._computeAlphas(traces[0][i],traces[1][i]) for i in range(len(traces[0]))]
+			return sum(temp)/sum(traces[1])
 
 	def __str__(self) -> str:
 		res = self.name+'\n'
@@ -409,7 +418,9 @@ def asynchronousComposition(m1: CTMC, m2: CTMC, name: str='unknown_composition',
 
 	return CTMC(new_states,initial_state,name)
 
-def modelCTMC_random(number_states: int, alphabet: list, min_exit_rate_time : int, max_exit_rate_time: int, self_loop: bool = True) -> CTMC:
+def CTMC_random(number_states: int, alphabet: list, min_exit_rate_time : int,
+				max_exit_rate_time: int, self_loop: bool = True,
+				random_initial_state: bool=False) -> CTMC:
 	"""
 	Generates a random CTMC. All the rates will be between 0 and 1.
 	All the exit rates will be integers.
@@ -427,6 +438,9 @@ def modelCTMC_random(number_states: int, alphabet: list, min_exit_rate_time : in
 	self_loop: bool, optional
 		Wether or not there will be self loop in the output model.
 		Default is True.
+	random_initial_state: bool, optional
+		If set to True we will start in each state with a random probability, otherwise we will always start in state 0.
+		Default is False.
 
 	Returns
 	-------
@@ -448,6 +462,9 @@ def modelCTMC_random(number_states: int, alphabet: list, min_exit_rate_time : in
 	states = []
 	for i in range(number_states):
 		av_waiting_time = randint(min_exit_rate_time,max_exit_rate_time)
-		states.append(CTMC_state([[p/av_waiting_time for p in randomProbabilities(len(obs))],s[i],obs]))
-
-	return CTMC(states,0,"CTMC_random_"+str(number_states)+"_states")
+		states.append(CTMC_state([[p/av_waiting_time for p in randomProbabilities(len(obs))],s[i],obs],i))
+	if random_initial_state:
+		init = randomProbabilities(number_states)
+	else:
+		init = 0
+	return CTMC(states,init,"CTMC_random_"+str(number_states)+"_states")

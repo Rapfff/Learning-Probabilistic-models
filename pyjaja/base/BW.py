@@ -101,7 +101,7 @@ class BW:
 		else:
 			return [self._processWork(seq, times) for seq,times in zip(traces[0],traces[1])]
 
-	def fit(self,traces: list,initial_model,output_file: str=None,epsilon: float=0.01, pp: str=''):
+	def fit(self,traces: list,initial_model,output_file: str,epsilon: float, pp: str):
 		"""
 		Fits the model according to ``traces``.
 
@@ -111,16 +111,16 @@ class BW:
 			training set.
 		initial_model : Model
 			first hypothesis.
-		output_file : str, optional
+		output_file : str
 			if set path file of the output model. Otherwise the output model
 			will not be saved into a text file.
-		epsilon : float, optional
+		epsilon : float
 			the learning process stops when the difference between the
 			loglikelihood of the training set under the two last hypothesis is
 			lower than ``epsilon``. The lower this value the better the output,
-			but the longer the running time. By default 0.01.
-		pp : str, optional
-			Will be printed at each iteration. By default ''
+			but the longer the running time.
+		pp : str
+			Will be printed at each iteration.
 
 		Returns
 		-------

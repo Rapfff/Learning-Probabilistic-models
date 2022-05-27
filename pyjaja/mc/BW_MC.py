@@ -67,10 +67,10 @@ class BW_MC(BW):
 				den[s] = dot(alpha_matrix[s][:-1]*beta_matrix[s][:-1],times/proba_seq).sum()
 				c = 0
 				for ss in range(self.nb_states):
+					p = array([self.h_tau(s,ss,o) for o in sequence])
 					for obs in self.alphabet:
 						arr_dirak = [1.0 if t == obs else 0.0 for t in sequence]
-						p = array([self.h_tau(s,ss,o) if o == obs else 0.0 for o in sequence])
-						num[s,c] = dot(alpha_matrix[s][:-1]*arr_dirak*beta_matrix[ss][1:]*p,times/proba_seq).sum()
+						num[s,c] = dot(alpha_matrix[s][:-1]*arr_dirak*p*beta_matrix[ss][1:],times/proba_seq).sum()
 						c += 1
 			####################
 			num_init = alpha_matrix.T[0]*beta_matrix.T[0]*times/proba_seq
@@ -79,28 +79,26 @@ class BW_MC(BW):
 		return False
 
 	def _generateHhat(self,temp):
-		den = zeros(self.nb_states)
-		tau = zeros(shape=(self.nb_states,self.nb_states*len(self.alphabet)))
-		lst_den = array([i[0] for i in temp]).T
-		lst_num = array([i[1] for i in temp]).T.reshape(self.nb_states*self.nb_states*len(self.alphabet),len(temp))
+		den = array([i[0] for i in temp]).sum(axis=0)
+		num = array([i[1] for i in temp]).sum(axis=0)
 		lst_proba=array([i[2] for i in temp])
 		lst_times=array([i[3] for i in temp])
 		lst_init =array([i[4] for i in temp]).T
 
 		currentloglikelihood = dot(log(lst_proba),lst_times)
 
-		for s in range(self.nb_states):
-			den[s] = lst_den[s].sum()
-			for x in range(self.nb_states*len(self.alphabet)):
-				tau[s,x] = lst_num[x*self.nb_states+s].sum()
 		list_sta = []
 		for i in range(self.nb_states):
 			for _ in self.alphabet:
 				list_sta.append(i)
 		list_obs = self.alphabet*self.nb_states
 		new_states = []
+
 		for s in range(self.nb_states):
-			l = [ tau[s]/den[s] , list_sta, list_obs ]
+			if den[s] != 0.0:
+				l = [ num[s]/den[s] , list_sta, list_obs ]
+			else:
+				l = self.h.states[s].transition_matrix
 			new_states.append(MC_state(l,s))
 		initial_state = [lst_init[s].sum()/lst_init.sum() for s in range(self.nb_states)]
 		return [MC(new_states,initial_state),currentloglikelihood]
