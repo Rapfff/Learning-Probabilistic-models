@@ -1,4 +1,3 @@
-#CONTINUOUS TIME MARKOV CHAIN
 from numpy.random import exponential
 from ast import literal_eval
 from ..base.tools import resolveRandom, correct_proba, randomProbabilities
