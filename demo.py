@@ -112,7 +112,8 @@ def test_CTMC():
 	print(model.logLikelihood(su))
 	print(m1.logLikelihood(su))
 	print(m2.logLikelihood(su))
-	
-	
+
+
+print("CTMC")
 test_CTMC()
 remove("test_save.txt")

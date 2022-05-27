@@ -412,4 +412,6 @@ class Model:
 				p = array([self.tau(ss,s,sequence[k]) for ss in range(nb_states)])
 				new_arr[s] = dot(prev_arr,p)
 			prev_arr = new_arr
+		if prev_arr.sum() == 0.0:
+			return 0.0
 		return log(prev_arr.sum())*times

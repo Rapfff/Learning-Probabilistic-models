@@ -244,7 +244,7 @@ class Active_BW_MDP(BW_MDP):
 			tasks = []
 			for seq,times in zip(traces[0],traces[1]):
 				tasks.append(p.apply_async(self._computeProbas, [seq, times,]))
-			temp = array([res.get() for res in tasks if res.get() != False])
+			temp = array([res.get() for res in tasks])
 		else:
 			temp = array([self._computeProbas(seq, times) for seq,times in zip(traces[0],traces[1])])
 		temp = temp.sum(axis=0)
