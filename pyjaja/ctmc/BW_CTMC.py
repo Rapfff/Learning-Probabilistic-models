@@ -145,7 +145,7 @@ class BW_CTMC(BW):
 		return super().computeBetas(sequence)
 
 
-	def fit(self, traces: list, initial_model: MC=None, nb_states: int=None,
+	def fit(self, traces: list, initial_model: CTMC=None, nb_states: int=None,
 			random_initial_state: bool=False, min_exit_rate_time : int=1.0,
 			max_exit_rate_time: int=10.0, self_loop: bool = True,
 			output_file: str=None, epsilon: float=0.01, pp: str=''):
@@ -169,13 +169,13 @@ class BW_CTMC(BW):
 			Should be set if ``initial_model`` is not set.
 			Default is False.
 		min_exit_rate_time: int, optional
-			Minimum exit rate for the states.
+			Minimum exit rate for the states in the first hypothesis.
 			Default is 1.0.
 		max_exit_rate_time: int, optional
-			Minimum exit rate for the states.
+			Minimum exit rate for the states in the first hypothesis.
 			Default is 10.0.
 		self_loop: bool, optional
-			Wether or not there will be self loop in the output model.
+			Wether or not there will be self loop in the first hypothesis.
 			Default is True.
 		output_file : str, optional
 			if set path file of the output model. Otherwise the output model
@@ -230,22 +230,21 @@ class BW_CTMC(BW):
 		for s in range(self.nb_states):
 			den = zeros(self.nb_states)
 			num = zeros(shape=(self.nb_states,self.nb_states*len(self.alphabet)))
-			
-			for s in range(self.nb_states):
+
+			if timed:
+				den[s] = dot(alpha_matrix[s][:-1]*beta_matrix[s][:-1]*times_seq,times/proba_seq).sum()
+			else:
+				den[s] = dot(alpha_matrix[s][:-1]*beta_matrix[s][:-1],times/proba_seq).sum()
+			c = 0
+			for ss in range(self.nb_states):
 				if timed:
-					den[s] = dot(alpha_matrix[s][:-1]*beta_matrix[s][:-1]*times_seq,times/proba_seq).sum()
+					p = array([self.h_l(s,ss,o)*exp(-self.h_e(s)*t) for o,t in zip(obs_seq,times_seq)])
 				else:
-					den[s] = dot(alpha_matrix[s][:-1]*beta_matrix[s][:-1],times/proba_seq).sum()
-				c = 0
-				for ss in range(self.nb_states):
-					if timed:
-						p = array([self.h_l(s,ss,o)*exp(-self.h_e(s)*t) for o,t in zip(obs_seq,times_seq)])
-					else:
-						p = array([self.h_l(s,ss,o) for o in obs_seq])
-					for obs in self.alphabet:
-						arr_dirak = [1.0 if o == obs else 0.0 for o in obs_seq]
-						num[s,c] = dot(alpha_matrix[s][:-1]*arr_dirak*beta_matrix[ss][1:]*p,times/proba_seq).sum()
-						c += 1
+					p = array([self.h_l(s,ss,o) for o in obs_seq])
+				for obs in self.alphabet:
+					arr_dirak = [1.0 if o == obs else 0.0 for o in obs_seq]
+					num[s,c] = dot(alpha_matrix[s][:-1]*arr_dirak*beta_matrix[ss][1:]*p,times/proba_seq).sum()
+					c += 1
 		####################			
 		num_init = alpha_matrix.T[0]*beta_matrix.T[0]*times/proba_seq
 		####################
