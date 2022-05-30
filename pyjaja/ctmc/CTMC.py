@@ -1,4 +1,3 @@
-#CONTINUOUS TIME MARKOV CHAIN
 from numpy.random import exponential
 from ast import literal_eval
 from ..base.tools import resolveRandom, correct_proba, randomProbabilities
@@ -276,7 +275,7 @@ class CTMC(Model):
 			c += 1
 		return output
 	
-	def _computeAlphas(self, sequence: list, times: int) -> float:
+	def _computeAlphas_timed(self, sequence: list, times: int) -> float:
 		obs_seq   = [sequence[i] for i in range(1,len(sequence),2)]
 		times_seq = [sequence[i] for i in range(0,len(sequence),2)]
 		nb_states = len(self.states)
@@ -298,10 +297,10 @@ class CTMC(Model):
 				p = Pool(processes = cpu_count()-1)
 				tasks = []
 				for seq,times in zip(traces[0],traces[1]):
-					tasks.append(p.apply_async(self._computeAlphas, [seq, times,]))
+					tasks.append(p.apply_async(self._computeAlphas_timed, [seq, times,]))
 				temp = [res.get() for res in tasks if res.get() != False]
 			else:
-				temp = [self._computeAlphas(traces[0][i],traces[1][i]) for i in range(len(traces[0]))]
+				temp = [self._computeAlphas_timed(traces[0][i],traces[1][i]) for i in range(len(traces[0]))]
 			return sum(temp)/sum(traces[1])
 
 	def __str__(self) -> str:
