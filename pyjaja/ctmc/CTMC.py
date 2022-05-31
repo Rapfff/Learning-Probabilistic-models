@@ -413,7 +413,7 @@ def asynchronousComposition(m1: CTMC, m2: CTMC, name: str='unknown_composition',
 				o = [i+'1' for i in s1.lambda_matrix[2]] + [i+'2' for i in s2.lambda_matrix[2]]
 				
 			initial_state.append(m1.initial_state[i1]*m2.initial_state[i2])
-			new_states.append(CTMC_state([p,s,o]))
+			new_states.append(CTMC_state([p,s,o],i1*len(m2.states)+i2))
 
 	return CTMC(new_states,initial_state,name)
 

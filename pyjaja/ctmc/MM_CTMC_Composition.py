@@ -116,35 +116,51 @@ class MM_CTMC_Composition(BW_CTMC):
 		other = to_update%2 + 1
 		nb_states = self.nb_states_hs[to_update]
 		nb_states_other = self.nb_states_hs[other]
-
-		####################
 		den = zeros(nb_states)
 		num = zeros(shape=(nb_states,nb_states*len(self.alphabet)))
-		for v,u in enumerate(range(nb_states),range(nb_states_other)):
-			uv = self._getStateInComposition(v,to_update,u)
-			if self.disjoints_alphabet:
-				divider = self.hs[to_update].e(v)
-			else:
-				divider = self.hs[to_update].e(v) + self.hs[other].e(u)
-			if timed:
-				den[v] = dot(alpha_matrix[uv][:-1]*beta_matrix[uv][:-1]*times_seq,times/proba_seq).sum()
-			else:
-				den[v] = dot(alpha_matrix[uv][:-1]*beta_matrix[uv][:-1],times/proba_seq).sum()
-			c = 0
-			for vv in [i for i in range(nb_states) if i != v]:
-				uvv = self._getStateInComposition(vv,to_update,u)
-				if timed:
-					p = array([exp(-divider*t)*self.hs[to_update].l(v,vv,o)*self.hs[to_update].l(v,vv,o) for o,t in zip(obs_seq,times_seq)])
+		for v in range(nb_states):
+			for u in range(nb_states_other):
+				uv = self._getStateInComposition(v,to_update,u)
+				if self.disjoints_alphabet:
+					divider = self.hs[to_update].e(v)
 				else:
-					p = array([self.hs[to_update].l(v,vv,o) for o in obs_seq])
-				for obs in self.alphabets[to_update]:
-					arr_dirak = [1.0 if o == obs else 0.0 for o in obs_seq]
-					num[v,c] = dot(alpha_matrix[uv][:-1]*arr_dirak*beta_matrix[uvv][1:]*p,times/proba_seq).sum()
-					c += 1
+					divider = self.hs[to_update].e(v) + self.hs[other].e(u)
+				if timed:
+					den[v] += dot(alpha_matrix[uv][:-1]*beta_matrix[uv][:-1]*times_seq,times/proba_seq).sum()
+				else:
+					den[v] += dot(alpha_matrix[uv][:-1]*beta_matrix[uv][:-1],times/proba_seq).sum()
+				
+				for vv in [i for i in range(nb_states) if i != v]:
+					uvv = self._getStateInComposition(vv,to_update,u)
+					if timed:
+						p = array([exp(-divider*t)*self.hs[to_update].l(v,vv,o) for o,t in zip(obs_seq,times_seq)])
+					else:
+						p = array([self.hs[to_update].l(v,vv,o) for o in obs_seq])
+					c = 0
+					for obs in self.alphabets[to_update]:
+						arr_dirak = [1.0 if o == obs else 0.0 for o in obs_seq]
+						num[v,vv*len(self.alphabets[to_update])+c] += dot(alpha_matrix[uv][:-1]*arr_dirak*beta_matrix[uvv][1:]*p,times/proba_seq).sum()
+						c += 1
 		num_init = alpha_matrix.T[0]*beta_matrix.T[0]*times/proba_seq
 		return [den,num,num_init]
 
-	def computeAlphasBetas(self,obs_seq, times_seq):
+	def _computeAlphasBetas(self,obs_seq: list, times_seq: list=None) -> tuple:
+		"""
+		Computes the alpha and the beta matrix for a given a trace (timed or
+		not).
+
+		Parameters
+		----------
+		obs_seq : list of str
+			Sequence of observations.
+		times_seq : list of float, optional
+			Sequence of waiting times (omitted is the sequence is non-timed).
+
+		Returns
+		-------
+		tuple
+			The alpha matrix and the beta matrix.
+		"""
 		if not self.disjoints_alphabet:
 			return self.computeAlphas(obs_seq, times_seq), self.computeBetas(obs_seq, times_seq)
 		else:
@@ -170,8 +186,7 @@ class MM_CTMC_Composition(BW_CTMC):
 			timed = False
 		else:
 			timed = True
-		alpha_matrix, beta_matrix = self.computeAlphasBetas(obs_seq,times_seq)
-
+		alpha_matrix, beta_matrix = self._computeAlphasBetas(obs_seq,times_seq)
 		proba_seq = alpha_matrix.T[-1].sum()
 		if proba_seq <= 0.0:
 			return False
@@ -202,10 +217,10 @@ class MM_CTMC_Composition(BW_CTMC):
 		new_states = []
 		for s in range(nb_states):
 			if den[s] != 0.0:
-				l = [ num[s]/den[s] , list_sta, list_obs ]
+				l = [ (num[s]/den[s]).tolist() , list_sta, list_obs ]
 				l = _removeZeros(l)		
 			else:
-				l = self.hs[to_update].states[s].transition_matrix		 
+				l = self.hs[to_update].states[s].lambda_matrix		 
 			new_states.append(CTMC_state(l,s))
 
 		initial_state = [lst_init[s].sum()/lst_init.sum() for s in range(nb_states)]

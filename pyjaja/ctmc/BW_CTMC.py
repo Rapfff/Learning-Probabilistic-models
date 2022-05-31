@@ -205,7 +205,22 @@ class BW_CTMC(BW):
 		return super().fit(traces, initial_model, output_file, epsilon, pp)
 
 
-	def _splitTime(self,sequence: list) -> tuple:
+	def splitTime(self,sequence: list) -> tuple:
+		"""
+		Given a trace it returns a sequence of observation and a sequence of
+		waiting times. If the given trace is non-timed the output waiting time
+		sequence is ``None``.
+
+		Parameters
+		----------
+		sequence : list
+			_description_
+
+		Returns
+		-------
+		tuple
+			_description_
+		"""
 		if type(sequence[0]) == float and type(sequence[1]) == str:
 			times_seq = [sequence[i] for i in range(0,len(sequence),2)]
 			obs_seq   = [sequence[i] for i in range(1,len(sequence),2)]
@@ -215,7 +230,7 @@ class BW_CTMC(BW):
 		return (times_seq,obs_seq)
 
 	def _processWork(self,sequence: list, times: int):
-		times_seq, obs_seq = self._splitTime(sequence)
+		times_seq, obs_seq = self.splitTime(sequence)
 		if times_seq == None:
 			timed = False
 		else:
@@ -270,7 +285,7 @@ class BW_CTMC(BW):
 			if den[s] != 0.0:
 				l = [ num[s]/den[s] , list_sta, list_obs ]
 			else:
-				l = self.h.states[s].transition_matrix
+				l = self.h.states[s].lambda_matrix
 			new_states.append(CTMC_state(l,s))
 		initial_state = [lst_init[s].sum()/lst_init.sum() for s in range(self.nb_states)]
 		return [CTMC(new_states,initial_state),currentloglikelihood]

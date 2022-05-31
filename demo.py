@@ -3,6 +3,8 @@ from random import seed
 from datetime import datetime
 from os import remove
 
+from pyjaja.ctmc.CTMC import asynchronousComposition
+
 def test_HMM():
 	def modelHMM4():
 		h_s0 = ja.HMM_state([[0.4,0.6],['x','y']],[[0.5,0.5],[1,2]],0)
@@ -91,12 +93,6 @@ def test_CTMC():
 		s2 = ja.CTMC_state([[0.5/4,0.2/4,0.3/4],[1,3,3], ['b'+suffix,'g'+suffix,'r'+suffix]],2)
 		s3 = ja.CTMC_state([[0.95/2,0.04/2,0.01/2],[0,0,2], ['r'+suffix,'g'+suffix,'r'+suffix]],3)
 		return ja.CTMC([s0,s1,s2,s3],0,"CTMC2")
-	def modelCTMC3(suffix=''):
-		s0 = ja.CTMC_state([[0.65/4,0.35/4],[1,3],['g'+suffix,'b'+suffix]],0)
-		s1 = ja.CTMC_state([[0.6/3,0.1/3,0.3/3],[0,3,3],['g'+suffix,'g'+suffix,'b'+suffix]],1)
-		s2 = ja.CTMC_state([[0.25/5,0.6/5,0.15/5],[0,0,1],['r'+suffix,'g'+suffix,'b'+suffix]],2)
-		s3 = ja.CTMC_state([[1.0/10],[2],['g'+suffix]],3)
-		return ja.CTMC([s0,s1,s2,s3],0,"CTMC3")
 	print("\nCTMC")
 	model = modelCTMC2()
 	model.save("test_save.txt")
@@ -106,14 +102,28 @@ def test_CTMC():
 	su = model.generateSet(100,10, timed=False)
 	m1 = ja.BW_CTMC().fit(st,nb_states=4,self_loop=False)
 	m2 = ja.BW_CTMC().fit(su,nb_states=4,self_loop=False)
-	print(model.logLikelihood(st))
-	print(m1.logLikelihood(st))
-	print(m2.logLikelihood(st))
-	print(model.logLikelihood(su))
-	print(m1.logLikelihood(su))
-	print(m2.logLikelihood(su))
 
+def test_CTMC_Composition():
+	def modelCTMC2(suffix=''):
+		s0 = ja.CTMC_state([[0.3/5,0.5/5,0.2/5],[1,2,3], ['r'+suffix,'g'+suffix,'r'+suffix]],0)
+		s1 = ja.CTMC_state([[0.08,0.25,0.6,0.07],[0,2,2,3], ['r'+suffix,'r'+suffix,'g'+suffix,'b'+suffix]],1)
+		s2 = ja.CTMC_state([[0.5/4,0.2/4,0.3/4],[1,3,3], ['b'+suffix,'g'+suffix,'r'+suffix]],2)
+		s3 = ja.CTMC_state([[0.95/2,0.04/2,0.01/2],[0,0,2], ['r'+suffix,'g'+suffix,'r'+suffix]],3)
+		return ja.CTMC([s0,s1,s2,s3],0,"CTMC2")
+	def modelCTMC3(suffix=''):
+		s0 = ja.CTMC_state([[0.65/4,0.35/4],[1,3],['g'+suffix,'b'+suffix]],0)
+		s1 = ja.CTMC_state([[0.6/3,0.1/3,0.3/3],[0,3,3],['g'+suffix,'g'+suffix,'b'+suffix]],1)
+		s2 = ja.CTMC_state([[0.25/5,0.6/5,0.15/5],[0,0,1],['r'+suffix,'g'+suffix,'b'+suffix]],2)
+		s3 = ja.CTMC_state([[1.0/10],[2],['g'+suffix]],3)
+		return ja.CTMC([s0,s1,s2,s3],0,"CTMC3")
+	print("\nCTMC")
+	print("Joint")
+	model = asynchronousComposition(modelCTMC2(),modelCTMC3())
+	st = model.generateSet(100,10, timed=True)
+	su = model.generateSet(100,10, timed=False)
+	m1,m2 = ja.MM_CTMC_Composition().fit(st,nb_states_1=4,nb_states_2=4)
+	m3,_ = ja.MM_CTMC_Composition().fit(su,nb_states_1=4,initial_model_2=modelCTMC3(),to_update=1)
+	print(m3)
 
-print("CTMC")
-test_CTMC()
+test_CTMC_Composition()
 remove("test_save.txt")

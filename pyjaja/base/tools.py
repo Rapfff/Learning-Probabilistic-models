@@ -1,6 +1,7 @@
 from random import random
 from scipy.stats import norm
 from numpy import nditer
+from ast import literal_eval
 
 
 def normpdf(x: float, params: list, variation:float = 0.01) -> float:
@@ -48,16 +49,11 @@ def loadSet(file_path:str , float_obs: bool = False) -> list:
 	f = open(file_path,'r')
 	l = f.readline()
 	while l:
-		l = l.replace("'",'')
-		l = l.replace(' ','')
-		res_set[0].append(l[1:-2].split(','))
+		res_set[0].append(literal_eval(l[:-1]))
 		l = f.readline()
 		res_set[1].append(int(l[:-1]))
 		l = f.readline()
 	f.close()
-	if float_obs:
-		for i in range(len(res_set[0])):
-			res_set[0][i] = [float(j) for j in res_set[0][i]]
 	return res_set
 
 def saveSet(t_set: list, file_path: str) -> None:
